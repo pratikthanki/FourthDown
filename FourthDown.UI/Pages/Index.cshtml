@@ -1,0 +1,20 @@
+﻿@page
+@using FourthDown.UI.Components
+@model IndexModel
+@{
+    ViewData["Title"] = "Home page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Welcome</h1>
+    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+</div>
+
+@(await Html.RenderComponentAsync<PlayByPlay>(RenderMode.Server))
+@(await Html.RenderComponentAsync<WinProbability>(RenderMode.Server))
+
+<script src="_framework/blazor.server.js"></script>
+<script src="_content/ChartJs.Blazor/moment-with-locales.min.js" type="text/javascript" language="javascript"></script>
+<script src="_content/ChartJs.Blazor/Chart.min.js" type="text/javascript" language="javascript"></script>
+<script src="_content/ChartJs.Blazor/ChartJsBlazorInterop.js" type="text/javascript" language="javascript"></script>
+<link rel="stylesheet" href="_content/ChartJs.Blazor/ChartJSBlazor.css" />
