@@ -1,0 +1,36 @@
+@using FourthDown.UI.Services
+@inject JsonPlayByPlayService PlayByPlayService
+
+<h3>PlayByPlay</h3>
+
+<div class="play-table">
+    <table>
+        <tr>
+            <th>PlayId</th>
+            <th>GameId</th>
+            <th>Quarter</th>
+            <th>QuarterEnd</th>
+            <th>HomeTeam</th>
+            <th>AwayTeam</th>
+            <th>HomeWinProb</th>
+            <th>AwayWinProb</th>
+            <th>HomePoints</th>
+            <th>AwayPoints</th>
+        </tr>
+        @foreach (var play in PlayByPlayService.GetGameWinProbability())
+        {
+            <tr>
+            <td>@play.PlayId</td>
+            <td>@play.GameId</td>
+            <td>@play.Qtr</td>
+            <td>@play.QuarterEnd</td>
+            <td>@play.HomeTeam</td>
+            <td>@play.AwayTeam</td>
+            <td>@play.HomeWp</td>
+            <td>@play.AwayWp</td>
+            <td>@play.TotalHomeScore</td>
+            <td>@play.TotalAwayScore</td>
+            </tr>
+        }
+    </table>
+</div>
