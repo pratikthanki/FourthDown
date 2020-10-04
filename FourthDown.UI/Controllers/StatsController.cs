@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace FourthDown.UI.Controllers
 {
-    [Route("stats/")]
+    [Route("stats")]
     public class StatsController : ControllerBase
     {
         public StatsController(JsonPlayByPlayService playByPlayService)
@@ -16,13 +16,13 @@ namespace FourthDown.UI.Controllers
         private JsonPlayByPlayService PlayByPlayService { get; }
 
         [HttpGet]
-        [Route("playbyplay")]
+        [Route("pbp")]
         public IEnumerable<PlayByPlay> GetPbp()
         {
             return PlayByPlayService.GetPlayByPlays();
         }
         [HttpGet]
-        [Route("winprobability")]
+        [Route("wp")]
         public IEnumerable<WinProbability> GetWp()
         {
             return PlayByPlayService.GetGameWinProbability();
