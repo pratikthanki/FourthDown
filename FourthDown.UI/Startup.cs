@@ -1,3 +1,4 @@
+using FourthDown.UI.Repositories;
 using FourthDown.UI.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -23,6 +24,7 @@ namespace FourthDown.UI
             services.AddServerSideBlazor();
             services.AddControllers();
             services.AddTransient<JsonPlayByPlayService>();
+            services.AddSingleton<IPlayByPlayRepository, PlayByPlayRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

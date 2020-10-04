@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using System.IO;
+using System.Text.Json;
 using FourthDown.UI.Models;
 
 namespace FourthDown.UI.Repositories
@@ -12,7 +14,7 @@ namespace FourthDown.UI.Repositories
 
         public IEnumerable<PlayByPlay> GetGamePlays(string gameId)
         {
-            throw new System.NotImplementedException();
+            return ReadCsv(gameId);
         }
 
         public PlayByPlay GetGamePlayByPlay(string gameId, string playId)
@@ -25,9 +27,15 @@ namespace FourthDown.UI.Repositories
             throw new System.NotImplementedException();
         }
 
-        private static IEnumerable<PlayByPlay> ReadCsv()
+        private static IEnumerable<PlayByPlay> ReadCsv(string jsonFileName)
         {
-            throw new System.NotImplementedException();
+            using var jsonFileReader = File.OpenText(jsonFileName);
+
+            return JsonSerializer.Deserialize<PlayByPlay[]>(jsonFileReader.ReadToEnd(),
+                new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                });
         }
     }
 }
