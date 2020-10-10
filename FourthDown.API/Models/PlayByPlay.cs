@@ -1,6 +1,6 @@
 using System;
 
-namespace FourthDown.UI.Models
+namespace FourthDown.API.Models
 {
     public class PlayByPlay
     {

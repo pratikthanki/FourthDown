@@ -177,7 +177,7 @@
   {
     "city": "Los Angeles",
     "name": "Chargers",
-    "abr": "SD",
+    "abr": "LAC",
     "conf": "AFC",
     "div": "West"
   },
@@ -198,7 +198,7 @@
   {
     "city": "Los Angeles",
     "name": "Rams",
-    "abr": "STL",
+    "abr": "LA",
     "conf": "NFC",
     "div": "West"
   },

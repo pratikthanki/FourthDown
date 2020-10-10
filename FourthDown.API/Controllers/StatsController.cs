@@ -1,9 +1,9 @@
 using System.Collections.Generic;
-using FourthDown.UI.Models;
-using FourthDown.UI.Services;
+using FourthDown.API.Models;
+using FourthDown.API.Services;
 using Microsoft.AspNetCore.Mvc;
 
-namespace FourthDown.UI.Controllers
+namespace FourthDown.API.Controllers
 {
     [Route("stats")]
     public class StatsController : ControllerBase
@@ -16,13 +16,13 @@ namespace FourthDown.UI.Controllers
         private JsonPlayByPlayService PlayByPlayService { get; }
 
         [HttpGet]
-        [Route("pbp")]
+        [Route("playbyplay")]
         public IEnumerable<PlayByPlay> GetPbp()
         {
             return PlayByPlayService.GetPlayByPlays();
         }
         [HttpGet]
-        [Route("wp")]
+        [Route("winprobability")]
         public IEnumerable<WinProbability> GetWp()
         {
             return PlayByPlayService.GetGameWinProbability();

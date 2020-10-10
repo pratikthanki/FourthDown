@@ -1,12 +1,12 @@
-using FourthDown.UI.Repositories;
-using FourthDown.UI.Services;
+using FourthDown.API.Repositories;
+using FourthDown.API.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-namespace FourthDown.UI
+namespace FourthDown.API
 {
     public class Startup
     {

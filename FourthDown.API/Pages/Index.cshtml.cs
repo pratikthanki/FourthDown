@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
-using FourthDown.UI.Models;
-using FourthDown.UI.Services;
+using FourthDown.API.Models;
+using FourthDown.API.Services;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
 
-namespace FourthDown.UI.Pages
+namespace FourthDown.API.Pages
 {
     public class IndexModel : PageModel
     {

@@ -1,7 +1,7 @@
 using System.Collections.Generic;
-using FourthDown.UI.Models;
+using FourthDown.API.Models;
 
-namespace FourthDown.UI.Services
+namespace FourthDown.API.Services
 {
     public interface IPlayByPlayService
     {

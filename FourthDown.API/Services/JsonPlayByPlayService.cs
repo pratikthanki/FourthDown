@@ -1,11 +1,11 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using FourthDown.UI.Models;
-using FourthDown.UI.Repositories;
+using FourthDown.API.Models;
+using FourthDown.API.Repositories;
 using Microsoft.AspNetCore.Hosting;
 
-namespace FourthDown.UI.Services
+namespace FourthDown.API.Services
 {
     public class JsonPlayByPlayService : IPlayByPlayService
     {
@@ -35,6 +35,7 @@ namespace FourthDown.UI.Services
             var game = GetPlayByPlays();
 
             return game
+                .Where(x => x.GameSecondsRemaining % 10 == 0)
                 .Select(x => new WinProbability()
                 {
                     PlayId = x.PlayId,

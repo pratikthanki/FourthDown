@@ -1,7 +1,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace FourthDown.UI.Models
+namespace FourthDown.API.Models
 {
     public class Team
     {

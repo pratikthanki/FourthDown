@@ -1,9 +1,9 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
-using FourthDown.UI.Models;
+using FourthDown.API.Models;
 
-namespace FourthDown.UI.Repositories
+namespace FourthDown.API.Repositories
 {
     public class PlayByPlayRepository : IPlayByPlayRepository
     {
