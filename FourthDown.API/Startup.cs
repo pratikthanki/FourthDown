@@ -1,4 +1,5 @@
 using FourthDown.API.Repositories;
+using FourthDown.API.Repositories.Json;
 using FourthDown.API.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -20,11 +21,9 @@ namespace FourthDown.API
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddRazorPages();
-            services.AddServerSideBlazor();
             services.AddControllers();
             services.AddTransient<JsonPlayByPlayService>();
-            services.AddSingleton<IPlayByPlayRepository, PlayByPlayRepository>();
+            services.AddSingleton<IPlayByPlayRepository, JsonPlayByPlayRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -50,9 +49,7 @@ namespace FourthDown.API
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapRazorPages();
                 endpoints.MapControllers();
-                endpoints.MapBlazorHub();
             });
         }
     }

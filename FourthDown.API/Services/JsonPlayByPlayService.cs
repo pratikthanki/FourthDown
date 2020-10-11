@@ -9,25 +9,33 @@ namespace FourthDown.API.Services
 {
     public class JsonPlayByPlayService : IPlayByPlayService
     {
-        private readonly IPlayByPlayRepository _playByPlayRepository;
+        private readonly IPlayByPlayRepository _pbpRepository;
+
         public JsonPlayByPlayService(
-            IWebHostEnvironment webHostEnvironment, 
-            IPlayByPlayRepository playByPlayRepository)
+            IWebHostEnvironment webHostEnvironment,
+            IPlayByPlayRepository pbpRepository)
         {
             WebHostEnvironment = webHostEnvironment;
-            _playByPlayRepository = playByPlayRepository;
+            _pbpRepository = pbpRepository;
         }
 
         private IWebHostEnvironment WebHostEnvironment { get; set; }
 
-        private string JsonFileName => 
+        private string JsonFileName =>
             Path.Combine(WebHostEnvironment.WebRootPath, "data", "play_by_play_2020.json");
 
         public IEnumerable<PlayByPlay> GetPlayByPlays()
         {
-            return _playByPlayRepository
+            return _pbpRepository
+                .GetGamePlays(JsonFileName);
+        }
+
+        public IEnumerable<PlayByPlay> GetGamePlayByPlays(int gameId)
+        {
+            // var gameId = 2020091312;
+            return _pbpRepository
                 .GetGamePlays(JsonFileName)
-                .Where(x => x.GameId == "2020_01_DAL_LA");
+                .Where(x => x.OldGameId == gameId);
         }
 
         public IEnumerable<WinProbability> GetGameWinProbability()
