@@ -1,4 +1,4 @@
-namespace FourthDown.API.Models
+namespace FourthDown.Shared.Models
 {
     public class WinProbability
     {
