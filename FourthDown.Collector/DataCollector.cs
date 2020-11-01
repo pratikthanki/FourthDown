@@ -10,19 +10,24 @@ namespace FourthDown.Collector
 {
     public class DataCollector : IHostedService
     {
-        private static ILogger _logger;
-        private static IPlayByPlayRepository _playByPlayRepository;
+        private ILogger _logger;
+        private IPlayByPlayRepository _playByPlayRepository;
+        private IGameRepository _gameRepository;
         private readonly CancellationTokenSource _cancellationTokenSource;
+        private readonly CancellationToken _cancellationToken;
         private Task _task;
 
         public DataCollector(
             ILogger<DataCollector> logger,
             IHostApplicationLifetime appLifetime,
-            IPlayByPlayRepository playByPlayRepository)
+            IPlayByPlayRepository playByPlayRepository, IGameRepository gameRepository)
         {
             _logger = logger;
             _playByPlayRepository = playByPlayRepository;
+            _gameRepository = gameRepository;
+
             _cancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(appLifetime.ApplicationStopping);
+            _cancellationToken = _cancellationTokenSource.Token;
 
             Environment.ExitCode = 0;
 
@@ -52,6 +57,8 @@ namespace FourthDown.Collector
         {
             try
             {
+                var games = await _gameRepository.GetGames(2020, _cancellationTokenSource.Token);
+
                 const string fileName = "play_by_play_2020";
                 var plays = _playByPlayRepository.ReadPlays();
                 JsonFileWriter.Write(plays, fileName);

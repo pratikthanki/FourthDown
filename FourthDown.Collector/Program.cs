@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using FourthDown.Collector.Repositories;
+using FourthDown.Collector.Repositories.Csv;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
@@ -13,7 +14,8 @@ namespace FourthDown.Collector
                 .ConfigureServices((hostContext, services) =>
                 {
                     services.AddHostedService<DataCollector>();
-                    services.AddSingleton<IPlayByPlayRepository, CsvRepository>();
+                    services.AddSingleton<IPlayByPlayRepository, CsvPlayByPlayRepository>();
+                    services.AddSingleton<IGameRepository, CsvGameRepository>();
                 });
 
             await builder.RunConsoleAsync();

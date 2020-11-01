@@ -20,4 +20,12 @@
       <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Repositories\Json" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\FourthDown.Shared\FourthDown.Shared.csproj" />
+    </ItemGroup>
+
 </Project>

@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using FourthDown.Collector.Models;
+using FourthDown.Shared.Models;
 using Newtonsoft.Json;
 
 namespace FourthDown.Collector.Utilities
