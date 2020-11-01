@@ -1,5 +1,6 @@
 using System.Collections.Generic;
-using FourthDown.API.Models;
+using FourthDown.Shared.Models;
+using PlayByPlay = FourthDown.Shared.Models.PlayByPlay;
 
 namespace FourthDown.API.Services
 {

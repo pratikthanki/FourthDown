@@ -5,6 +5,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FourthDown.Collector", "Fou
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FourthDown.API", "FourthDown.API\FourthDown.API.csproj", "{6177E492-9378-4541-9D3D-17808AB00B48}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FourthDown.Shared", "FourthDown.Shared\FourthDown.Shared.csproj", "{6569A268-B978-4FCD-A35C-285407C3C3F6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -19,5 +21,9 @@ Global
 		{6177E492-9378-4541-9D3D-17808AB00B48}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6177E492-9378-4541-9D3D-17808AB00B48}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6177E492-9378-4541-9D3D-17808AB00B48}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6569A268-B978-4FCD-A35C-285407C3C3F6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6569A268-B978-4FCD-A35C-285407C3C3F6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6569A268-B978-4FCD-A35C-285407C3C3F6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6569A268-B978-4FCD-A35C-285407C3C3F6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

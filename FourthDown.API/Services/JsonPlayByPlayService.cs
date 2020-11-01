@@ -1,9 +1,10 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using FourthDown.API.Models;
 using FourthDown.API.Repositories;
+using FourthDown.Shared.Models;
 using Microsoft.AspNetCore.Hosting;
+using PlayByPlay = FourthDown.Shared.Models.PlayByPlay;
 
 namespace FourthDown.API.Services
 {

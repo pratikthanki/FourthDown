@@ -16,4 +16,8 @@
       <_ContentIncludedByDefault Remove="Pages\_ViewStart.cshtml" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\FourthDown.Shared\FourthDown.Shared.csproj" />
+    </ItemGroup>
+
 </Project>

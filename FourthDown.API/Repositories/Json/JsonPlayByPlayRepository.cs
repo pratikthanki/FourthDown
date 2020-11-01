@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
-using FourthDown.API.Models;
+using FourthDown.Shared.Models;
 
 namespace FourthDown.API.Repositories.Json
 {

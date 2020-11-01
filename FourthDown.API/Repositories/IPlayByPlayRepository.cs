@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using FourthDown.API.Models;
+using FourthDown.Shared.Models;
 
 namespace FourthDown.API.Repositories
 {

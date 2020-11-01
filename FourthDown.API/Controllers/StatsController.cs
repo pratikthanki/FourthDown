@@ -1,8 +1,8 @@
 using System.Collections.Generic;
-using System.Threading.Tasks;
-using FourthDown.API.Models;
 using FourthDown.API.Services;
+using FourthDown.Shared.Models;
 using Microsoft.AspNetCore.Mvc;
+using PlayByPlay = FourthDown.Shared.Models.PlayByPlay;
 
 namespace FourthDown.API.Controllers
 {
