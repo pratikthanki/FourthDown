@@ -2,6 +2,8 @@
 
     <PropertyGroup>
         <TargetFramework>netcoreapp3.1</TargetFramework>
+        <AssemblyName>FourthDown.Api</AssemblyName>
+        <RootNamespace>FourthDown.Api</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>

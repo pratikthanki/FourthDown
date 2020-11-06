@@ -10,7 +10,7 @@ namespace FourthDown.Collector.Utilities
     {
         public static void Write(IEnumerable<PlayByPlay> data, string fileName)
         {
-            const string DestinationPath = @"../../../../FourthDown.API/wwwroot/data/";
+            const string DestinationPath = @"../../../../FourthDown.Api/wwwroot/data/";
             var folderPath = StringParser.GetAbsolutePath(DestinationPath);
 
             // Create directory if it doesn't exist

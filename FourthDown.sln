@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FourthDown.Collector", "FourthDown.Collector\FourthDown.Collector.csproj", "{592BE7E4-2810-48CA-AB1A-190C3A9571B7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FourthDown.API", "FourthDown.API\FourthDown.API.csproj", "{6177E492-9378-4541-9D3D-17808AB00B48}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FourthDown.Api", "FourthDown.Api\FourthDown.Api.csproj", "{6177E492-9378-4541-9D3D-17808AB00B48}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FourthDown.Shared", "FourthDown.Shared\FourthDown.Shared.csproj", "{6569A268-B978-4FCD-A35C-285407C3C3F6}"
 EndProject
