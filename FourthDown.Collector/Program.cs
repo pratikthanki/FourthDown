@@ -8,6 +8,7 @@ using FourthDown.Collector.Repositories.Csv;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Serilog;
 
 namespace FourthDown.Collector
 {
@@ -32,8 +33,12 @@ namespace FourthDown.Collector
                     configuration
                         .SetBasePath(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location))
                         .AddJsonFile("appsettings.json");
-
-                    var configurationRoot = configuration.Build();
+                })
+                .UseSerilog((context, services, config) =>
+                {
+                    config
+                        .Enrich.FromLogContext()
+                        .WriteTo.Console();
                 });
 
             await builder.RunConsoleAsync();
