@@ -13,16 +13,25 @@ namespace FourthDown.Collector.Utilities
         public static int? ToNullableInt(string number) =>
             IsNa(number) ? (int?) null : int.Parse(number);
 
+        public static int ToIntDefaultZero(string number) =>
+            IsNa(number) ? 0 : int.Parse(number);
+
         public static double ToDouble(string number) =>
             double.Parse(number);
 
         public static double? ToNullableDouble(string number) =>
             IsNa(number) ? (double?) null : double.Parse(number);
 
-        public static DateTime? ToDateTime(string dateTime, string format) =>
+        public static double ToDoubleDefaultZero(string number) =>
+            IsNa(number) ? 0 : double.Parse(number);
+
+        public static DateTime? ToDateTimeOrNull(string dateTime, string format) =>
             IsNa(dateTime) || dateTime == "0"
                 ? (DateTime?) null
                 : DateTime.ParseExact(dateTime, format, CultureInfo.InvariantCulture);
+
+        public static DateTime ToDateTime(string dateTime, string format) =>
+            DateTime.ParseExact(dateTime, format, CultureInfo.InvariantCulture);
 
         public static bool ToBool(string number) =>
             number == "1";
@@ -33,8 +42,7 @@ namespace FourthDown.Collector.Utilities
         public static string ToString(string str) =>
             IsNa(str) ? "" : str;
 
-        private static bool IsNa(string value) =>
-            value == "NA" || value == "";
+        private static bool IsNa(string value) => value == "NA" || value == "";
 
         public static string GetAbsolutePath(string relativePath)
         {

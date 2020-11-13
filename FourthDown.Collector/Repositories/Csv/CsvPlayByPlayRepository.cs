@@ -54,7 +54,7 @@ namespace FourthDown.Collector.Repositories.Csv
                 Play.DefTeam = StringParser.ToString(x[9]);
                 Play.SideOfField = StringParser.ToString(x[10]);
                 Play.YardLine100 = StringParser.ToNullableInt(x[11]);
-                Play.GameDate = StringParser.ToDateTime(x[12], DateFormat);
+                Play.GameDate = StringParser.ToDateTimeOrNull(x[12], DateFormat);
                 Play.QuarterSecondsRemaining = StringParser.ToInt(x[13]);
                 Play.HalfSecondsRemaining = StringParser.ToInt(x[14]);
                 Play.GameSecondsRemaining = StringParser.ToInt(x[15]);
@@ -65,7 +65,7 @@ namespace FourthDown.Collector.Repositories.Csv
                 Play.Qtr = StringParser.ToInt(x[20]);
                 Play.Down = StringParser.ToNullableInt(x[21]);
                 Play.GoalToGo = StringParser.ToInt(x[22]);
-                Play.Time = StringParser.ToDateTime(x[23], TimeMmSs);
+                Play.Time = StringParser.ToDateTimeOrNull(x[23], TimeMmSs);
                 Play.YardLine = StringParser.ToString(x[24]);
                 Play.YdsToGo = StringParser.ToInt(x[25]);
                 Play.YardsNet = StringParser.ToNullableInt(x[26]);
@@ -310,8 +310,8 @@ namespace FourthDown.Collector.Repositories.Csv
                 Play.SeriesSuccess = StringParser.ToInt(x[265]);
                 Play.SeriesResult = StringParser.ToString(x[266]);
                 Play.OrderSequence = StringParser.ToDouble(x[267]);
-                Play.StartTime = StringParser.ToDateTime(x[268], ClockHhMmSs);
-                Play.TimeOfDay = StringParser.ToDateTime(x[269], ClockHhMmSs);
+                Play.StartTime = StringParser.ToDateTimeOrNull(x[268], ClockHhMmSs);
+                Play.TimeOfDay = StringParser.ToDateTimeOrNull(x[269], ClockHhMmSs);
                 Play.Stadium = StringParser.ToString(x[270]);
                 Play.Weather = StringParser.ToString(x[271]);
                 Play.NflApiId = StringParser.ToString(x[272]);
@@ -320,13 +320,13 @@ namespace FourthDown.Collector.Repositories.Csv
                 Play.PlayTypeNfl = StringParser.ToString(x[275]);
                 Play.SpecialTeamsPlay = StringParser.ToBool(x[276]);
                 Play.SpecialTeamsPlayType = StringParser.ToString(x[277]);
-                Play.EndClockTime = StringParser.ToDateTime(x[278], TimeMmSs);
+                Play.EndClockTime = StringParser.ToDateTimeOrNull(x[278], TimeMmSs);
                 Play.EndYardLine = StringParser.ToString(x[279]);
                 Play.FixedDrive = StringParser.ToInt(x[280]);
                 Play.FixedDriveResult = StringParser.ToString(x[281]);
                 Play.DriveRealStartTime = StringParser.ToString(x[282]);
                 Play.DrivePlayCount = StringParser.ToNullableInt(x[283]);
-                Play.DriveTimeOfPossession = StringParser.ToDateTime(x[284], TimeMmSs);
+                Play.DriveTimeOfPossession = StringParser.ToDateTimeOrNull(x[284], TimeMmSs);
                 Play.DriveFirstDowns = StringParser.ToNullableInt(x[285]);
                 Play.DriveInside20 = StringParser.ToNullableInt(x[286]);
                 Play.DriveEndedWithScore = StringParser.ToNullableInt(x[287]);
@@ -335,8 +335,8 @@ namespace FourthDown.Collector.Repositories.Csv
                 Play.DriveYardsPenalized = StringParser.ToNullableInt(x[290]);
                 Play.DriveStartTransition = StringParser.ToString(x[291]);
                 Play.DriveEndTransition = StringParser.ToString(x[292]);
-                Play.DriveGameClockStart = StringParser.ToDateTime(x[293], TimeMmSs);
-                Play.DriveGameClockEnd = StringParser.ToDateTime(x[294], TimeMmSs);
+                Play.DriveGameClockStart = StringParser.ToDateTimeOrNull(x[293], TimeMmSs);
+                Play.DriveGameClockEnd = StringParser.ToDateTimeOrNull(x[294], TimeMmSs);
                 Play.DriveStartYardLine = StringParser.ToString(x[295]);
                 Play.DriveEndYardLine = StringParser.ToString(x[296]);
                 Play.DrivePlayIdStarted = StringParser.ToNullableInt(x[297]);
