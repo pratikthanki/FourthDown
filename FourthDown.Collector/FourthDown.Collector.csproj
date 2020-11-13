@@ -6,7 +6,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Content Include="data\play_by_play_2020.csv" />
+      <Content Include="Data\play_by_play_2020.csv" />
     </ItemGroup>
 
     <ItemGroup>
@@ -33,6 +33,9 @@
 
     <ItemGroup>
       <None Update="appsettings.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Data\ImportedGames.json">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
     </ItemGroup>
