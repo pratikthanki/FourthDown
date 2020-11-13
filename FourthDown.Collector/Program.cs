@@ -14,12 +14,12 @@ namespace FourthDown.Collector
 {
     public class Program
     {
-        static async Task Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var builder = new HostBuilder()
                 .ConfigureServices((hostContext, services) =>
                 {
-                    services.Configure<Options>(hostContext.Configuration);
+                    services.Configure<ReadSettings>(hostContext.Configuration);
                     services.AddHostedService<DataCollector>();
                     services.AddSingleton<IPlayByPlayRepository, CsvPlayByPlayRepository>();
                     services.AddSingleton<IGameRepository, CsvGameRepository>();

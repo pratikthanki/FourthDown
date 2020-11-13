@@ -1,6 +1,6 @@
 namespace FourthDown.Collector.Configuration
 {
-    public class Options
+    public class ReadSettings
     {
         public bool BackLoad { get; set; }
     }
