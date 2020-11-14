@@ -5,7 +5,6 @@ namespace FourthDown.Shared.Models
 {
     public class Team
     {
-
         public string City { get; set; }
         public string Name { get; set; }
         [JsonPropertyName("abr")] 

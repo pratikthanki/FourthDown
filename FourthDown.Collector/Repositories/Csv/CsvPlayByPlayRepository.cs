@@ -19,14 +19,7 @@ namespace FourthDown.Collector.Repositories.Csv
 
         private static IEnumerable<PlayByPlay> ReadCsv()
         {
-            const string RelativePath = @"../../../data/play_by_play_2020.csv";
-            var filePath = StringParser.GetAbsolutePath(RelativePath);
-
-            const string TimeMmSs = "mm:ss";
-            const string ClockHhMmSs = "HH:mm:ss";
-            const string DateFormat = "dd/MM/yyyy";
-
-            var results = new List<PlayByPlay>();
+            var filePath = GetFilePath();
 
             using var parser = new TextFieldParser(filePath) {HasFieldsEnclosedInQuotes = true};
             parser.SetDelimiters(",");
@@ -34,6 +27,26 @@ namespace FourthDown.Collector.Repositories.Csv
             // Skip the header row
             if (!parser.EndOfData)
                 parser.ReadLine();
+
+            var results = NewMethod(parser);
+
+            return results;
+        }
+
+        private static string GetFilePath()
+        {
+            const string RelativePath = @"../../../data/play_by_play_2020.csv";
+            var filePath = StringParser.GetAbsolutePath(RelativePath);
+            return filePath;
+        }
+
+        private static List<PlayByPlay> NewMethod(TextFieldParser parser)
+        {
+            const string TimeMmSs = "mm:ss";
+            const string ClockHhMmSs = "HH:mm:ss";
+            const string DateFormat = "dd/MM/yyyy";
+
+            var results = new List<PlayByPlay>();
 
             while (!parser.EndOfData)
             {
@@ -387,7 +400,7 @@ namespace FourthDown.Collector.Repositories.Csv
 
                 results.Add(Play);
             }
-
+            
             return results;
         }
     }

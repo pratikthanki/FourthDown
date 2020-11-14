@@ -1,14 +1,14 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using FourthDown.Collector.Repositories;
 using FourthDown.Collector.Utilities;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
-namespace FourthDown.Collector
+namespace FourthDown.Collector.Service
 {
-    public class DataCollector : IHostedService
+    public class DataCollectorService : IHostedService
     {
         private ILogger _logger;
         private IPlayByPlayRepository _playByPlayRepository;
@@ -17,8 +17,8 @@ namespace FourthDown.Collector
         private readonly CancellationToken _cancellationToken;
         private Task _task;
 
-        public DataCollector(
-            ILogger<DataCollector> logger,
+        public DataCollectorService(
+            ILogger<DataCollectorService> logger,
             IHostApplicationLifetime appLifetime,
             IPlayByPlayRepository playByPlayRepository, IGameRepository gameRepository)
         {
@@ -33,14 +33,14 @@ namespace FourthDown.Collector
 
             _cancellationTokenSource.Token.Register(() =>
             {
-                _logger.LogInformation($"Shutting down {nameof(DataCollector)}..");
+                _logger.LogInformation($"Shutting down {nameof(DataCollectorService)}..");
                 appLifetime.StopApplication();
             });
         }
 
         public Task StartAsync(CancellationToken token)
         {
-            _logger.LogInformation($"Starting {nameof(DataCollector)}..");
+            _logger.LogInformation($"Starting {nameof(DataCollectorService)}..");
 
             if (_task != null)
                 throw new InvalidOperationException();
@@ -48,7 +48,7 @@ namespace FourthDown.Collector
             if (!_cancellationTokenSource.IsCancellationRequested)
                 _task = Task.Run(RunService, token);
 
-            _logger.LogInformation($"Starting {nameof(DataCollector)}..");
+            _logger.LogInformation($"Starting {nameof(DataCollectorService)}..");
 
             return Task.CompletedTask;
         }
@@ -57,7 +57,7 @@ namespace FourthDown.Collector
         {
             try
             {
-                var games = await _gameRepository.GetGames(2020, _cancellationTokenSource.Token);
+                var games = await _gameRepository.GetGames(_cancellationTokenSource.Token);
 
                 const string fileName = "play_by_play_2020";
                 var plays = _playByPlayRepository.ReadPlays();
@@ -77,14 +77,14 @@ namespace FourthDown.Collector
 
         public async Task StopAsync(CancellationToken token)
         {
-            _logger.LogInformation($"Stopping {nameof(DataCollector)}..");
+            _logger.LogInformation($"Stopping {nameof(DataCollectorService)}..");
 
             _cancellationTokenSource.Cancel();
             var runningTask = Interlocked.Exchange(ref _task, null);
             if (runningTask != null)
                 await runningTask;
 
-            _logger.LogInformation($"Stopped {nameof(DataCollector)}..");
+            _logger.LogInformation($"Stopped {nameof(DataCollectorService)}..");
         }
     }
 }

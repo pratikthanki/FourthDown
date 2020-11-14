@@ -8,6 +8,7 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using FourthDown.Collector.Configuration;
+using FourthDown.Collector.Models;
 using FourthDown.Collector.Utilities;
 using FourthDown.Shared.Models;
 using Microsoft.Extensions.Options;
@@ -20,9 +21,6 @@ namespace FourthDown.Collector.Repositories.Csv
         private const int FirstSeason = 1999;
         private readonly DateTime Today = DateTime.UtcNow;
 
-        private const string GithubHost = @"https://raw.githubusercontent.com";
-        private readonly string url = $@"{GithubHost}/leesharpe/nfldata/master/data/games.csv";
-
         public CsvGameRepository(IOptions<ReadSettings> options)
         {
             _readSettings = options.Value;
@@ -30,24 +28,26 @@ namespace FourthDown.Collector.Repositories.Csv
 
         private int CurrentSeason() => Today.Month > 8 ? Today.Year : Today.Year - 1;
 
-        private async Task<List<Game>> GetImportedGames()
+        private async Task<List<ImportedGame>> GetImportedGames()
         {
             var path = @"../../../Data/ImportedGames.json";
             var absolutePath = StringParser.GetAbsolutePath(path);
 
             await using var fs = File.OpenRead(absolutePath);
-            var importedGames = await JsonSerializer.DeserializeAsync<List<Game>>(fs);
-            
+            var importedGames = await JsonSerializer.DeserializeAsync<List<ImportedGame>>(fs);
+
             return importedGames;
         }
 
-        public async Task<IEnumerable<Game>> GetGames(int season, CancellationToken cancellationToken)
+        public async Task<IEnumerable<Game>> GetGames(CancellationToken cancellationToken)
         {
             var timeout = TimeSpan.FromSeconds(10);
             var httpClientHandler = new HttpClientHandler
             {
                 AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate
             };
+
+            const string url = @"https://raw.githubusercontent.com/leesharpe/nfldata/master/data/games.csv";
 
             var httpClient = new HttpClient(httpClientHandler) {Timeout = timeout};
             var response = await httpClient.GetAsync(url, cancellationToken);
@@ -128,5 +128,8 @@ namespace FourthDown.Collector.Repositories.Csv
 
             return games;
         }
+
+        private string GetGameUrl(int season, string gameId) =>
+            $"https://github.com/guga31bb/nflfastR-raw/blob/master/raw/{season}/{gameId}.json.gz?raw=true";
     }
 }

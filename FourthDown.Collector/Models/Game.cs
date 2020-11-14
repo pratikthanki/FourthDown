@@ -1,6 +1,6 @@
 using System;
 
-namespace FourthDown.Shared.Models
+namespace FourthDown.Collector.Models
 {
     public class Game
     {
