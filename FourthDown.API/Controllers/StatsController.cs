@@ -1,18 +1,18 @@
 using System.Collections.Generic;
-using FourthDown.API.Services;
-using FourthDown.Shared.Models;
+using FourthDown.Api.Models;
+using FourthDown.Api.Services;
 using Microsoft.AspNetCore.Mvc;
-using PlayByPlay = FourthDown.Shared.Models.PlayByPlay;
+using PlayByPlay = FourthDown.Api.Models.PlayByPlay;
 
-namespace FourthDown.API.Controllers
+namespace FourthDown.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
     public class StatsController : ControllerBase
     {
-        private JsonPlayByPlayService _pbpService { get; }
+        private PlayByPlayService _pbpService { get; }
 
-        public StatsController(JsonPlayByPlayService pbpService)
+        public StatsController(PlayByPlayService pbpService)
         {
             _pbpService = pbpService;
         }

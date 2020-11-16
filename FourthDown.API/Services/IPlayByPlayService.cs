@@ -1,8 +1,8 @@
 using System.Collections.Generic;
-using FourthDown.Shared.Models;
-using PlayByPlay = FourthDown.Shared.Models.PlayByPlay;
+using FourthDown.Api.Models;
+using PlayByPlay = FourthDown.Api.Models.PlayByPlay;
 
-namespace FourthDown.API.Services
+namespace FourthDown.Api.Services
 {
     public interface IPlayByPlayService
     {

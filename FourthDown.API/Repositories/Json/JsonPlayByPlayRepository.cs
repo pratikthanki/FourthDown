@@ -2,9 +2,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
-using FourthDown.Shared.Models;
+using FourthDown.Api.Models;
 
-namespace FourthDown.API.Repositories.Json
+namespace FourthDown.Api.Repositories.Json
 {
     public class JsonPlayByPlayRepository : IPlayByPlayRepository
     {
