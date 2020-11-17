@@ -2,37 +2,42 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using FourthDown.Api.Models;
-using FourthDown.Api.Repositories;
+using FourthDown.Api.Parameters;
 using FourthDown.Api.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FourthDown.Api.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/schedule")]
     [ApiController]
     public class ScheduleController : ControllerBase
     {
-        private readonly IGameRepository _gameRepository;
         private readonly IScheduleService _scheduleService;
 
-        public ScheduleController(
-            IGameRepository gameRepository,
-            IScheduleService scheduleService)
+        public ScheduleController(IScheduleService scheduleService)
         {
-            _gameRepository = gameRepository;
             _scheduleService = scheduleService;
         }
 
+        /// <summary>
+        /// Query for games based on conditions
+        /// </summary>
+        /// <remarks>
+        /// If no parameters are passed, games for the current week/season and all teams is returned
+        /// </remarks>
+        /// <param name="queryParameter">Combination of Season, Week and Team</param>
+        /// <param name="cancellationToken"></param>
+        /// <returns>List of Games</returns>
         [HttpGet("")]
-        public async Task<IEnumerable<Game>> GetSchedule(CancellationToken cancellationToken)
+        [Produces("application/json")]
+        [ProducesResponseType(typeof(IEnumerable<Game>), 200)]
+        public async Task<ActionResult<IEnumerable<Game>>> GetSchedule(
+            [FromQuery] ScheduleQueryParameter queryParameter,
+            CancellationToken cancellationToken)
         {
-            return await _scheduleService.GetGamesForCurrentWeek(cancellationToken);
-        }
-        
-        [HttpGet("{week}")]
-        public async Task<IEnumerable<Game>> GetScheduleForWeek(int week, CancellationToken cancellationToken)
-        {
-            return await _scheduleService.GetGamesForWeek(week, cancellationToken);
+            var games = await _scheduleService.GetGames(queryParameter, cancellationToken);
+
+            return Ok(games);
         }
     }
 }
