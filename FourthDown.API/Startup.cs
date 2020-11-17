@@ -28,6 +28,7 @@ namespace FourthDown.Api
             services
                 .AddSingleton<IPlayByPlayService, PlayByPlayService>()
                 .AddSingleton<IScheduleService, ScheduleService>()
+                .AddSingleton<ITeamRepository, JsonTeamRepository>()
                 .AddSingleton<IGameRepository, CsvGameRepository>()
                 .AddSingleton<IPlayByPlayRepository, CsvPlayByPlayRepository>()
                 .AddSingleton<IPlayByPlayRepository, JsonPlayByPlayRepository>();

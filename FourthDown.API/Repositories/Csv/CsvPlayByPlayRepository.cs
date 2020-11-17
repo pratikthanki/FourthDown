@@ -23,7 +23,8 @@ namespace FourthDown.Api.Repositories.Csv
 
         private static IEnumerable<PlayByPlay> ReadCsv()
         {
-            var filePath = GetFilePath();
+            var file = @"play_by_play_2020.csv";
+            var filePath = StringParser.GetDataFilePath(file);
 
             using var parser = new TextFieldParser(filePath) {HasFieldsEnclosedInQuotes = true};
             parser.SetDelimiters(",");
@@ -35,13 +36,6 @@ namespace FourthDown.Api.Repositories.Csv
             var results = NewMethod(parser);
 
             return results;
-        }
-
-        private static string GetFilePath()
-        {
-            const string RelativePath = @"../../../data/play_by_play_2020.csv";
-            var filePath = StringParser.GetAbsolutePath(RelativePath);
-            return filePath;
         }
 
         private static List<PlayByPlay> NewMethod(TextFieldParser parser)

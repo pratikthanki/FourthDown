@@ -15,8 +15,7 @@ namespace FourthDown.Api.Services
         private readonly DateTime Today = DateTime.UtcNow;
         private readonly int _currentSeason;
 
-        public ScheduleService(
-            IGameRepository gameRepository)
+        public ScheduleService(IGameRepository gameRepository)
         {
             _gameRepository = gameRepository;
             _currentSeason = CurrentSeason();
@@ -39,12 +38,22 @@ namespace FourthDown.Api.Services
 
             var currentWeek = GetCurrentWeek(games);
 
-            var week = queryParameter.Week ?? currentWeek;
-            var season = queryParameter.Season ?? _currentSeason;
             var team = queryParameter.Team;
+            var season = queryParameter.Season;
+            var week = queryParameter.Week;
 
+            IEnumerable<Game> filteredGames = season == null
+                ? games.Where(x => x.Season == _currentSeason)
+                : games.Where(x => x.Season == season);
 
-            return games.Where(x => x.Season == _currentSeason && x.Week == week);
+            filteredGames = week == null 
+                ? filteredGames 
+                : filteredGames.Where(x => x.Week == week);
+            
+            if (!string.IsNullOrWhiteSpace(team))
+                return filteredGames.Where(x => x.HomeTeam == team || x.AwayTeam == team);
+            
+            return filteredGames;
         }
     }
 }
