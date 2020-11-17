@@ -2,7 +2,6 @@ using System;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
-using FourthDown.Api;
 
 namespace FourthDown.Api.Utilities
 {
@@ -45,7 +44,7 @@ namespace FourthDown.Api.Utilities
 
         private static bool IsNa(string value) => value == "NA" || value == "";
 
-        public static string GetAbsolutePath(string relativePath)
+        private static string GetAbsolutePath(string relativePath)
         {
             var _dataRoot = new FileInfo(typeof(Program).Assembly.Location);
 
@@ -56,5 +55,8 @@ namespace FourthDown.Api.Utilities
 
             return fullPath;
         }
+
+        public static string GetDataFilePath(string file) => GetAbsolutePath($@"../../../data/{file}");
+
     }
 }
