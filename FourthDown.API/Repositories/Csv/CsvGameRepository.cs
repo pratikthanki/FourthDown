@@ -16,7 +16,7 @@ namespace FourthDown.Api.Repositories.Csv
         {
         }
 
-        public async Task<IList<Game>> GetGames(CancellationToken cancellationToken)
+        public async Task<Dictionary<int, List<Game>>> GetGames(CancellationToken cancellationToken)
         {
             var response = await WebClient.CreateRequest(url, cancellationToken);
             var responseBody = await response.Content.ReadAsStringAsync();
@@ -24,7 +24,7 @@ namespace FourthDown.Api.Repositories.Csv
             return ProcessGamesResponse(responseBody);
         }
 
-        private IList<Game> ProcessGamesResponse(string responseBody)
+        private Dictionary<int, List<Game>> ProcessGamesResponse(string responseBody)
         {
             var csvResponse = responseBody
                 .Split("\n")
@@ -81,7 +81,9 @@ namespace FourthDown.Api.Repositories.Csv
 
             }
 
-            return games;
+            return games
+                .GroupBy(x => x.Season)
+                .ToDictionary(x => x.Key, x => x.ToList());
         }
     }
 }

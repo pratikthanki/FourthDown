@@ -34,26 +34,26 @@ namespace FourthDown.Api.Services
             ScheduleQueryParameter queryParameter,
             CancellationToken cancellationToken)
         {
-            var games = await _gameRepository.GetGames(cancellationToken);
+            var gamesPerSeason = await _gameRepository.GetGames(cancellationToken);
 
-            var currentWeek = GetCurrentWeek(games);
+            var currentWeek = GetCurrentWeek(gamesPerSeason[_currentSeason]);
 
             var team = queryParameter.Team;
-            var season = queryParameter.Season;
+            var season = queryParameter.Season ?? _currentSeason;
             var week = queryParameter.Week;
 
-            IEnumerable<Game> filteredGames = season == null
-                ? games.Where(x => x.Season == _currentSeason)
-                : games.Where(x => x.Season == season);
+            var games = gamesPerSeason[season];
 
-            filteredGames = week == null 
-                ? filteredGames 
-                : filteredGames.Where(x => x.Week == week);
+            if (season != _currentSeason)
+            {
+                if (week != null)
+                    games = games.Where(x => x.Week == week).ToList();
+            }
             
             if (!string.IsNullOrWhiteSpace(team))
-                return filteredGames.Where(x => x.HomeTeam == team || x.AwayTeam == team);
-            
-            return filteredGames;
+                return games.Where(x => x.HomeTeam == team || x.AwayTeam == team);
+
+            return games;
         }
     }
 }
