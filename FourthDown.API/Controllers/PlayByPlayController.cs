@@ -5,7 +5,6 @@ using FourthDown.Api.Models;
 using FourthDown.Api.Parameters;
 using FourthDown.Api.Services;
 using Microsoft.AspNetCore.Mvc;
-using PlayByPlay = FourthDown.Api.Models.PlayByPlay;
 
 namespace FourthDown.Api.Controllers
 {
@@ -35,7 +34,7 @@ namespace FourthDown.Api.Controllers
                     Status = 400,
                 });
 
-            var plays = await _pbpService.GetPlayByPlays(queryParameter, cancellationToken);
+            var plays = await _pbpService.GetGamePlayByPlays(queryParameter, cancellationToken);
 
             return Ok(plays);
         }

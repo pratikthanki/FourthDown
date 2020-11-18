@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using FourthDown.Api.Models;
 using FourthDown.Api.Repositories;
@@ -14,8 +13,8 @@ namespace FourthDown.Api.Services
         private readonly IPlayByPlayRepository _pbpRepository;
         private readonly IScheduleService _scheduleService;
 
-        private readonly string GameId = "2020_09_PIT_DAL";        
-        private readonly int Season = 2020;
+        private const string GameId = "2020_09_PIT_DAL";
+        private const int Season = 2020;
 
         public PlayByPlayService(
             IPlayByPlayRepository pbpRepository,
@@ -25,8 +24,30 @@ namespace FourthDown.Api.Services
             _scheduleService = scheduleService;
         }
 
-        public async Task<IEnumerable<GameRaw>> GetPlayByPlays(
-            PlayByPlayQueryParameter queryParameter, 
+        public async Task<List<GameDetail>> GetGamePlayByPlays(
+            PlayByPlayQueryParameter queryParameter,
+            CancellationToken cancellationToken)
+        {
+            var games = await GetGamesFromQuery(queryParameter, cancellationToken);
+
+            if (games == null)
+            {
+                return null;
+            }
+
+            var gamePlayByPlays = new List<GameDetail>();
+
+            foreach (var game in games)
+            {
+                var pbp = await _pbpRepository.GetGamePlays(game.GameId, game.Season, cancellationToken);
+                gamePlayByPlays.Add(pbp);
+            }
+
+            return gamePlayByPlays;
+        }
+
+        private async Task<IEnumerable<Game>> GetGamesFromQuery(
+            PlayByPlayQueryParameter queryParameter,
             CancellationToken cancellationToken)
         {
             IEnumerable<Game> games;
@@ -46,15 +67,12 @@ namespace FourthDown.Api.Services
                 games = await _scheduleService.GetGameById(queryParameter.GameId, cancellationToken);
             }
 
-            if (games == null)
-            {
-                return null;
-            }
-
-            return await _pbpRepository.GetGamePlays(GameId, Season, cancellationToken);
+            return games;
         }
 
-        public Task<IEnumerable<WinProbability>> GetGameWinProbability(PlayByPlayQueryParameter queryParameter, CancellationToken cancellationToken)
+        public Task<IEnumerable<WinProbability>> GetGameWinProbability(
+            PlayByPlayQueryParameter queryParameter, 
+            CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
         }
