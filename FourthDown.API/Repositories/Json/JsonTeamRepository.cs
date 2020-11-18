@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 using FourthDown.Api.Models;
 using FourthDown.Api.Utilities;
@@ -13,7 +14,7 @@ namespace FourthDown.Api.Repositories.Json
         {
         }
 
-        public async Task<IEnumerable<Team>> GetTeams()
+        public async Task<IEnumerable<Team>> GetTeams(CancellationToken cancellationToken)
         {
             return await ReadTeamsJson();
         }
