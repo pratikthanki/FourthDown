@@ -1,64 +1,62 @@
+using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
+using System.Threading;
 using FourthDown.Api.Models;
 using FourthDown.Api.Repositories;
-using Microsoft.AspNetCore.Hosting;
-using PlayByPlay = FourthDown.Api.Models.PlayByPlay;
+using System.Threading.Tasks;
+using FourthDown.Api.Parameters;
 
 namespace FourthDown.Api.Services
 {
     public class PlayByPlayService : IPlayByPlayService
     {
         private readonly IPlayByPlayRepository _pbpRepository;
+        private readonly IScheduleService _scheduleService;
+
+        private readonly string GameId = "2020_09_PIT_DAL";        
+        private readonly int Season = 2020;
 
         public PlayByPlayService(
-            IWebHostEnvironment webHostEnvironment,
-            IPlayByPlayRepository pbpRepository)
+            IPlayByPlayRepository pbpRepository,
+            IScheduleService scheduleService)
         {
-            WebHostEnvironment = webHostEnvironment;
             _pbpRepository = pbpRepository;
+            _scheduleService = scheduleService;
         }
 
-        private IWebHostEnvironment WebHostEnvironment { get; set; }
-
-        private string JsonFileName =>
-            Path.Combine(WebHostEnvironment.WebRootPath, "data", "play_by_play_2020.json");
-
-        public IEnumerable<PlayByPlay> GetPlayByPlays()
+        public async Task<IEnumerable<GameRaw>> GetPlayByPlays(
+            PlayByPlayQueryParameter queryParameter, 
+            CancellationToken cancellationToken)
         {
-            return _pbpRepository
-                .GetGamePlays(JsonFileName);
-        }
-
-        public IEnumerable<PlayByPlay> GetGamePlayByPlays(int gameId)
-        {
-            // var gameId = 2020091312;
-            return _pbpRepository
-                .GetGamePlays(JsonFileName)
-                .Where(x => x.OldGameId == gameId);
-        }
-
-        public IEnumerable<WinProbability> GetGameWinProbability()
-        {
-            var game = GetPlayByPlays();
-
-            return game
-                .Where(x => x.GameSecondsRemaining % 10 == 0)
-                .Select(x => new WinProbability()
+            IEnumerable<Game> games;
+            if (string.IsNullOrWhiteSpace(queryParameter.GameId))
+            {
+                var scheduleParams = new ScheduleQueryParameter()
                 {
-                    PlayId = x.PlayId,
-                    GameId = x.GameId,
-                    Qtr = x.Qtr,
-                    QuarterEnd = x.QuarterEnd,
-                    HomeTeam = x.HomeTeam,
-                    AwayTeam = x.AwayTeam,
-                    HomeWp = x.HomeWp,
-                    AwayWp = x.AwayWp,
-                    TotalHomeScore = x.TotalHomeScore,
-                    TotalAwayScore = x.TotalAwayScore
-                })
-                .Where(x => x.HomeWp != null && x.AwayWp != null);
+                    Week = queryParameter.Week,
+                    Season = queryParameter.Season,
+                    Team = queryParameter.Team
+                };
+
+                games = await _scheduleService.GetGames(scheduleParams, cancellationToken);
+            }
+            else
+            {
+                games = await _scheduleService.GetGameById(queryParameter.GameId, cancellationToken);
+            }
+
+            if (games == null)
+            {
+                return null;
+            }
+
+            return await _pbpRepository.GetGamePlays(GameId, Season, cancellationToken);
+        }
+
+        public Task<IEnumerable<WinProbability>> GetGameWinProbability(PlayByPlayQueryParameter queryParameter, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
         }
     }
 }

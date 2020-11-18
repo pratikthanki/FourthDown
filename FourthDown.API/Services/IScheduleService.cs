@@ -8,6 +8,12 @@ namespace FourthDown.Api.Services
 {
     public interface IScheduleService
     {
-        Task<IEnumerable<Game>> GetGames(ScheduleQueryParameter queryParameter, CancellationToken cancellationToken);
+        Task<IEnumerable<Game>> GetGames(
+            ScheduleQueryParameter queryParameter, 
+            CancellationToken cancellationToken);
+
+        Task<IEnumerable<Game>> GetGameById(
+            string gameId,
+            CancellationToken cancellationToken);
     }
 }

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using FourthDown.Api.Models;
 using FourthDown.Api.Parameters;
 using FourthDown.Api.Repositories;
+using FourthDown.Api.Utilities;
 
 namespace FourthDown.Api.Services
 {
@@ -30,11 +31,26 @@ namespace FourthDown.Api.Services
                 .Max(x => x.Week);
         }
 
+        private async Task<Dictionary<int, List<Game>>> GetAllGames(CancellationToken cancellationToken)
+        {
+            return await _gameRepository.GetGames(cancellationToken);
+        }
+
+        public async Task<IEnumerable<Game>> GetGameById(
+            string gameId,
+            CancellationToken cancellationToken)
+        {
+            var gamesPerSeason = await GetAllGames(cancellationToken);
+            var season = gameId.ToString().Substring(0, 4);
+
+            return gamesPerSeason[StringParser.ToInt(season)].Where(x => x.GameId == gameId);
+        }
+
         public async Task<IEnumerable<Game>> GetGames(
             ScheduleQueryParameter queryParameter,
             CancellationToken cancellationToken)
         {
-            var gamesPerSeason = await _gameRepository.GetGames(cancellationToken);
+            var gamesPerSeason = await GetAllGames(cancellationToken);
 
             var currentWeek = GetCurrentWeek(gamesPerSeason[_currentSeason]);
 
@@ -44,14 +60,18 @@ namespace FourthDown.Api.Services
 
             var games = gamesPerSeason[season];
 
-            if (season != _currentSeason)
+            if (week == null)
             {
-                if (week != null)
-                    games = games.Where(x => x.Week == week).ToList();
+                if (season == _currentSeason)
+                    games = games.Where(x => x.Week == currentWeek).ToList();
             }
-            
+            else
+            {
+                games = games.Where(x => x.Week == week).ToList();
+            }
+
             if (!string.IsNullOrWhiteSpace(team))
-                return games.Where(x => x.HomeTeam == team || x.AwayTeam == team);
+                games = games.Where(x => x.HomeTeam == team || x.AwayTeam == team).ToList();
 
             return games;
         }
