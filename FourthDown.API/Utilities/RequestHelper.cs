@@ -17,7 +17,8 @@ namespace FourthDown.Api.Utilities
             };
 
             var httpClient = new HttpClient(httpClientHandler) {Timeout = timeout};
-            var response = await httpClient.GetAsync(url, cancellationToken);
+
+            var response = await httpClient.GetAsync(url, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
 
             return response;
         }

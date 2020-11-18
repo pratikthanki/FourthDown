@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace FourthDown.Api.Models
 {
-    public class GameRaw
+    internal class GameRaw
     {
         public DataObject Data { get; set; }
     }
@@ -200,12 +200,12 @@ namespace FourthDown.Api.Models
         public IList<Play> Plays { get; set; }
     }
 
-    public class Viewer
+    internal class Viewer
     {
         public GameDetail GameDetail { get; set; }
     }
 
-    public class DataObject
+    internal class DataObject
     {
         public Viewer Viewer { get; set; }
     }
