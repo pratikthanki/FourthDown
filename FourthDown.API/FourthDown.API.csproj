@@ -7,29 +7,9 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <_ContentIncludedByDefault Remove="Components\PlayByPlay.razor" />
-      <_ContentIncludedByDefault Remove="Components\WinProbability.razor" />
-      <_ContentIncludedByDefault Remove="Pages\Error.cshtml" />
-      <_ContentIncludedByDefault Remove="Pages\Index.cshtml" />
-      <_ContentIncludedByDefault Remove="Pages\Privacy.cshtml" />
-      <_ContentIncludedByDefault Remove="Pages\Shared\_Layout.cshtml" />
-      <_ContentIncludedByDefault Remove="Pages\Shared\_ValidationScriptsPartial.cshtml" />
-      <_ContentIncludedByDefault Remove="Pages\_ViewImports.cshtml" />
-      <_ContentIncludedByDefault Remove="Pages\_ViewStart.cshtml" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <ProjectReference Include="..\FourthDown.Shared\FourthDown.Shared.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
       <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
       <PackageReference Include="Serilog" Version="2.10.0" />
       <PackageReference Include="Serilog.AspNetCore" Version="3.4.0" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Content Include="Data\play_by_play_2020.csv" />
     </ItemGroup>
 
     <ItemGroup>

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using FourthDown.Api.Models;
 using FourthDown.Api.Repositories;
@@ -23,9 +24,9 @@ namespace FourthDown.Api.Controllers
         [HttpGet("")]
         [Produces("application/json")]
         [ProducesResponseType(typeof(IEnumerable<Team>), 200)]
-        public async Task<ActionResult<IEnumerable<Team>>> GetTeams()
+        public async Task<ActionResult<IEnumerable<Team>>> GetTeams(CancellationToken cancellationToken)
         {
-            var teams = await _teamRepository.GetTeams();
+            var teams = await _teamRepository.GetTeams(cancellationToken);
 
             return Ok(teams);
         }
