@@ -59,17 +59,13 @@ namespace FourthDown.Api.Services
             var week = queryParameter.Week;
 
             var games = gamesPerSeason[season];
+            
+            if (queryParameter.IsNull())
+                games = games.Where(x => x.Week == currentWeek).ToList();
 
-            if (week == null)
-            {
-                if (season == _currentSeason)
-                    games = games.Where(x => x.Week == currentWeek).ToList();
-            }
-            else
-            {
+            if (week != null)
                 games = games.Where(x => x.Week == week).ToList();
-            }
-
+            
             if (!string.IsNullOrWhiteSpace(team))
                 games = games.Where(x => x.HomeTeam == team || x.AwayTeam == team).ToList();
 
