@@ -4,7 +4,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using FourthDown.Api.Models;
 using FourthDown.Api.Utilities;
-using WebClient = FourthDown.Api.Utilities.WebClient;
 
 namespace FourthDown.Api.Repositories.Csv
 {
@@ -18,7 +17,7 @@ namespace FourthDown.Api.Repositories.Csv
 
         public async Task<Dictionary<int, List<Game>>> GetGames(CancellationToken cancellationToken)
         {
-            var response = await WebClient.CreateRequest(url, cancellationToken);
+            var response = await RequestHelper.GetRequestResponse(url, cancellationToken);
             var responseBody = await response.Content.ReadAsStringAsync();
 
             return ProcessGamesResponse(responseBody);
