@@ -7,6 +7,6 @@ namespace FourthDown.Api.Repositories
 {
     public interface IPlayByPlayRepository
     {
-        Task<IEnumerable<GameRaw>> GetGamePlays(string gameId, int season, CancellationToken cancellationToken);
+        Task<GameDetail> GetGamePlays(string gameId, int season, CancellationToken cancellationToken);
     }
 }
