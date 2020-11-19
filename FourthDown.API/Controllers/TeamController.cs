@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using FourthDown.Api.Models;
 using FourthDown.Api.Repositories;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FourthDown.Api.Controllers
@@ -19,11 +20,12 @@ namespace FourthDown.Api.Controllers
         }
 
         /// <summary>
-        /// Query for all 32 teams in the league
+        /// Query for all 32 teams 
         /// </summary>
+        /// <returns>List of all teams with some details</returns>
         [HttpGet("")]
         [Produces("application/json")]
-        [ProducesResponseType(typeof(IEnumerable<Team>), 200)]
+        [ProducesResponseType(typeof(IEnumerable<Team>), StatusCodes.Status200OK)]
         public async Task<ActionResult<IEnumerable<Team>>> GetTeams(CancellationToken cancellationToken)
         {
             var teams = await _teamRepository.GetTeams(cancellationToken);

@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using FourthDown.Api.Models;
 using FourthDown.Api.Parameters;
 using FourthDown.Api.Services;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FourthDown.Api.Controllers
@@ -19,9 +20,18 @@ namespace FourthDown.Api.Controllers
             _pbpService = pbpService;
         }
 
+        /// <summary>
+        /// Play by Play and Drive data for a set of games
+        /// </summary>
+        /// <remarks>
+        /// Either GameId or a combination of Season, Week and Team should be provided 
+        /// </remarks>
+        /// <param name="queryParameter">Combination of Season, Week and Team</param>
+        /// <param name="cancellationToken"></param>
+        /// <returns>List of game play by plays</returns>
         [HttpGet("")]
         [Produces("application/json")]
-        [ProducesResponseType(typeof(IEnumerable<PlayByPlay>), 200)]
+        [ProducesResponseType(typeof(IEnumerable<PlayByPlay>), StatusCodes.Status200OK)]
         public async Task<ActionResult<IEnumerable<PlayByPlay>>> GetPbp(
             [FromQuery] PlayByPlayQueryParameter queryParameter,
             CancellationToken cancellationToken)
@@ -39,9 +49,18 @@ namespace FourthDown.Api.Controllers
             return Ok(plays);
         }
 
+        /// <summary>
+        /// Win probabilities represented per drive
+        /// </summary>
+        /// <remarks>
+        /// Either GameId or a combination of Season, Week and Team should be provided 
+        /// </remarks>
+        /// <param name="queryParameter">Combination of Season, Week and Team</param>
+        /// <param name="cancellationToken"></param>
+        /// <returns>List of game win probabilities</returns>
         [HttpGet("winprobability")]
         [Produces("application/json")]
-        [ProducesResponseType(typeof(IEnumerable<WinProbability>), 200)]
+        [ProducesResponseType(typeof(IEnumerable<WinProbability>), StatusCodes.Status200OK)]
         public async Task<ActionResult<IEnumerable<WinProbability>>> GetWp(
             [FromQuery] PlayByPlayQueryParameter queryParameter,
             CancellationToken cancellationToken)

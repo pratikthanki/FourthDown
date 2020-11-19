@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using FourthDown.Api.Models;
 using FourthDown.Api.Parameters;
 using FourthDown.Api.Services;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FourthDown.Api.Controllers
@@ -20,17 +21,17 @@ namespace FourthDown.Api.Controllers
         }
 
         /// <summary>
-        /// Query for games based on conditions
+        /// Query for a set of games and accompanying details
         /// </summary>
         /// <remarks>
-        /// If no parameters are passed, games for the current week/season and all teams is returned
+        /// If no parameters are passed, all team games for the current week for this season are returned
         /// </remarks>
         /// <param name="queryParameter">Combination of Season, Week and Team</param>
         /// <param name="cancellationToken"></param>
-        /// <returns>List of Games</returns>
+        /// <returns>List of games</returns>
         [HttpGet("")]
         [Produces("application/json")]
-        [ProducesResponseType(typeof(IEnumerable<Game>), 200)]
+        [ProducesResponseType(typeof(IEnumerable<Game>), StatusCodes.Status200OK)]
         public async Task<ActionResult<IEnumerable<Game>>> GetSchedule(
             [FromQuery] ScheduleQueryParameter queryParameter,
             CancellationToken cancellationToken)
