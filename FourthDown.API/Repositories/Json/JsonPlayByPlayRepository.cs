@@ -11,6 +11,11 @@ namespace FourthDown.Api.Repositories.Json
 {
     public class JsonPlayByPlayRepository : IPlayByPlayRepository
     {
+        public JsonPlayByPlayRepository()
+        {
+            
+        }
+
         private string GetGameUrl(string gameId, int season) =>
             $"https://github.com/pratikthanki/nflfastR-raw/blob/master/raw/{season}/{gameId}.json.gz?raw=true";
 

@@ -28,7 +28,7 @@ namespace FourthDown.Api.Services
             PlayByPlayQueryParameter queryParameter,
             CancellationToken cancellationToken)
         {
-            var games = await GetGamesFromQuery(queryParameter, cancellationToken);
+            var games = await GetGamesFromQueryOptions(queryParameter, cancellationToken);
 
             if (games == null)
             {
@@ -46,7 +46,7 @@ namespace FourthDown.Api.Services
             return gamePlayByPlays;
         }
 
-        private async Task<IEnumerable<Game>> GetGamesFromQuery(
+        private async Task<IEnumerable<Game>> GetGamesFromQueryOptions(
             PlayByPlayQueryParameter queryParameter,
             CancellationToken cancellationToken)
         {

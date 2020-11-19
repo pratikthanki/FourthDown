@@ -1,19 +1,27 @@
+using System;
+using System.Reflection;
+using System.IO;
 using FourthDown.Api.Configuration;
+using FourthDown.Api.HealthChecks;
 using FourthDown.Api.Repositories;
 using FourthDown.Api.Repositories.Csv;
 using FourthDown.Api.Repositories.Json;
 using FourthDown.Api.Services;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.OpenApi.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
 
 namespace FourthDown.Api
 {
     public class Startup
     {
-        public IConfiguration Configuration { get; }
+        private IConfiguration Configuration { get; }
 
         public Startup(IConfiguration configuration)
         {
@@ -24,15 +32,47 @@ namespace FourthDown.Api
         {
             services
                 .Configure<ReadSettings>(Configuration);
-                
+
             services
                 .AddSingleton<IPlayByPlayService, PlayByPlayService>()
                 .AddSingleton<IScheduleService, ScheduleService>()
                 .AddSingleton<ITeamRepository, JsonTeamRepository>()
                 .AddSingleton<IGameRepository, CsvGameRepository>()
                 .AddSingleton<IPlayByPlayRepository, JsonPlayByPlayRepository>();
-            
+
             services.AddControllers();
+
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo
+                {
+                    Version = "1.0.0",
+                    Title = "Fourth Down API",
+                    Description = "Web API serving NFL data",
+                    TermsOfService = new Uri("https://example.com/terms"),
+                    Contact = new OpenApiContact
+                    {
+                        Name = "Pratik Thanki",
+                        Email = "pratikthanki1@gmail.com",
+                        Url = new Uri("http://pratikthanki.github.io/"),
+                    },
+                    License = new OpenApiLicense
+                    {
+                        Name = "MIT License",
+                        Url = new Uri("https://choosealicense.com/licenses/mit/"),
+                    }
+                });
+
+                var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+                c.IncludeXmlComments(xmlPath);
+            });
+
+            services.AddHealthChecks()
+                .AddCheck<DataAccessHealthCheck>(
+                    "Health check for access to data repository",
+                    failureStatus: HealthStatus.Degraded,
+                    tags: new[] {"data"});
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -47,14 +87,32 @@ namespace FourthDown.Api
                 app.UseHsts();
             }
 
-            app.UseHttpsRedirection();
             app.UseStaticFiles();
+
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Fourth Down V1");
+                c.InjectStylesheet("/swagger-ui/custom.css");
+                c.RoutePrefix = string.Empty;
+            });
+
             app.UseRouting();
             // app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.MapHealthChecks("/health", new HealthCheckOptions()
+                {
+                    AllowCachingResponses = false,
+                    ResultStatusCodes =
+                    {
+                        [HealthStatus.Healthy] = StatusCodes.Status200OK,
+                        [HealthStatus.Degraded] = StatusCodes.Status200OK,
+                        [HealthStatus.Unhealthy] = StatusCodes.Status503ServiceUnavailable
+                    }
+                });
             });
         }
     }
