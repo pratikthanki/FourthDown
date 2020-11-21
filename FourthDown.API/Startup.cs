@@ -1,6 +1,7 @@
 using System;
 using System.Reflection;
 using System.IO;
+using FourthDown.Api.Authentication;
 using FourthDown.Api.Configuration;
 using FourthDown.Api.HealthChecks;
 using FourthDown.Api.Repositories;
@@ -31,14 +32,15 @@ namespace FourthDown.Api
         public void ConfigureServices(IServiceCollection services)
         {
             services
-                .Configure<ReadSettings>(Configuration);
+                .Configure<ApiKeyOptions>(Configuration);
 
             services
                 .AddSingleton<IPlayByPlayService, PlayByPlayService>()
                 .AddSingleton<IScheduleService, ScheduleService>()
                 .AddSingleton<ITeamRepository, JsonTeamRepository>()
                 .AddSingleton<IGameRepository, CsvGameRepository>()
-                .AddSingleton<IPlayByPlayRepository, JsonPlayByPlayRepository>();
+                .AddSingleton<IPlayByPlayRepository, JsonPlayByPlayRepository>()
+                .AddSingleton<IAuthClient, AuthClient>();
 
             services.AddControllers();
 
@@ -46,7 +48,7 @@ namespace FourthDown.Api
             {
                 c.SwaggerDoc("v1", new OpenApiInfo
                 {
-                    Version = "1.0.0",
+                    Version = "v1",
                     Title = "Fourth Down API",
                     Description = "Web API serving NFL data",
                     TermsOfService = new Uri("https://example.com/terms"),
@@ -68,11 +70,21 @@ namespace FourthDown.Api
                 c.IncludeXmlComments(xmlPath);
             });
 
-            services.AddHealthChecks()
+            services
+                .AddHealthChecks()
                 .AddCheck<DataAccessHealthCheck>(
                     "Health check for access to data repository",
                     failureStatus: HealthStatus.Degraded,
                     tags: new[] {"data"});
+
+            services
+                .AddAuthentication(options =>
+                {
+                    options.DefaultAuthenticateScheme = ApiKeyAuthenticationOptions.DefaultScheme;
+                    options.DefaultChallengeScheme = ApiKeyAuthenticationOptions.DefaultScheme;
+                })
+                .AddScheme<ApiKeyAuthenticationOptions, ApiKeyAuthenticationHandler>(
+                    ApiKeyAuthenticationOptions.DefaultScheme, options => { });
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -98,7 +110,8 @@ namespace FourthDown.Api
             });
 
             app.UseRouting();
-            // app.UseAuthorization();
+            app.UseAuthentication();
+            app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {
