@@ -4,20 +4,22 @@ using System.Threading.Tasks;
 using FourthDown.Api.Models;
 using FourthDown.Api.Parameters;
 using FourthDown.Api.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
 namespace FourthDown.Api.Controllers
 {
-    [Route("api/pbp")]
+    [Route("api/game")]
+    [Authorize]
     [ApiController]
-    public class PlayByPlayController : ControllerBase
+    public class GameController : ControllerBase
     {
         private readonly ILogger<ScheduleController> _logger;
         private IPlayByPlayService _pbpService { get; }
 
-        public PlayByPlayController(
+        public GameController(
             ILogger<ScheduleController> logger,
             IPlayByPlayService pbpService)
         {
@@ -34,10 +36,10 @@ namespace FourthDown.Api.Controllers
         /// <param name="queryParameter">Combination of Season, Week and Team</param>
         /// <param name="cancellationToken"></param>
         /// <returns>List of game play by plays</returns>
-        [HttpGet("")]
+        [HttpGet("playbyplay")]
         [Produces("application/json")]
-        [ProducesResponseType(typeof(IEnumerable<PlayByPlay>), StatusCodes.Status200OK)]
-        public async Task<ActionResult<IEnumerable<PlayByPlay>>> GetPbp(
+        [ProducesResponseType(typeof(IEnumerable<GameDetail>), StatusCodes.Status200OK)]
+        public async Task<ActionResult<IEnumerable<GameDetail>>> GetPbp(
             [FromQuery] PlayByPlayQueryParameter queryParameter,
             CancellationToken cancellationToken)
         {
