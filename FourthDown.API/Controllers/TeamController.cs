@@ -5,6 +5,7 @@ using FourthDown.Api.Models;
 using FourthDown.Api.Repositories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 
 namespace FourthDown.Api.Controllers
 {
@@ -12,10 +13,14 @@ namespace FourthDown.Api.Controllers
     [ApiController]
     public class TeamController : ControllerBase
     {
+        private readonly ILogger<TeamController> _logger;
         private ITeamRepository _teamRepository { get; }
 
-        public TeamController(ITeamRepository teamRepository)
+        public TeamController(
+            ILogger<TeamController> logger,
+            ITeamRepository teamRepository)
         {
+            _logger = logger;
             _teamRepository = teamRepository;
         }
 
@@ -29,6 +34,8 @@ namespace FourthDown.Api.Controllers
         public async Task<ActionResult<IEnumerable<Team>>> GetTeams(CancellationToken cancellationToken)
         {
             var teams = await _teamRepository.GetTeams(cancellationToken);
+            
+            _logger.LogInformation("Successful Teams request");
 
             return Ok(teams);
         }

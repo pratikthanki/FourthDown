@@ -6,6 +6,7 @@ using FourthDown.Api.Parameters;
 using FourthDown.Api.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 
 namespace FourthDown.Api.Controllers
 {
@@ -13,10 +14,14 @@ namespace FourthDown.Api.Controllers
     [ApiController]
     public class PlayByPlayController : ControllerBase
     {
+        private readonly ILogger<ScheduleController> _logger;
         private IPlayByPlayService _pbpService { get; }
 
-        public PlayByPlayController(IPlayByPlayService pbpService)
+        public PlayByPlayController(
+            ILogger<ScheduleController> logger,
+            IPlayByPlayService pbpService)
         {
+            _logger = logger;
             _pbpService = pbpService;
         }
 

@@ -6,6 +6,7 @@ using FourthDown.Api.Parameters;
 using FourthDown.Api.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 
 namespace FourthDown.Api.Controllers
 {
@@ -13,10 +14,14 @@ namespace FourthDown.Api.Controllers
     [ApiController]
     public class ScheduleController : ControllerBase
     {
+        private readonly ILogger<ScheduleController> _logger;
         private readonly IScheduleService _scheduleService;
 
-        public ScheduleController(IScheduleService scheduleService)
+        public ScheduleController(
+            ILogger<ScheduleController> logger,
+            IScheduleService scheduleService)
         {
+            _logger = logger;
             _scheduleService = scheduleService;
         }
 
@@ -37,6 +42,8 @@ namespace FourthDown.Api.Controllers
             CancellationToken cancellationToken)
         {
             var games = await _scheduleService.GetGames(queryParameter, cancellationToken);
+
+            _logger.LogInformation("Successful Games request");
 
             return Ok(games);
         }
