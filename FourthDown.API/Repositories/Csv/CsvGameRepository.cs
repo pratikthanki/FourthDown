@@ -9,7 +9,7 @@ namespace FourthDown.Api.Repositories.Csv
 {
     public class CsvGameRepository : IGameRepository
     {
-        private const string url = @"https://raw.githubusercontent.com/leesharpe/nfldata/master/data/games.csv";
+        private const string url = @"https://github.com/leesharpe/nfldata/blob/master/data/games.csv?raw=true";
 
         public CsvGameRepository()
         {

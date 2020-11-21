@@ -14,9 +14,6 @@ namespace FourthDown.Api.Services
         private readonly IPlayByPlayRepository _pbpRepository;
         private readonly IScheduleService _scheduleService;
 
-        private const string GameId = "2020_09_PIT_DAL";
-        private const int Season = 2020;
-
         public PlayByPlayService(
             IPlayByPlayRepository pbpRepository,
             IScheduleService scheduleService)
