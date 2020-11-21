@@ -87,7 +87,7 @@ namespace FourthDown.Api.Models
         public string HowEndedDescription { get; set; }
         public string HowStartedDescription { get; set; }
         public bool Inside20 { get; set; }
-        public int OrderSequence { get; set; }
+        public double OrderSequence { get; set; }
         public int PlayCount { get; set; }
         public int PlayIdEnded { get; set; }
         public int PlayIdStarted { get; set; }
@@ -124,7 +124,7 @@ namespace FourthDown.Api.Models
         public bool GoalToGo { get; set; }
         public bool NextPlayIsGoalToGo { get; set; }
         public string NextPlayType { get; set; }
-        public int OrderSequence { get; set; }
+        public double OrderSequence { get; set; }
         public bool PenaltyOnPlay { get; set; }
         public string PlayClock { get; set; }
         public bool PlayDeleted { get; set; }
