@@ -21,7 +21,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Authorization" />
       <Folder Include="Extensions" />
       <Folder Include="Formatters" />
     </ItemGroup>

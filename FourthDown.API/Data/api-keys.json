@@ -1,0 +1,12 @@
+{
+  "api-key": {
+    "Alias": "Bloggs",
+    "Created": "2020-11-01T00:00:00",
+    "Expiration": "2099-01-01T00:00:00"
+  },
+  "expired-api-key": {
+    "Alias": "Smith",
+    "Created": "2020-11-01T00:00:00",
+    "Expiration": "2020-11-02T00:00:00"
+  }
+}
