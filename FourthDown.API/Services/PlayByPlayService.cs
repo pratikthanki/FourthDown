@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using FourthDown.Api.Models;
 using FourthDown.Api.Repositories;
@@ -30,7 +31,7 @@ namespace FourthDown.Api.Services
         {
             var games = await GetGamesFromQueryOptions(queryParameter, cancellationToken);
 
-            if (games == null)
+            if (games == null || !games.Any())
             {
                 return null;
             }
@@ -67,7 +68,7 @@ namespace FourthDown.Api.Services
                 games = await _scheduleService.GetGameById(queryParameter.GameId, cancellationToken);
             }
 
-            return games;
+            return games.Where(game => game.Gameday < DateTime.UtcNow.Date).ToList();
         }
 
         public Task<IEnumerable<WinProbability>> GetGameWinProbability(
