@@ -3,13 +3,15 @@ using System.Threading;
 using System.Threading.Tasks;
 using FourthDown.Api.Models;
 using FourthDown.Api.Repositories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
 namespace FourthDown.Api.Controllers
 {
-    [Route("api/team")]
+    [Route("api/teams")]
+    [Authorize]
     [ApiController]
     public class TeamController : ControllerBase
     {

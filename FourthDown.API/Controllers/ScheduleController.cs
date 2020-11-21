@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using FourthDown.Api.Models;
 using FourthDown.Api.Parameters;
 using FourthDown.Api.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -11,6 +12,7 @@ using Microsoft.Extensions.Logging;
 namespace FourthDown.Api.Controllers
 {
     [Route("api/schedule")]
+    [Authorize]
     [ApiController]
     public class ScheduleController : ControllerBase
     {
