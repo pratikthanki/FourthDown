@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using FourthDown.Api.Models;
@@ -38,8 +39,8 @@ namespace FourthDown.Api.Controllers
         /// <returns>List of game play by plays</returns>
         [HttpGet("playbyplay")]
         [Produces("application/json")]
-        [ProducesResponseType(typeof(IEnumerable<GameDetail>), StatusCodes.Status200OK)]
-        public async Task<ActionResult<IEnumerable<GameDetail>>> GetPbp(
+        [ProducesResponseType(typeof(IEnumerable<PlayByPlay>), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetPbp(
             [FromQuery] PlayByPlayQueryParameter queryParameter,
             CancellationToken cancellationToken)
         {
@@ -48,10 +49,17 @@ namespace FourthDown.Api.Controllers
                 return BadRequest(new ValidationProblemDetails(errors)
                 {
                     Title = "Looks like there are some errors with your request.",
-                    Status = 400,
+                    Status = StatusCodes.Status400BadRequest
                 });
 
             var plays = await _pbpService.GetGamePlayByPlays(queryParameter, cancellationToken);
+
+            if (plays == null || !plays.Any())
+                return NotFound(new ValidationProblemDetails(queryParameter.ToKeyValues())
+                {
+                    Title = "No data for the request parameters given.",
+                    Status = StatusCodes.Status404NotFound
+                });
 
             return Ok(plays);
         }
@@ -81,7 +89,10 @@ namespace FourthDown.Api.Controllers
                 });
 
             var wp = await _pbpService.GetGameWinProbability(queryParameter, cancellationToken);
-
+            
+            if (wp == null || !wp.Any())
+                return NotFound();
+            
             return Ok(wp);
         }
     }
