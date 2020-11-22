@@ -22,7 +22,7 @@ namespace FourthDown.Api.Services
             _scheduleService = scheduleService;
         }
 
-        public async Task<List<GameDetail>> GetGamePlayByPlays(
+        public async Task<List<PlayByPlay>> GetGamePlayByPlays(
             PlayByPlayQueryParameter queryParameter,
             CancellationToken cancellationToken)
         {
@@ -33,12 +33,12 @@ namespace FourthDown.Api.Services
                 return null;
             }
 
-            var gamePlayByPlays = new List<GameDetail>();
+            var gamePlayByPlays = new List<PlayByPlay>();
 
             foreach (var game in games)
             {
                 var pbp = await _pbpRepository.GetGamePlays(game.GameId, game.Season, cancellationToken);
-                gamePlayByPlays.Add(pbp);
+                gamePlayByPlays.Add(new PlayByPlay(pbp));
             }
 
             return gamePlayByPlays;

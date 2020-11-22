@@ -8,7 +8,7 @@ namespace FourthDown.Api.Services
 {
     public interface IPlayByPlayService
     {
-        public Task<List<GameDetail>> GetGamePlayByPlays(PlayByPlayQueryParameter queryParameter,
+        public Task<List<PlayByPlay>> GetGamePlayByPlays(PlayByPlayQueryParameter queryParameter,
             CancellationToken cancellationToken);
 
         public Task<IEnumerable<WinProbability>> GetGameWinProbability(
