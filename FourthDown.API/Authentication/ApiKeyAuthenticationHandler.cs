@@ -54,13 +54,13 @@ namespace FourthDown.Api.Authentication
             if (existingApiKey == null)
                 return AuthenticateResult.Fail("Invalid API Key provided.");
 
-            if (DateTime.UtcNow.Date > existingApiKey.Expiration)
-                return AuthenticateResult.Fail($"Provided API Key has expired: {existingApiKey.Expiration}.");
+            if (DateTime.UtcNow.Date > existingApiKey.ExpirationDateTime)
+                return AuthenticateResult.Fail($"Provided API Key has expired: {existingApiKey.ExpirationDateTime}.");
 
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.Name, existingApiKey.Alias),
-                new Claim(ClaimTypes.Expiration, existingApiKey.Expiration.ToString(CultureInfo.InvariantCulture)),
+                new Claim(ClaimTypes.Expiration, existingApiKey.ExpirationDateTime.ToString(CultureInfo.InvariantCulture)),
             };
 
             var identity = new ClaimsIdentity(claims, ApiKeyAuthenticationOptions.AuthenticationType);
@@ -95,7 +95,7 @@ namespace FourthDown.Api.Authentication
     public class ApiKey
     {
         public string Alias { get; set; }
-        public DateTime Created { get; set; }
-        public DateTime Expiration { get; set; }
+        public DateTime CreationDateTime { get; set; }
+        public DateTime ExpirationDateTime { get; set; }
     }
 }
