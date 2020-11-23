@@ -18,18 +18,18 @@ namespace FourthDown.Api.Controllers
     public class GameController : ControllerBase
     {
         private readonly ILogger<ScheduleController> _logger;
-        private IPlayByPlayService _pbpService { get; }
+        private IGamePlayService _pbpService { get; }
 
         public GameController(
             ILogger<ScheduleController> logger,
-            IPlayByPlayService pbpService)
+            IGamePlayService pbpService)
         {
             _logger = logger;
             _pbpService = pbpService;
         }
 
         /// <summary>
-        /// Play by Play and Drive data for a set of games
+        /// Play by Play data for a set of games
         /// </summary>
         /// <remarks>
         /// Either GameId or a combination of Season, Week and Team should be provided 
@@ -37,10 +37,10 @@ namespace FourthDown.Api.Controllers
         /// <param name="queryParameter">Combination of Season, Week and Team</param>
         /// <param name="cancellationToken"></param>
         /// <returns>List of game play by plays</returns>
-        [HttpGet("playbyplay")]
+        [HttpGet("plays")]
         [Produces("application/json")]
-        [ProducesResponseType(typeof(IEnumerable<PlayByPlay>), StatusCodes.Status200OK)]
-        public async Task<IActionResult> GetPbp(
+        [ProducesResponseType(typeof(IEnumerable<GamePlays>), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetPlays(
             [FromQuery] PlayByPlayQueryParameter queryParameter,
             CancellationToken cancellationToken)
         {
@@ -52,7 +52,7 @@ namespace FourthDown.Api.Controllers
                     Status = StatusCodes.Status400BadRequest
                 });
 
-            var plays = await _pbpService.GetGamePlayByPlays(queryParameter, cancellationToken);
+            var plays = await _pbpService.GetGamePlays(queryParameter, cancellationToken);
 
             if (plays == null || !plays.Any())
                 return NotFound(new ValidationProblemDetails(queryParameter.ToKeyValues())
@@ -65,18 +65,18 @@ namespace FourthDown.Api.Controllers
         }
 
         /// <summary>
-        /// Win probabilities represented per drive
+        /// game drives summarised from plays 
         /// </summary>
         /// <remarks>
         /// Either GameId or a combination of Season, Week and Team should be provided 
         /// </remarks>
         /// <param name="queryParameter">Combination of Season, Week and Team</param>
         /// <param name="cancellationToken"></param>
-        /// <returns>List of game win probabilities</returns>
-        [HttpGet("winprobability")]
+        /// <returns>List of game drives</returns>
+        [HttpGet("drives")]
         [Produces("application/json")]
-        [ProducesResponseType(typeof(IEnumerable<WinProbability>), StatusCodes.Status200OK)]
-        public async Task<ActionResult<IEnumerable<WinProbability>>> GetWp(
+        [ProducesResponseType(typeof(IEnumerable<GameDrives>), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetDrives(
             [FromQuery] PlayByPlayQueryParameter queryParameter,
             CancellationToken cancellationToken)
         {
@@ -85,15 +85,55 @@ namespace FourthDown.Api.Controllers
                 return BadRequest(new ValidationProblemDetails(errors)
                 {
                     Title = "Looks like there are some errors with your request.",
-                    Status = 400,
+                    Status = StatusCodes.Status400BadRequest
                 });
 
-            var wp = await _pbpService.GetGameWinProbability(queryParameter, cancellationToken);
-            
-            if (wp == null || !wp.Any())
-                return NotFound();
-            
-            return Ok(wp);
+            var plays = await _pbpService.GetGameDrives(queryParameter, cancellationToken);
+
+            if (plays == null || !plays.Any())
+                return NotFound(new ValidationProblemDetails(queryParameter.ToKeyValues())
+                {
+                    Title = "No data for the request parameters given.",
+                    Status = StatusCodes.Status404NotFound
+                });
+
+            return Ok(plays);
+        }
+
+        /// <summary>
+        /// List of scoring drives with updated team scores
+        /// </summary>
+        /// <remarks>
+        /// Either GameId or a combination of Season, Week and Team should be provided 
+        /// </remarks>
+        /// <param name="queryParameter">Combination of Season, Week and Team</param>
+        /// <param name="cancellationToken"></param>
+        /// <returns>List of game scoring summaries</returns>
+        [HttpGet("scoringsummaries")]
+        [Produces("application/json")]
+        [ProducesResponseType(typeof(IEnumerable<GameScoringSummaries>), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetScoringSummaries(
+            [FromQuery] PlayByPlayQueryParameter queryParameter,
+            CancellationToken cancellationToken)
+        {
+            var errors = queryParameter.Validate();
+            if (errors.Count > 0)
+                return BadRequest(new ValidationProblemDetails(errors)
+                {
+                    Title = "Looks like there are some errors with your request.",
+                    Status = StatusCodes.Status400BadRequest
+                });
+
+            var plays = await _pbpService.GetGameScoringSummaries(queryParameter, cancellationToken);
+
+            if (plays == null || !plays.Any())
+                return NotFound(new ValidationProblemDetails(queryParameter.ToKeyValues())
+                {
+                    Title = "No data for the request parameters given.",
+                    Status = StatusCodes.Status404NotFound
+                });
+
+            return Ok(plays);
         }
     }
 }
