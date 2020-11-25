@@ -9,12 +9,12 @@ using FourthDown.Api.Parameters;
 
 namespace FourthDown.Api.Services
 {
-    public class GameGamePlayService : IGamePlayService
+    public class GamePlayService : IGamePlayService
     {
         private readonly IGamePlayRepository _gamePlayRepository;
         private readonly IScheduleService _scheduleService;
 
-        public GameGamePlayService(
+        public GamePlayService(
             IGamePlayRepository gamePlayRepository,
             IScheduleService scheduleService)
         {

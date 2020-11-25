@@ -39,11 +39,12 @@ namespace FourthDown.Api
                 .Configure<ApiKeyOptions>(Configuration);
 
             services
-                .AddSingleton<IGamePlayService, GameGamePlayService>()
+                .AddSingleton<IGamePlayService, GamePlayService>()
                 .AddSingleton<IScheduleService, ScheduleService>()
                 .AddSingleton<ITeamRepository, JsonTeamRepository>()
                 .AddSingleton<IGameRepository, CsvGameRepository>()
                 .AddSingleton<IGamePlayRepository, JsonGamePlayRepository>()
+                .AddSingleton<IPlayByPlayRepository, CsvPlayByPlayRepository>()
                 .AddSingleton<IAuthClient, AuthClient>();
 
             services.AddControllers();
