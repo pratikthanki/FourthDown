@@ -16,10 +16,10 @@ namespace FourthDown.Api.Repositories.Json
 
         public async Task<IEnumerable<Team>> GetTeams(CancellationToken cancellationToken)
         {
-            return await ReadTeamsJson();
+            return await ReadTeamsJson(cancellationToken);
         }
 
-        private static async Task<IEnumerable<Team>> ReadTeamsJson()
+        private static async Task<IEnumerable<Team>> ReadTeamsJson(CancellationToken cancellationToken)
         {
             const string file = "teams.json";
             var filePath = StringParser.GetDataFilePath(file);
@@ -31,7 +31,7 @@ namespace FourthDown.Api.Repositories.Json
                 new JsonSerializerOptions
                 {
                     PropertyNameCaseInsensitive = true
-                });
+                }, cancellationToken);
         }
     }
 }

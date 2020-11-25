@@ -1,5 +1,6 @@
 using System.IO;
 using System.IO.Compression;
+using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Threading;
@@ -39,7 +40,7 @@ namespace FourthDown.Api.Repositories.Json
             var response = await RequestHelper.GetRequestResponse(url, cancellationToken);
             var stream = await response.Content.ReadAsStreamAsync();
 
-            var data = await ReadCompressedStreamToString(stream);
+            var data = await ResponseHelper.ReadCompressedStreamToString(stream);
 
             var jsonSerializerOptions = new JsonSerializerOptions
             {
@@ -56,20 +57,7 @@ namespace FourthDown.Api.Repositories.Json
                 _logger.LogError($"Error in deserializing json string: {JsonException}\n url: {url}");
             }
 
-            return gameRaw.Data.Viewer.GameDetail;
-        }
-
-        private static async Task<string> ReadCompressedStreamToString(Stream stream)
-        {
-            await using var inStream = new GZipInputStream(stream);
-            await using var MemoryStream = new MemoryStream();
-
-            byte[] buffer = new byte[4096];
-            StreamUtils.Copy(inStream, MemoryStream, buffer);
-            
-            var data = Encoding.UTF8.GetString(MemoryStream.ToArray());
-
-            return data;
+            return gameRaw == null ? new GameDetail() : gameRaw.Data.Viewer.GameDetail;
         }
     }
 }
