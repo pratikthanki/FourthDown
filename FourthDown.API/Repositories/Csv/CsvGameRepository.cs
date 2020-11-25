@@ -23,7 +23,7 @@ namespace FourthDown.Api.Repositories.Csv
             return ProcessGamesResponse(responseBody);
         }
 
-        private Dictionary<int, List<Game>> ProcessGamesResponse(string responseBody)
+        private static Dictionary<int, List<Game>> ProcessGamesResponse(string responseBody)
         {
             var csvResponse = responseBody
                 .Split("\n")
