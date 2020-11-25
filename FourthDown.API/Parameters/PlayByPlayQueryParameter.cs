@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
@@ -59,6 +60,12 @@ namespace FourthDown.Api.Parameters
                 if (NonGameIdParameterSet())
                     errors["query"] = new[] {"If gameId is used then Week, Season and Team do not need to be provided"};
             }
+
+            var Today = DateTime.UtcNow;
+            var currentSeason = Today.Month > 8 ? Today.Year : Today.Year - 1;
+
+            if (Season > currentSeason || Season < 1999)
+                errors["query"] = new[] {$"Season must be between 1999 and {currentSeason}"};
 
             return errors;
         }
