@@ -33,7 +33,7 @@ namespace FourthDown.Api.Controllers
         [HttpGet("")]
         [Produces("application/json")]
         [ProducesResponseType(typeof(IEnumerable<Team>), StatusCodes.Status200OK)]
-        public async Task<ActionResult<IEnumerable<Team>>> GetTeams(CancellationToken cancellationToken)
+        public async Task<ActionResult> GetTeams(CancellationToken cancellationToken)
         {
             var teams = await _teamRepository.GetTeams(cancellationToken);
             

@@ -39,7 +39,7 @@ namespace FourthDown.Api.Controllers
         [HttpGet("")]
         [Produces("application/json")]
         [ProducesResponseType(typeof(IEnumerable<Game>), StatusCodes.Status200OK)]
-        public async Task<ActionResult<IEnumerable<Game>>> GetSchedule(
+        public async Task<ActionResult> GetSchedule(
             [FromQuery] ScheduleQueryParameter queryParameter,
             CancellationToken cancellationToken)
         {
