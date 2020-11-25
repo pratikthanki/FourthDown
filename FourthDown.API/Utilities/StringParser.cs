@@ -7,8 +7,11 @@ namespace FourthDown.Api.Utilities
 {
     public static class StringParser
     {
-        public static int ToInt(string number) =>
-            int.Parse(number);
+        public static int ToInt(string number)
+        {
+            int.TryParse(number, out var num);
+            return num;
+        }
 
         public static int? ToNullableInt(string number) =>
             IsNa(number) ? (int?) null : int.Parse(number);
@@ -24,6 +27,9 @@ namespace FourthDown.Api.Utilities
 
         public static double ToDoubleDefaultZero(string number) =>
             IsNa(number) ? 0 : double.Parse(number);
+
+        public static TimeSpan? ToTimeSpanOrNull(string time) =>
+            IsNa(time) || time == "0" ? (TimeSpan?) null : TimeSpan.Parse(time);
 
         public static DateTime? ToDateTimeOrNull(string dateTime, string format) =>
             IsNa(dateTime) || dateTime == "0"
