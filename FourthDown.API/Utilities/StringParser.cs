@@ -7,6 +7,8 @@ namespace FourthDown.Api.Utilities
 {
     public static class StringParser
     {
+        private const string DateFormat = "yyyy-MM-dd";
+
         public static int ToInt(string number)
         {
             int.TryParse(number, out var num);
@@ -31,10 +33,10 @@ namespace FourthDown.Api.Utilities
         public static TimeSpan? ToTimeSpanOrNull(string time) =>
             IsNa(time) || time == "0" ? (TimeSpan?) null : TimeSpan.Parse(time);
 
-        public static DateTime? ToDateTimeOrNull(string dateTime, string format) =>
+        public static DateTime? ToDateTimeOrNull(string dateTime) =>
             IsNa(dateTime) || dateTime == "0"
                 ? (DateTime?) null
-                : DateTime.ParseExact(dateTime, format, CultureInfo.InvariantCulture);
+                : DateTime.ParseExact(dateTime, DateFormat, CultureInfo.InvariantCulture);
 
         public static DateTime ToDateTime(string dateTime, string format) =>
             DateTime.ParseExact(dateTime, format, CultureInfo.InvariantCulture);

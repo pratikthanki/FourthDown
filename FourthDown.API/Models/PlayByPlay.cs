@@ -27,7 +27,7 @@ namespace FourthDown.Api.Models
         public int Qtr { get; set; }
         public int? Down { get; set; }
         public int GoalToGo { get; set; }
-        public DateTime? Time { get; set; }
+        public string Time { get; set; }
         public string YardLine { get; set; }
         public int YdsToGo { get; set; }
         public int? YardsNet { get; set; }
@@ -272,8 +272,8 @@ namespace FourthDown.Api.Models
         public int SeriesSuccess { get; set; }
         public string SeriesResult { get; set; }
         public double OrderSequence { get; set; }
-        public TimeSpan? StartTime { get; set; }
-        public TimeSpan? TimeOfDay { get; set; }
+        public string StartTime { get; set; }
+        public string TimeOfDay { get; set; }
         public string Stadium { get; set; }
         public string Weather { get; set; }
         public string NflApiId { get; set; }
@@ -282,13 +282,13 @@ namespace FourthDown.Api.Models
         public string PlayTypeNfl { get; set; }
         public bool SpecialTeamsPlay { get; set; }
         public string SpecialTeamsPlayType { get; set; }
-        public TimeSpan? EndClockTime { get; set; }
+        public string EndClockTime { get; set; }
         public string EndYardLine { get; set; }
         public int FixedDrive { get; set; }
         public string FixedDriveResult { get; set; }
         public string DriveRealStartTime { get; set; }
         public int? DrivePlayCount { get; set; }
-        public TimeSpan? DriveTimeOfPossession { get; set; }
+        public string DriveTimeOfPossession { get; set; }
         public int? DriveFirstDowns { get; set; }
         public int? DriveInside20 { get; set; }
         public int? DriveEndedWithScore { get; set; }
@@ -297,8 +297,8 @@ namespace FourthDown.Api.Models
         public int? DriveYardsPenalized { get; set; }
         public string DriveStartTransition { get; set; }
         public string DriveEndTransition { get; set; }
-        public TimeSpan? DriveGameClockStart { get; set; }
-        public TimeSpan? DriveGameClockEnd { get; set; }
+        public string DriveGameClockStart { get; set; }
+        public string DriveGameClockEnd { get; set; }
         public string DriveStartYardLine { get; set; }
         public string DriveEndYardLine { get; set; }
         public int? DrivePlayIdStarted { get; set; }

@@ -11,7 +11,9 @@ namespace FourthDown.Api.Repositories.Csv
 {
     public class CsvPlayByPlayRepository : IPlayByPlayRepository
     {
-        public async Task<List<PlayByPlay>> GetPlayByPlays(PlayByPlayQueryParameter queryParameter, CancellationToken cancellationToken)
+        public async Task<IEnumerable<PlayByPlay>> GetPlayByPlays(
+            PlayByPlayQueryParameter queryParameter, 
+            CancellationToken cancellationToken)
         {
             var season = queryParameter.Season;
             var team = queryParameter.Team;
@@ -34,15 +36,11 @@ namespace FourthDown.Api.Repositories.Csv
             if (week != null)
                 plaByPlays = plaByPlays.Where(x => x.Week == week);
             
-            return plaByPlays.Where(x => x.Season == season).ToList();
+            return plaByPlays.Where(x => x.Season == season);
         }
 
         private static IEnumerable<PlayByPlay> ProcessPlayByPlayResponse(string responseBody)
         {
-            const string TimeMmSs = "mm:ss";
-            const string ClockHhMmSs = "HH:mm:ss";
-            const string DateFormat = "yyyy-MM-dd";
-
             var csvResponse = responseBody
                 .Split("\n")
                 .Skip(1);
@@ -71,7 +69,7 @@ namespace FourthDown.Api.Repositories.Csv
                 Play.DefTeam = StringParser.ToString(x[9]);
                 Play.SideOfField = StringParser.ToString(x[10]);
                 Play.YardLine100 = StringParser.ToNullableInt(x[11]);
-                Play.GameDate = StringParser.ToDateTimeOrNull(x[12], DateFormat);
+                Play.GameDate = StringParser.ToDateTimeOrNull(x[12]);
                 Play.QuarterSecondsRemaining = StringParser.ToInt(x[13]);
                 Play.HalfSecondsRemaining = StringParser.ToInt(x[14]);
                 Play.GameSecondsRemaining = StringParser.ToInt(x[15]);
@@ -82,7 +80,7 @@ namespace FourthDown.Api.Repositories.Csv
                 Play.Qtr = StringParser.ToInt(x[20]);
                 Play.Down = StringParser.ToNullableInt(x[21]);
                 Play.GoalToGo = StringParser.ToInt(x[22]);
-                Play.Time = StringParser.ToDateTimeOrNull(x[23], TimeMmSs);
+                Play.Time = StringParser.ToString(x[23]);
                 Play.YardLine = StringParser.ToString(x[24]);
                 Play.YdsToGo = StringParser.ToInt(x[25]);
                 Play.YardsNet = StringParser.ToNullableInt(x[26]);
@@ -327,8 +325,8 @@ namespace FourthDown.Api.Repositories.Csv
                 Play.SeriesSuccess = StringParser.ToInt(x[265]);
                 Play.SeriesResult = StringParser.ToString(x[266]);
                 Play.OrderSequence = StringParser.ToDouble(x[267]);
-                Play.StartTime = StringParser.ToTimeSpanOrNull(x[268]);
-                Play.TimeOfDay = StringParser.ToTimeSpanOrNull(x[269]);
+                Play.StartTime = StringParser.ToString(x[268]);
+                Play.TimeOfDay = StringParser.ToString(x[269]);
                 Play.Stadium = StringParser.ToString(x[270]);
                 Play.Weather = StringParser.ToString(x[271]);
                 Play.NflApiId = StringParser.ToString(x[272]);
@@ -337,13 +335,13 @@ namespace FourthDown.Api.Repositories.Csv
                 Play.PlayTypeNfl = StringParser.ToString(x[275]);
                 Play.SpecialTeamsPlay = StringParser.ToBool(x[276]);
                 Play.SpecialTeamsPlayType = StringParser.ToString(x[277]);
-                Play.EndClockTime = StringParser.ToTimeSpanOrNull(x[278]);
+                Play.EndClockTime = StringParser.ToString(x[278]);
                 Play.EndYardLine = StringParser.ToString(x[279]);
                 Play.FixedDrive = StringParser.ToInt(x[280]);
                 Play.FixedDriveResult = StringParser.ToString(x[281]);
                 Play.DriveRealStartTime = StringParser.ToString(x[282]);
                 Play.DrivePlayCount = StringParser.ToNullableInt(x[283]);
-                Play.DriveTimeOfPossession = StringParser.ToTimeSpanOrNull(x[284]);
+                Play.DriveTimeOfPossession = StringParser.ToString(x[284]);
                 Play.DriveFirstDowns = StringParser.ToNullableInt(x[285]);
                 Play.DriveInside20 = StringParser.ToNullableInt(x[286]);
                 Play.DriveEndedWithScore = StringParser.ToNullableInt(x[287]);
@@ -352,8 +350,8 @@ namespace FourthDown.Api.Repositories.Csv
                 Play.DriveYardsPenalized = StringParser.ToNullableInt(x[290]);
                 Play.DriveStartTransition = StringParser.ToString(x[291]);
                 Play.DriveEndTransition = StringParser.ToString(x[292]);
-                Play.DriveGameClockStart = StringParser.ToTimeSpanOrNull(x[293]);
-                Play.DriveGameClockEnd = StringParser.ToTimeSpanOrNull(x[294]);
+                Play.DriveGameClockStart = StringParser.ToString(x[293]);
+                Play.DriveGameClockEnd = StringParser.ToString(x[294]);
                 Play.DriveStartYardLine = StringParser.ToString(x[295]);
                 Play.DriveEndYardLine = StringParser.ToString(x[296]);
                 Play.DrivePlayIdStarted = StringParser.ToNullableInt(x[297]);
