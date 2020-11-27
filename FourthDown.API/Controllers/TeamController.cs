@@ -1,6 +1,6 @@
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Threading;
-using System.Threading.Tasks;
 using FourthDown.Api.Models;
 using FourthDown.Api.Repositories;
 using Microsoft.AspNetCore.Authorization;
@@ -33,13 +33,15 @@ namespace FourthDown.Api.Controllers
         [HttpGet("")]
         [Produces("application/json")]
         [ProducesResponseType(typeof(IEnumerable<Team>), StatusCodes.Status200OK)]
-        public async Task<ActionResult> GetTeams(CancellationToken cancellationToken)
+        public async IAsyncEnumerable<IActionResult> GetTeams(
+            [EnumeratorCancellation] CancellationToken cancellationToken)
         {
-            var teams = await _teamRepository.GetTeams(cancellationToken);
-            
             _logger.LogInformation("Successful Teams request");
 
-            return Ok(teams);
+            await foreach (var team in _teamRepository.GetTeamsAsync(cancellationToken))
+            {
+                yield return Ok(team);
+            }
         }
     }
 }
