@@ -1,14 +1,8 @@
-using System.IO;
-using System.IO.Compression;
-using System.Linq;
-using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using FourthDown.Api.Models;
 using FourthDown.Api.Utilities;
-using ICSharpCode.SharpZipLib.Core;
-using ICSharpCode.SharpZipLib.GZip;
 using Microsoft.Extensions.Logging;
 
 namespace FourthDown.Api.Repositories.Json
@@ -16,7 +10,7 @@ namespace FourthDown.Api.Repositories.Json
     public class JsonGamePlayRepository : IGamePlayRepository
     {
         private static ILogger<JsonGamePlayRepository> _logger;
-        
+
         public JsonGamePlayRepository(ILogger<JsonGamePlayRepository> logger)
         {
             _logger = logger;
@@ -25,7 +19,7 @@ namespace FourthDown.Api.Repositories.Json
         private string GetGameUrl(string gameId, int season) =>
             $"https://github.com/pratikthanki/nflfastR-raw/blob/master/raw/{season}/{gameId}.json.gz?raw=true";
 
-        public async Task<GameDetail> GetGamePlays(
+        public async Task<GameDetail> GetGamePlaysAsync(
             string gameId,
             int season,
             CancellationToken cancellationToken)

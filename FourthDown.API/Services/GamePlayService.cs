@@ -88,7 +88,7 @@ namespace FourthDown.Api.Services
 
             foreach (var game in games)
             {
-                var pbp = await _gamePlayRepository.GetGamePlays(game.GameId, game.Season, cancellationToken);
+                var pbp = await _gamePlayRepository.GetGamePlaysAsync(game.GameId, game.Season, cancellationToken);
                 gamePlays.Add(new GameDetailsFormatted(pbp));
             }
 

@@ -35,7 +35,7 @@ namespace FourthDown.Api.Controllers
         /// <returns>List of game play by plays</returns>
         [HttpGet("")]
         [Produces("application/json")]
-        [ProducesResponseType(typeof(IEnumerable<GamePlays>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> GetPlayByPlays(
             [FromQuery] PlayByPlayQueryParameter queryParameter, 
             CancellationToken cancellationToken)
@@ -48,7 +48,7 @@ namespace FourthDown.Api.Controllers
                     Status = StatusCodes.Status400BadRequest
                 });
 
-            var plays = await _playByPlayRepository.GetPlayByPlays(queryParameter, cancellationToken);
+            var plays = await _playByPlayRepository.GetPlayByPlaysAsync(queryParameter, cancellationToken);
 
             if (plays == null || !plays.Any())
                 return NotFound(new ValidationProblemDetails()

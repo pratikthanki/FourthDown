@@ -7,6 +7,6 @@ namespace FourthDown.Api.Repositories
 {
     public interface IGameRepository
     {
-        Task<Dictionary<int, List<Game>>> GetGames(CancellationToken cancellationToken);
+        Task<Dictionary<int, List<Game>>> GetGamesAsync(CancellationToken cancellationToken);
     }
 }

@@ -33,7 +33,7 @@ namespace FourthDown.Api.Services
 
         private async Task<Dictionary<int, List<Game>>> GetAllGames(CancellationToken cancellationToken)
         {
-            return await _gameRepository.GetGames(cancellationToken);
+            return await _gameRepository.GetGamesAsync(cancellationToken);
         }
 
         public async Task<IEnumerable<Game>> GetGameById(

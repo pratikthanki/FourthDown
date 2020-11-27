@@ -11,7 +11,7 @@ namespace FourthDown.Api.Repositories.Csv
 {
     public class CsvPlayByPlayRepository : IPlayByPlayRepository
     {
-        public async Task<IEnumerable<PlayByPlay>> GetPlayByPlays(
+        public async Task<IEnumerable<PlayByPlay>> GetPlayByPlaysAsync(
             PlayByPlayQueryParameter queryParameter, 
             CancellationToken cancellationToken)
         {
@@ -25,7 +25,7 @@ namespace FourthDown.Api.Repositories.Csv
 
             var response = await RequestHelper.GetRequestResponse(path, cancellationToken);
             var stream = await response.Content.ReadAsStreamAsync();
-            
+
             var data = await ResponseHelper.ReadCompressedStreamToString(stream);
             
             var plaByPlays = ProcessPlayByPlayResponse(data);
