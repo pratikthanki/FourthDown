@@ -55,7 +55,9 @@ namespace FourthDown.Api.Controllers
                     Title = "Looks like there are some errors with your request.",
                     Status = StatusCodes.Status400BadRequest
                 });
-
+            
+            using var scope = _tracer.BuildSpan(nameof(GetPlayByPlays)).StartActive();
+            
             var plays = await _playByPlayRepository.GetPlayByPlaysAsync(queryParameter, cancellationToken);
 
             if (plays == null || !plays.Any())

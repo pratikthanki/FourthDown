@@ -41,6 +41,8 @@ namespace FourthDown.Api.Controllers
             [FromQuery] string name, 
             CancellationToken cancellationToken)
         {
+            using var scope = _tracer.BuildSpan(nameof(CreateApiKey)).StartActive();
+
             return Ok();
         }
     }

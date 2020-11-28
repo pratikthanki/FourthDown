@@ -47,6 +47,8 @@ namespace FourthDown.Api.Controllers
             [FromQuery] ScheduleQueryParameter queryParameter,
             CancellationToken cancellationToken)
         {
+            using var scope = _tracer.BuildSpan(nameof(GetSchedule)).StartActive();
+
             var games = await _scheduleService.GetGames(queryParameter, cancellationToken);
 
             _logger.LogInformation("Successful Games request");

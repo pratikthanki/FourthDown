@@ -55,7 +55,8 @@ namespace FourthDown.Api.Controllers
                     Title = "Looks like there are some errors with your request.",
                     Status = StatusCodes.Status400BadRequest
                 });
-
+            using var scope = _tracer.BuildSpan(nameof(GetPlays)).StartActive();
+            
             var plays = await _pbpService.GetGamePlays(queryParameter, cancellationToken);
 
             if (plays == null || !plays.Any())
@@ -92,6 +93,8 @@ namespace FourthDown.Api.Controllers
                     Status = StatusCodes.Status400BadRequest
                 });
 
+            using var scope = _tracer.BuildSpan(nameof(GetDrives)).StartActive();
+
             var plays = await _pbpService.GetGameDrives(queryParameter, cancellationToken);
 
             if (plays == null || !plays.Any())
@@ -127,6 +130,8 @@ namespace FourthDown.Api.Controllers
                     Title = "Looks like there are some errors with your request.",
                     Status = StatusCodes.Status400BadRequest
                 });
+
+            using var scope = _tracer.BuildSpan(nameof(GetScoringSummaries)).StartActive();
 
             var plays = await _pbpService.GetGameScoringSummaries(queryParameter, cancellationToken);
 
