@@ -1,5 +1,7 @@
 # FourthDown
 
+![.NET Core](https://github.com/pratikthanki/FourthDown/workflows/.NET%20Core/badge.svg)
+
 ## Background
 
 Most tools to analyse NFL data is limited to Python and R packages or miscellaneous data from GitHub repos. This means all the C#/.NET devs (and most other languages) are missing out or needing to create data pipelines to actually make doing any analysis work-able!
