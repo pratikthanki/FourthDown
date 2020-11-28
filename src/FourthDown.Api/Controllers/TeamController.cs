@@ -37,6 +37,8 @@ namespace FourthDown.Api.Controllers
         [HttpGet("")]
         [Produces("application/json")]
         [ProducesResponseType(typeof(IEnumerable<Team>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status404NotFound)]
         public async IAsyncEnumerable<IActionResult> GetTeams(
             [EnumeratorCancellation] CancellationToken cancellationToken)
         {

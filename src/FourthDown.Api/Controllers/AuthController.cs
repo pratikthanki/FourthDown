@@ -37,6 +37,8 @@ namespace FourthDown.Api.Controllers
         [AllowAnonymous]
         [Produces("application/json")]
         [ProducesResponseType(typeof(string), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
         public async Task<ActionResult> CreateApiKey(
             [FromQuery] string name,
             CancellationToken cancellationToken)

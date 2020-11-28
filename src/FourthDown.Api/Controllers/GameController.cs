@@ -44,6 +44,8 @@ namespace FourthDown.Api.Controllers
         [HttpGet("plays")]
         [Produces("application/json")]
         [ProducesResponseType(typeof(IEnumerable<GamePlays>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetPlays(
             [FromQuery] PlayByPlayQueryParameter queryParameter,
             CancellationToken cancellationToken)
@@ -81,6 +83,7 @@ namespace FourthDown.Api.Controllers
         [HttpGet("drives")]
         [Produces("application/json")]
         [ProducesResponseType(typeof(IEnumerable<GameDrives>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetDrives(
             [FromQuery] PlayByPlayQueryParameter queryParameter,
             CancellationToken cancellationToken)
@@ -119,6 +122,7 @@ namespace FourthDown.Api.Controllers
         [HttpGet("scoringsummaries")]
         [Produces("application/json")]
         [ProducesResponseType(typeof(IEnumerable<GameScoringSummaries>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetScoringSummaries(
             [FromQuery] PlayByPlayQueryParameter queryParameter,
             CancellationToken cancellationToken)
