@@ -19,6 +19,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using OpenTracing;
 using OpenTracing.Util;
 
@@ -48,16 +49,19 @@ namespace FourthDown.Api
                 .AddSingleton<IAuthClient, AuthClient>();
 
             services.AddControllers();
-
             services.AddOpenTracing();
-            // Adds the Jaeger Tracer.
+
+            // Adds the Jaeger Trace.
             services.AddSingleton<ITracer>(serviceProvider =>
             {
                 var serviceName = serviceProvider.GetRequiredService<IWebHostEnvironment>().ApplicationName;
+                var loggerFactory = serviceProvider.GetRequiredService<ILoggerFactory>();
+                ISampler sampler = new ConstSampler(true);
 
                 // This will log to a default localhost installation of Jaeger.
                 var tracer = new Tracer.Builder(serviceName)
-                    .WithSampler(new ConstSampler(true))
+                    .WithLoggerFactory(loggerFactory)
+                    .WithSampler(sampler)
                     .Build();
 
                 // Allows code that can't use DI to also access the tracer.
@@ -112,9 +116,14 @@ namespace FourthDown.Api
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            Environment.SetEnvironmentVariable("JAEGER_SERVICE_NAME", "my-service-name");
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+                Environment.SetEnvironmentVariable("JAEGER_AGENT_HOST", "localhost");
+                Environment.SetEnvironmentVariable("JAEGER_AGENT_PORT", "6831");
+                Environment.SetEnvironmentVariable("JAEGER_SAMPLER_TYPE", "const");
             }
             else
             {
