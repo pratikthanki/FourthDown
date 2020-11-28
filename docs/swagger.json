@@ -1,0 +1,2665 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Fourth Down API",
+    "description": "Web API serving NFL data",
+    "termsOfService": "https://example.com/terms",
+    "contact": {
+      "name": "Pratik Thanki",
+      "url": "http://pratikthanki.github.io/",
+      "email": "pratikthanki1@gmail.com"
+    },
+    "license": {
+      "name": "MIT License",
+      "url": "https://choosealicense.com/licenses/mit/"
+    },
+    "version": "v1"
+  },
+  "servers": [
+    {
+      "url": "https://fourthdown.analytics.com"
+    }
+  ],
+  "paths": {
+    "/api/auth": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Create an API Key",
+        "description": "Create an API Key with an expiry",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "query",
+            "description": "Name/alias for the created API Key",
+            "schema": {
+              "type": "string",
+              "description": "Name/alias for the created API Key",
+              "nullable": true
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/game/plays": {
+      "get": {
+        "tags": [
+          "Game"
+        ],
+        "summary": "Play by Play data for a set of games",
+        "description": "Either GameId or a combination of Season, Week and Team should be provided",
+        "parameters": [
+          {
+            "name": "GameId",
+            "in": "query",
+            "description": "Specific gameId in format Season_Week_VisitorAbr_HomeTAbr",
+            "schema": {
+              "type": "string",
+              "description": "Specific gameId in format Season_Week_VisitorAbr_HomeTAbr",
+              "nullable": true,
+              "example": "2020_17_DAL_NYG"
+            }
+          },
+          {
+            "name": "Week",
+            "in": "query",
+            "description": "Game week;\r\n- REG (1-17)\r\n- Wild Card (18)\r\n- Divisional (19)\r\n- Conference (20)\r\n- Super Bowl (21)",
+            "schema": {
+              "type": "integer",
+              "description": "Game week;\r\n- REG (1-17)\r\n- Wild Card (18)\r\n- Divisional (19)\r\n- Conference (20)\r\n- Super Bowl (21)",
+              "format": "int32",
+              "nullable": true
+            }
+          },
+          {
+            "name": "Season",
+            "in": "query",
+            "description": "Seasons between 1999 and current season",
+            "schema": {
+              "type": "integer",
+              "description": "Seasons between 1999 and current season",
+              "format": "int32",
+              "nullable": true
+            }
+          },
+          {
+            "name": "Team",
+            "in": "query",
+            "description": "Team abbreviation. See /api/teams for abr attribute",
+            "schema": {
+              "type": "string",
+              "description": "Team abbreviation. See /api/teams for abr attribute",
+              "nullable": true
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/GamePlays"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/game/drives": {
+      "get": {
+        "tags": [
+          "Game"
+        ],
+        "summary": "Game drives summarised from plays",
+        "description": "Either GameId or a combination of Season, Week and Team should be provided",
+        "parameters": [
+          {
+            "name": "GameId",
+            "in": "query",
+            "description": "Specific gameId in format Season_Week_VisitorAbr_HomeTAbr",
+            "schema": {
+              "type": "string",
+              "description": "Specific gameId in format Season_Week_VisitorAbr_HomeTAbr",
+              "nullable": true,
+              "example": "2020_17_DAL_NYG"
+            }
+          },
+          {
+            "name": "Week",
+            "in": "query",
+            "description": "Game week;\r\n- REG (1-17)\r\n- Wild Card (18)\r\n- Divisional (19)\r\n- Conference (20)\r\n- Super Bowl (21)",
+            "schema": {
+              "type": "integer",
+              "description": "Game week;\r\n- REG (1-17)\r\n- Wild Card (18)\r\n- Divisional (19)\r\n- Conference (20)\r\n- Super Bowl (21)",
+              "format": "int32",
+              "nullable": true
+            }
+          },
+          {
+            "name": "Season",
+            "in": "query",
+            "description": "Seasons between 1999 and current season",
+            "schema": {
+              "type": "integer",
+              "description": "Seasons between 1999 and current season",
+              "format": "int32",
+              "nullable": true
+            }
+          },
+          {
+            "name": "Team",
+            "in": "query",
+            "description": "Team abbreviation. See /api/teams for abr attribute",
+            "schema": {
+              "type": "string",
+              "description": "Team abbreviation. See /api/teams for abr attribute",
+              "nullable": true
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/GameDrives"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/game/scoringsummaries": {
+      "get": {
+        "tags": [
+          "Game"
+        ],
+        "summary": "List of scoring drives with updated team scores",
+        "description": "Either GameId or a combination of Season, Week and Team should be provided",
+        "parameters": [
+          {
+            "name": "GameId",
+            "in": "query",
+            "description": "Specific gameId in format Season_Week_VisitorAbr_HomeTAbr",
+            "schema": {
+              "type": "string",
+              "description": "Specific gameId in format Season_Week_VisitorAbr_HomeTAbr",
+              "nullable": true,
+              "example": "2020_17_DAL_NYG"
+            }
+          },
+          {
+            "name": "Week",
+            "in": "query",
+            "description": "Game week;\r\n- REG (1-17)\r\n- Wild Card (18)\r\n- Divisional (19)\r\n- Conference (20)\r\n- Super Bowl (21)",
+            "schema": {
+              "type": "integer",
+              "description": "Game week;\r\n- REG (1-17)\r\n- Wild Card (18)\r\n- Divisional (19)\r\n- Conference (20)\r\n- Super Bowl (21)",
+              "format": "int32",
+              "nullable": true
+            }
+          },
+          {
+            "name": "Season",
+            "in": "query",
+            "description": "Seasons between 1999 and current season",
+            "schema": {
+              "type": "integer",
+              "description": "Seasons between 1999 and current season",
+              "format": "int32",
+              "nullable": true
+            }
+          },
+          {
+            "name": "Team",
+            "in": "query",
+            "description": "Team abbreviation. See /api/teams for abr attribute",
+            "schema": {
+              "type": "string",
+              "description": "Team abbreviation. See /api/teams for abr attribute",
+              "nullable": true
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/GameScoringSummaries"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/nflfastr": {
+      "get": {
+        "tags": [
+          "Nflfastr"
+        ],
+        "summary": "Play by Play data for a set of games",
+        "description": "Either GameId or a combination of Season, Week and Team should be provided",
+        "parameters": [
+          {
+            "name": "GameId",
+            "in": "query",
+            "description": "Specific gameId in format Season_Week_VisitorAbr_HomeTAbr",
+            "schema": {
+              "type": "string",
+              "description": "Specific gameId in format Season_Week_VisitorAbr_HomeTAbr",
+              "nullable": true,
+              "example": "2020_17_DAL_NYG"
+            }
+          },
+          {
+            "name": "Week",
+            "in": "query",
+            "description": "Game week;\r\n- REG (1-17)\r\n- Wild Card (18)\r\n- Divisional (19)\r\n- Conference (20)\r\n- Super Bowl (21)",
+            "schema": {
+              "type": "integer",
+              "description": "Game week;\r\n- REG (1-17)\r\n- Wild Card (18)\r\n- Divisional (19)\r\n- Conference (20)\r\n- Super Bowl (21)",
+              "format": "int32",
+              "nullable": true
+            }
+          },
+          {
+            "name": "Season",
+            "in": "query",
+            "description": "Seasons between 1999 and current season",
+            "schema": {
+              "type": "integer",
+              "description": "Seasons between 1999 and current season",
+              "format": "int32",
+              "nullable": true
+            }
+          },
+          {
+            "name": "Team",
+            "in": "query",
+            "description": "Team abbreviation. See /api/teams for abr attribute",
+            "schema": {
+              "type": "string",
+              "description": "Team abbreviation. See /api/teams for abr attribute",
+              "nullable": true
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlayByPlay"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/schedule": {
+      "get": {
+        "tags": [
+          "Schedule"
+        ],
+        "summary": "Query for a set of games and accompanying details",
+        "description": "If no parameters are passed, all team games for the current week for this season are returned",
+        "parameters": [
+          {
+            "name": "Week",
+            "in": "query",
+            "description": "Game week;\r\n- REG (1-17)\r\n- Wild Card (18)\r\n- Divisional (19)\r\n- Conference (20)\r\n- Super Bowl (21)",
+            "schema": {
+              "type": "integer",
+              "description": "Game week;\r\n- REG (1-17)\r\n- Wild Card (18)\r\n- Divisional (19)\r\n- Conference (20)\r\n- Super Bowl (21)",
+              "format": "int32",
+              "nullable": true
+            }
+          },
+          {
+            "name": "Season",
+            "in": "query",
+            "description": "Seasons between 1999 and current season",
+            "schema": {
+              "type": "integer",
+              "description": "Seasons between 1999 and current season",
+              "format": "int32",
+              "nullable": true
+            }
+          },
+          {
+            "name": "Team",
+            "in": "query",
+            "description": "Team abbreviation. See /api/teams for abr attribute",
+            "schema": {
+              "type": "string",
+              "description": "Team abbreviation. See /api/teams for abr attribute",
+              "nullable": true
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Game"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/teams": {
+      "get": {
+        "tags": [
+          "Team"
+        ],
+        "summary": "Query for all 32 teams",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Team"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "TeamStats": {
+        "type": "object",
+        "properties": {
+          "teamAbbreviation": {
+            "type": "string",
+            "nullable": true
+          },
+          "teamNickName": {
+            "type": "string",
+            "nullable": true
+          },
+          "pointsQ1": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pointsQ2": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pointsQ3": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pointsQ4": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pointsOvertimeTotal": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pointsTotal": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "timeoutsUsed": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "timeoutsRemaining": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "PlayStat": {
+        "type": "object",
+        "properties": {
+          "statId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "yards": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "playerName": {
+            "type": "string",
+            "nullable": true
+          },
+          "teamId": {
+            "type": "string",
+            "nullable": true
+          },
+          "teamAbbreviation": {
+            "type": "string",
+            "nullable": true
+          },
+          "gsisPlayerId": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Play": {
+        "type": "object",
+        "properties": {
+          "clockTime": {
+            "type": "string",
+            "nullable": true
+          },
+          "down": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "endClockTime": {
+            "type": "string",
+            "nullable": true
+          },
+          "endYardLine": {
+            "type": "string",
+            "nullable": true
+          },
+          "firstDown": {
+            "type": "boolean"
+          },
+          "goalToGo": {
+            "type": "boolean"
+          },
+          "nextPlayIsGoalToGo": {
+            "type": "boolean"
+          },
+          "nextPlayType": {
+            "type": "string",
+            "nullable": true
+          },
+          "orderSequence": {
+            "type": "number",
+            "format": "double"
+          },
+          "penaltyOnPlay": {
+            "type": "boolean"
+          },
+          "playClock": {
+            "type": "string",
+            "nullable": true
+          },
+          "playDeleted": {
+            "type": "boolean"
+          },
+          "playDescription": {
+            "type": "string",
+            "nullable": true
+          },
+          "playDescriptionWithJerseyNumbers": {
+            "type": "string",
+            "nullable": true
+          },
+          "playId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "playType": {
+            "type": "string",
+            "nullable": true
+          },
+          "playStats": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PlayStat"
+            },
+            "nullable": true
+          },
+          "prePlayByPlay": {
+            "type": "string",
+            "nullable": true
+          },
+          "quarter": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "scoringPlay": {
+            "type": "boolean"
+          },
+          "shortDescription": {
+            "type": "string",
+            "nullable": true
+          },
+          "specialTeamsPlay": {
+            "type": "boolean"
+          },
+          "timeOfDay": {
+            "type": "string",
+            "nullable": true
+          },
+          "yardLine": {
+            "type": "string",
+            "nullable": true
+          },
+          "yards": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "yardsToGo": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "driveNetYards": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "drivePlayCount": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "driveSequenceNumber": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "driveTimeOfPossession": {
+            "type": "string",
+            "nullable": true
+          },
+          "possessionTeamAbbreviation": {
+            "type": "string",
+            "nullable": true
+          },
+          "possessionTeamNickName": {
+            "type": "string",
+            "nullable": true
+          },
+          "possessionTeamFranchiseCurrentLogoUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "isBigPlay": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "scoringPlayType": {
+            "type": "string",
+            "nullable": true
+          },
+          "scoringTeamId": {
+            "type": "string",
+            "nullable": true
+          },
+          "scoringTeamAbbreviation": {
+            "type": "string",
+            "nullable": true
+          },
+          "scoringTeamNickName": {
+            "type": "string",
+            "nullable": true
+          },
+          "stPlayType": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "GamePlays": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "nullable": true
+          },
+          "attendance": {
+            "type": "string",
+            "nullable": true
+          },
+          "stadium": {
+            "type": "string",
+            "nullable": true
+          },
+          "startTime": {
+            "type": "string",
+            "nullable": true
+          },
+          "weatherShortDescription": {
+            "type": "string",
+            "nullable": true
+          },
+          "homeTeam": {
+            "$ref": "#/components/schemas/TeamStats"
+          },
+          "visitorTeam": {
+            "$ref": "#/components/schemas/TeamStats"
+          },
+          "plays": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Play"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ValidationProblemDetails": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "nullable": true
+          },
+          "title": {
+            "type": "string",
+            "nullable": true
+          },
+          "status": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "detail": {
+            "type": "string",
+            "nullable": true
+          },
+          "instance": {
+            "type": "string",
+            "nullable": true
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "nullable": true,
+            "readOnly": true
+          }
+        },
+        "additionalProperties": { }
+      },
+      "Drive": {
+        "type": "object",
+        "properties": {
+          "quarterStart": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "endTransition": {
+            "type": "string",
+            "nullable": true
+          },
+          "endYardLine": {
+            "type": "string",
+            "nullable": true
+          },
+          "endedWithScore": {
+            "type": "boolean"
+          },
+          "firstDowns": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "gameClockEnd": {
+            "type": "string",
+            "nullable": true
+          },
+          "gameClockStart": {
+            "type": "string",
+            "nullable": true
+          },
+          "howEndedDescription": {
+            "type": "string",
+            "nullable": true
+          },
+          "howStartedDescription": {
+            "type": "string",
+            "nullable": true
+          },
+          "inside20": {
+            "type": "boolean"
+          },
+          "orderSequence": {
+            "type": "number",
+            "format": "double"
+          },
+          "playCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "playIdEnded": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "playIdStarted": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "playSeqEnded": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "playSeqStarted": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "quarterEnd": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "startTransition": {
+            "type": "string",
+            "nullable": true
+          },
+          "startYardLine": {
+            "type": "string",
+            "nullable": true
+          },
+          "timeOfPossession": {
+            "type": "string",
+            "nullable": true
+          },
+          "yards": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "yardsPenalized": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "possessionTeamAbbreviation": {
+            "type": "string",
+            "nullable": true
+          },
+          "possessionTeamNickName": {
+            "type": "string",
+            "nullable": true
+          },
+          "possessionTeamFranchiseCurrentLogoUrl": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "GameDrives": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "nullable": true
+          },
+          "attendance": {
+            "type": "string",
+            "nullable": true
+          },
+          "stadium": {
+            "type": "string",
+            "nullable": true
+          },
+          "startTime": {
+            "type": "string",
+            "nullable": true
+          },
+          "weatherShortDescription": {
+            "type": "string",
+            "nullable": true
+          },
+          "homeTeam": {
+            "$ref": "#/components/schemas/TeamStats"
+          },
+          "visitorTeam": {
+            "$ref": "#/components/schemas/TeamStats"
+          },
+          "drives": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Drive"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ScoringSummary": {
+        "type": "object",
+        "properties": {
+          "playId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "playDescription": {
+            "type": "string",
+            "nullable": true
+          },
+          "patPlayId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "homeScore": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "visitorScore": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "GameScoringSummaries": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "nullable": true
+          },
+          "attendance": {
+            "type": "string",
+            "nullable": true
+          },
+          "stadium": {
+            "type": "string",
+            "nullable": true
+          },
+          "startTime": {
+            "type": "string",
+            "nullable": true
+          },
+          "weatherShortDescription": {
+            "type": "string",
+            "nullable": true
+          },
+          "homeTeam": {
+            "$ref": "#/components/schemas/TeamStats"
+          },
+          "visitorTeam": {
+            "$ref": "#/components/schemas/TeamStats"
+          },
+          "scoringSummaries": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ScoringSummary"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "PlayByPlay": {
+        "type": "object",
+        "properties": {
+          "playId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "gameId": {
+            "type": "string",
+            "nullable": true
+          },
+          "oldGameId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "homeTeam": {
+            "type": "string",
+            "nullable": true
+          },
+          "awayTeam": {
+            "type": "string",
+            "nullable": true
+          },
+          "seasonType": {
+            "type": "string",
+            "nullable": true
+          },
+          "week": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "posTeam": {
+            "type": "string",
+            "nullable": true
+          },
+          "posTeamType": {
+            "type": "string",
+            "nullable": true
+          },
+          "defTeam": {
+            "type": "string",
+            "nullable": true
+          },
+          "sideOfField": {
+            "type": "string",
+            "nullable": true
+          },
+          "yardLine100": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "gameDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "quarterSecondsRemaining": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "halfSecondsRemaining": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "gameSecondsRemaining": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "gameHalf": {
+            "type": "string",
+            "nullable": true
+          },
+          "quarterEnd": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "drive": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "sp": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "qtr": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "down": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "goalToGo": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "time": {
+            "type": "string",
+            "nullable": true
+          },
+          "yardLine": {
+            "type": "string",
+            "nullable": true
+          },
+          "ydsToGo": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "yardsNet": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "desc": {
+            "type": "string",
+            "nullable": true
+          },
+          "playType": {
+            "type": "string",
+            "nullable": true
+          },
+          "yardsGained": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "shotgun": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "noHuddle": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "qbDropBack": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "qbKneel": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "qbSpike": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "qbScramble": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "passLength": {
+            "type": "string",
+            "nullable": true
+          },
+          "passLocation": {
+            "type": "string",
+            "nullable": true
+          },
+          "airYards": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "yardsAfterCatch": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "runLocation": {
+            "type": "string",
+            "nullable": true
+          },
+          "runGap": {
+            "type": "string",
+            "nullable": true
+          },
+          "fieldGoalResult": {
+            "type": "string",
+            "nullable": true
+          },
+          "kickDistance": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "extraPointResult": {
+            "type": "string",
+            "nullable": true
+          },
+          "twoPointConvResult": {
+            "type": "string",
+            "nullable": true
+          },
+          "homeTimeoutsRemaining": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "awayTimeoutsRemaining": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "timeout": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "timeoutTeam": {
+            "type": "string",
+            "nullable": true
+          },
+          "tdTeam": {
+            "type": "string",
+            "nullable": true
+          },
+          "posTeamTimeoutsRemaining": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "defTeamTimeoutsRemaining": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "totalHomeScore": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalAwayScore": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "posTeamScore": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "defTeamScore": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "scoreDifferential": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "posTeamScorePost": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "defTeamScorePost": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "scoreDifferentialPost": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "noScoreProb": {
+            "type": "number",
+            "format": "double"
+          },
+          "oppFgProb": {
+            "type": "number",
+            "format": "double"
+          },
+          "oppSafetyProb": {
+            "type": "number",
+            "format": "double"
+          },
+          "oppTdProb": {
+            "type": "number",
+            "format": "double"
+          },
+          "fgProb": {
+            "type": "number",
+            "format": "double"
+          },
+          "safetyProb": {
+            "type": "number",
+            "format": "double"
+          },
+          "tdProb": {
+            "type": "number",
+            "format": "double"
+          },
+          "extraPointProb": {
+            "type": "number",
+            "format": "double"
+          },
+          "twoPointConversionProb": {
+            "type": "number",
+            "format": "double"
+          },
+          "ep": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "epa": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "totalHomeEpa": {
+            "type": "number",
+            "format": "double"
+          },
+          "totalAwayEpa": {
+            "type": "number",
+            "format": "double"
+          },
+          "totalHomeRushEpa": {
+            "type": "number",
+            "format": "double"
+          },
+          "totalAwayRushEpa": {
+            "type": "number",
+            "format": "double"
+          },
+          "totalHomePassEpa": {
+            "type": "number",
+            "format": "double"
+          },
+          "totalAwayPassEpa": {
+            "type": "number",
+            "format": "double"
+          },
+          "airEpa": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "yacEpa": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "compAirEpa": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "compYacEpa": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "totalHomeCompAirEpa": {
+            "type": "number",
+            "format": "double"
+          },
+          "totalAwayCompAirEpa": {
+            "type": "number",
+            "format": "double"
+          },
+          "totalHomeCompYacEpa": {
+            "type": "number",
+            "format": "double"
+          },
+          "totalAwayCompYacEpa": {
+            "type": "number",
+            "format": "double"
+          },
+          "totalHomeRawAirEpa": {
+            "type": "number",
+            "format": "double"
+          },
+          "totalAwayRawAirEpa": {
+            "type": "number",
+            "format": "double"
+          },
+          "totalHomeRawYacEpa": {
+            "type": "number",
+            "format": "double"
+          },
+          "totalAwayRawYacEpa": {
+            "type": "number",
+            "format": "double"
+          },
+          "wp": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "defWp": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "homeWp": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "awayWp": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "wpa": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "homeWpPost": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "awayWpPost": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "vegasWp": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "vegasHomeWp": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "totalHomeRushWpa": {
+            "type": "number",
+            "format": "double"
+          },
+          "totalAwayRushWpa": {
+            "type": "number",
+            "format": "double"
+          },
+          "totalHomePassWpa": {
+            "type": "number",
+            "format": "double"
+          },
+          "totalAwayPassWpa": {
+            "type": "number",
+            "format": "double"
+          },
+          "airWpa": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "yacWpa": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "compAirWpa": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "compYacWpa": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "totalHomeCompAirWpa": {
+            "type": "number",
+            "format": "double"
+          },
+          "totalAwayCompAirWpa": {
+            "type": "number",
+            "format": "double"
+          },
+          "totalHomeCompYacWpa": {
+            "type": "number",
+            "format": "double"
+          },
+          "totalAwayCompYacWpa": {
+            "type": "number",
+            "format": "double"
+          },
+          "totalHomeRawAirWpa": {
+            "type": "number",
+            "format": "double"
+          },
+          "totalAwayRawAirWpa": {
+            "type": "number",
+            "format": "double"
+          },
+          "totalHomeRawYacWpa": {
+            "type": "number",
+            "format": "double"
+          },
+          "totalAwayRawYacWpa": {
+            "type": "number",
+            "format": "double"
+          },
+          "puntBlocked": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "firstDownRush": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "firstDownPass": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "firstDownPenalty": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "thirdDownConverted": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "thirdDownFailed": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "fourthDownConverted": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "fourthDownFailed": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "incompletePass": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "touchBack": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "interception": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "puntInsideTwenty": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "puntInEndZone": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "puntOutOfBounds": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "puntDowned": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "puntFairCatch": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "kickoffInsideTwenty": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "kickoffInEndZone": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "kickoffOutOfBounds": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "kickoffDowned": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "kickoffFairCatch": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "fumbleForced": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "fumbleNotForced": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "fumbleOutOfBounds": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "soloTackle": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "safety": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "penalty": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "tackledForLoss": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "fumbleLost": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "ownKickoffRecovery": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "ownKickoffRecoveryTd": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "qbHit": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "rushAttempt": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "passAttempt": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "sack": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "touchdown": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "passTouchdown": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "rushTouchdown": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "returnTouchdown": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "extraPointAttempt": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "twoPointAttempt": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "fieldGoalAttempt": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "kickoffAttempt": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "puntAttempt": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "fumble": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "completePass": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "assistTackle": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "lateralReception": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "lateralRush": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "lateralReturn": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "lateralRecovery": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "passerPlayerId": {
+            "type": "string",
+            "nullable": true
+          },
+          "passerPlayerName": {
+            "type": "string",
+            "nullable": true
+          },
+          "receiverPlayerId": {
+            "type": "string",
+            "nullable": true
+          },
+          "receiverPlayerName": {
+            "type": "string",
+            "nullable": true
+          },
+          "rusherPlayerId": {
+            "type": "string",
+            "nullable": true
+          },
+          "rusherPlayerName": {
+            "type": "string",
+            "nullable": true
+          },
+          "lateralReceiverPlayerId": {
+            "type": "string",
+            "nullable": true
+          },
+          "lateralReceiverPlayerName": {
+            "type": "string",
+            "nullable": true
+          },
+          "lateralRusherPlayerId": {
+            "type": "string",
+            "nullable": true
+          },
+          "lateralRusherPlayerName": {
+            "type": "string",
+            "nullable": true
+          },
+          "lateralSackPlayerId": {
+            "type": "string",
+            "nullable": true
+          },
+          "lateralSackPlayerName": {
+            "type": "string",
+            "nullable": true
+          },
+          "interceptionPlayerId": {
+            "type": "string",
+            "nullable": true
+          },
+          "interceptionPlayerName": {
+            "type": "string",
+            "nullable": true
+          },
+          "lateralInterceptionPlayerId": {
+            "type": "string",
+            "nullable": true
+          },
+          "lateralInterceptionPlayerName": {
+            "type": "string",
+            "nullable": true
+          },
+          "puntReturnerPlayerId": {
+            "type": "string",
+            "nullable": true
+          },
+          "puntReturnerPlayerName": {
+            "type": "string",
+            "nullable": true
+          },
+          "lateralPuntReturnerPlayerId": {
+            "type": "string",
+            "nullable": true
+          },
+          "lateralPuntReturnerPlayerName": {
+            "type": "string",
+            "nullable": true
+          },
+          "kickoffReturnerPlayerName": {
+            "type": "string",
+            "nullable": true
+          },
+          "kickoffReturnerPlayerId": {
+            "type": "string",
+            "nullable": true
+          },
+          "lateralKickoffReturnerPlayerId": {
+            "type": "string",
+            "nullable": true
+          },
+          "lateralKickoffReturnerPlayerName": {
+            "type": "string",
+            "nullable": true
+          },
+          "punterPlayerId": {
+            "type": "string",
+            "nullable": true
+          },
+          "punterPlayerName": {
+            "type": "string",
+            "nullable": true
+          },
+          "kickerPlayerName": {
+            "type": "string",
+            "nullable": true
+          },
+          "kickerPlayerId": {
+            "type": "string",
+            "nullable": true
+          },
+          "ownKickoffRecoveryPlayerId": {
+            "type": "string",
+            "nullable": true
+          },
+          "ownKickoffRecoveryPlayerName": {
+            "type": "string",
+            "nullable": true
+          },
+          "blockedPlayerId": {
+            "type": "string",
+            "nullable": true
+          },
+          "blockedPlayerName": {
+            "type": "string",
+            "nullable": true
+          },
+          "tackleForLoss1PlayerId": {
+            "type": "string",
+            "nullable": true
+          },
+          "tackleForLoss1PlayerName": {
+            "type": "string",
+            "nullable": true
+          },
+          "tackleForLoss2PlayerId": {
+            "type": "string",
+            "nullable": true
+          },
+          "tackleForLoss2PlayerName": {
+            "type": "string",
+            "nullable": true
+          },
+          "qbHit1PlayerId": {
+            "type": "string",
+            "nullable": true
+          },
+          "qbHit1PlayerName": {
+            "type": "string",
+            "nullable": true
+          },
+          "qbHit2PlayerId": {
+            "type": "string",
+            "nullable": true
+          },
+          "qbHit2PlayerName": {
+            "type": "string",
+            "nullable": true
+          },
+          "forcedFumblePlayer1Team": {
+            "type": "string",
+            "nullable": true
+          },
+          "forcedFumblePlayer1PlayerId": {
+            "type": "string",
+            "nullable": true
+          },
+          "forcedFumblePlayer1PlayerName": {
+            "type": "string",
+            "nullable": true
+          },
+          "forcedFumblePlayer2Team": {
+            "type": "string",
+            "nullable": true
+          },
+          "forcedFumblePlayer2PlayerId": {
+            "type": "string",
+            "nullable": true
+          },
+          "forcedFumblePlayer2PlayerName": {
+            "type": "string",
+            "nullable": true
+          },
+          "soloTackle1Team": {
+            "type": "string",
+            "nullable": true
+          },
+          "soloTackle2Team": {
+            "type": "string",
+            "nullable": true
+          },
+          "soloTackle1PlayerId": {
+            "type": "string",
+            "nullable": true
+          },
+          "soloTackle2PlayerId": {
+            "type": "string",
+            "nullable": true
+          },
+          "soloTackle1PlayerName": {
+            "type": "string",
+            "nullable": true
+          },
+          "soloTackle2PlayerName": {
+            "type": "string",
+            "nullable": true
+          },
+          "assistTackle1PlayerId": {
+            "type": "string",
+            "nullable": true
+          },
+          "assistTackle1PlayerName": {
+            "type": "string",
+            "nullable": true
+          },
+          "assistTackle1Team": {
+            "type": "string",
+            "nullable": true
+          },
+          "assistTackle2PlayerId": {
+            "type": "string",
+            "nullable": true
+          },
+          "assistTackle2PlayerName": {
+            "type": "string",
+            "nullable": true
+          },
+          "assistTackle2Team": {
+            "type": "string",
+            "nullable": true
+          },
+          "assistTackle3PlayerId": {
+            "type": "string",
+            "nullable": true
+          },
+          "assistTackle3PlayerName": {
+            "type": "string",
+            "nullable": true
+          },
+          "assistTackle3Team": {
+            "type": "string",
+            "nullable": true
+          },
+          "assistTackle4PlayerId": {
+            "type": "string",
+            "nullable": true
+          },
+          "assistTackle4PlayerName": {
+            "type": "string",
+            "nullable": true
+          },
+          "assistTackle4Team": {
+            "type": "string",
+            "nullable": true
+          },
+          "passDefense1PlayerId": {
+            "type": "string",
+            "nullable": true
+          },
+          "passDefense1PlayerName": {
+            "type": "string",
+            "nullable": true
+          },
+          "passDefense2PlayerId": {
+            "type": "string",
+            "nullable": true
+          },
+          "passDefense2PlayerName": {
+            "type": "string",
+            "nullable": true
+          },
+          "fumbled1Team": {
+            "type": "string",
+            "nullable": true
+          },
+          "fumbled1PlayerId": {
+            "type": "string",
+            "nullable": true
+          },
+          "fumbled1PlayerName": {
+            "type": "string",
+            "nullable": true
+          },
+          "fumbled2PlayerId": {
+            "type": "string",
+            "nullable": true
+          },
+          "fumbled2PlayerName": {
+            "type": "string",
+            "nullable": true
+          },
+          "fumbled2Team": {
+            "type": "string",
+            "nullable": true
+          },
+          "fumbleRecovery1Team": {
+            "type": "string",
+            "nullable": true
+          },
+          "fumbleRecovery1Yards": {
+            "type": "string",
+            "nullable": true
+          },
+          "fumbleRecovery1PlayerId": {
+            "type": "string",
+            "nullable": true
+          },
+          "fumbleRecovery1PlayerName": {
+            "type": "string",
+            "nullable": true
+          },
+          "fumbleRecovery2Team": {
+            "type": "string",
+            "nullable": true
+          },
+          "fumbleRecovery2Yards": {
+            "type": "string",
+            "nullable": true
+          },
+          "fumbleRecovery2PlayerId": {
+            "type": "string",
+            "nullable": true
+          },
+          "fumbleRecovery2PlayerName": {
+            "type": "string",
+            "nullable": true
+          },
+          "returnTeam": {
+            "type": "string",
+            "nullable": true
+          },
+          "returnYards": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "penaltyTeam": {
+            "type": "string",
+            "nullable": true
+          },
+          "penaltyPlayerId": {
+            "type": "string",
+            "nullable": true
+          },
+          "penaltyPlayerName": {
+            "type": "string",
+            "nullable": true
+          },
+          "penaltyYards": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "replayOrChallenge": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "replayOrChallengeResult": {
+            "type": "string",
+            "nullable": true
+          },
+          "penaltyType": {
+            "type": "string",
+            "nullable": true
+          },
+          "defensiveTwoPointAttempt": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "defensiveTwoPointConv": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "defensiveExtraPointAttempt": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "defensiveExtraPointConv": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "season": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "cp": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "cpoe": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "series": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "seriesSuccess": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "seriesResult": {
+            "type": "string",
+            "nullable": true
+          },
+          "orderSequence": {
+            "type": "number",
+            "format": "double"
+          },
+          "startTime": {
+            "type": "string",
+            "nullable": true
+          },
+          "timeOfDay": {
+            "type": "string",
+            "nullable": true
+          },
+          "stadium": {
+            "type": "string",
+            "nullable": true
+          },
+          "weather": {
+            "type": "string",
+            "nullable": true
+          },
+          "nflApiId": {
+            "type": "string",
+            "nullable": true
+          },
+          "playClock": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "playDeleted": {
+            "type": "boolean"
+          },
+          "playTypeNfl": {
+            "type": "string",
+            "nullable": true
+          },
+          "specialTeamsPlay": {
+            "type": "boolean"
+          },
+          "specialTeamsPlayType": {
+            "type": "string",
+            "nullable": true
+          },
+          "endClockTime": {
+            "type": "string",
+            "nullable": true
+          },
+          "endYardLine": {
+            "type": "string",
+            "nullable": true
+          },
+          "fixedDrive": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "fixedDriveResult": {
+            "type": "string",
+            "nullable": true
+          },
+          "driveRealStartTime": {
+            "type": "string",
+            "nullable": true
+          },
+          "drivePlayCount": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "driveTimeOfPossession": {
+            "type": "string",
+            "nullable": true
+          },
+          "driveFirstDowns": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "driveInside20": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "driveEndedWithScore": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "driveQuarterStart": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "driveQuarterEnd": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "driveYardsPenalized": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "driveStartTransition": {
+            "type": "string",
+            "nullable": true
+          },
+          "driveEndTransition": {
+            "type": "string",
+            "nullable": true
+          },
+          "driveGameClockStart": {
+            "type": "string",
+            "nullable": true
+          },
+          "driveGameClockEnd": {
+            "type": "string",
+            "nullable": true
+          },
+          "driveStartYardLine": {
+            "type": "string",
+            "nullable": true
+          },
+          "driveEndYardLine": {
+            "type": "string",
+            "nullable": true
+          },
+          "drivePlayIdStarted": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "drivePlayIdEnded": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "awayScore": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "homeScore": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "location": {
+            "type": "string",
+            "nullable": true
+          },
+          "result": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "total": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "spreadLine": {
+            "type": "number",
+            "format": "double"
+          },
+          "totalLine": {
+            "type": "number",
+            "format": "double"
+          },
+          "divGame": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "roof": {
+            "type": "string",
+            "nullable": true
+          },
+          "surface": {
+            "type": "string",
+            "nullable": true
+          },
+          "temp": {
+            "type": "string",
+            "nullable": true
+          },
+          "wind": {
+            "type": "string",
+            "nullable": true
+          },
+          "homeCoach": {
+            "type": "string",
+            "nullable": true
+          },
+          "awayCoach": {
+            "type": "string",
+            "nullable": true
+          },
+          "stadiumId": {
+            "type": "string",
+            "nullable": true
+          },
+          "gameStadium": {
+            "type": "string",
+            "nullable": true
+          },
+          "success": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "passer": {
+            "type": "string",
+            "nullable": true
+          },
+          "passerJerseyNumber": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "rusher": {
+            "type": "string",
+            "nullable": true
+          },
+          "rusherJerseyNumber": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "receiver": {
+            "type": "string",
+            "nullable": true
+          },
+          "receiverJerseyNumber": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "pass": {
+            "type": "boolean"
+          },
+          "rush": {
+            "type": "boolean"
+          },
+          "firstDown": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "abortedPlay": {
+            "type": "boolean"
+          },
+          "special": {
+            "type": "boolean"
+          },
+          "play": {
+            "type": "boolean"
+          },
+          "passerId": {
+            "type": "string",
+            "nullable": true
+          },
+          "rusherId": {
+            "type": "string",
+            "nullable": true
+          },
+          "receiverId": {
+            "type": "string",
+            "nullable": true
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "jerseyNumber": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "id": {
+            "type": "string",
+            "nullable": true
+          },
+          "qbEpa": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "xyacEpa": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "xyacMeanYardage": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "xyacMedianYardage": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "xyacSuccess": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "xyacFd": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Game": {
+        "type": "object",
+        "properties": {
+          "gameId": {
+            "type": "string",
+            "nullable": true
+          },
+          "season": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "gameType": {
+            "type": "string",
+            "nullable": true
+          },
+          "week": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "gameday": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "weekday": {
+            "type": "string",
+            "nullable": true
+          },
+          "gametime": {
+            "type": "string",
+            "nullable": true
+          },
+          "awayTeam": {
+            "type": "string",
+            "nullable": true
+          },
+          "awayScore": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "homeTeam": {
+            "type": "string",
+            "nullable": true
+          },
+          "homeScore": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "location": {
+            "type": "string",
+            "nullable": true
+          },
+          "result": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "total": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "overtime": {
+            "type": "boolean"
+          },
+          "oldGameId": {
+            "type": "string",
+            "nullable": true
+          },
+          "awayRest": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "homeRest": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "awayMoneyline": {
+            "type": "number",
+            "format": "double"
+          },
+          "homeMoneyline": {
+            "type": "number",
+            "format": "double"
+          },
+          "spreadLine": {
+            "type": "number",
+            "format": "double"
+          },
+          "awaySpreadOdds": {
+            "type": "number",
+            "format": "double"
+          },
+          "homeSpreadOdds": {
+            "type": "number",
+            "format": "double"
+          },
+          "totalLine": {
+            "type": "number",
+            "format": "double"
+          },
+          "underOdds": {
+            "type": "number",
+            "format": "double"
+          },
+          "overOdds": {
+            "type": "number",
+            "format": "double"
+          },
+          "divGame": {
+            "type": "boolean"
+          },
+          "roof": {
+            "type": "string",
+            "nullable": true
+          },
+          "surface": {
+            "type": "string",
+            "nullable": true
+          },
+          "temp": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "wind": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "awayCoach": {
+            "type": "string",
+            "nullable": true
+          },
+          "homeCoach": {
+            "type": "string",
+            "nullable": true
+          },
+          "referee": {
+            "type": "string",
+            "nullable": true
+          },
+          "stadiumId": {
+            "type": "string",
+            "nullable": true
+          },
+          "stadium": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Team": {
+        "type": "object",
+        "properties": {
+          "city": {
+            "type": "string",
+            "nullable": true
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "abr": {
+            "type": "string",
+            "nullable": true
+          },
+          "conf": {
+            "type": "string",
+            "nullable": true
+          },
+          "div": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "securitySchemes": {
+      "apiKey": {
+        "type": "apiKey",
+        "name": "X-API-KEY",
+        "in": "header"
+      }
+    }
+  }
+}
