@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using FourthDown.Api.Extensions;
 using FourthDown.Api.Models;
 using FourthDown.Api.Parameters;
 using FourthDown.Api.Services;
@@ -13,6 +14,7 @@ using OpenTracing;
 namespace FourthDown.Api.Controllers
 {
     [Route("api/schedule")]
+    [ApiVersion( "1.0" )]
     [Authorize]
     [ApiController]
     public class ScheduleController : ControllerBase
@@ -49,9 +51,13 @@ namespace FourthDown.Api.Controllers
             [FromQuery] ScheduleQueryParameter queryParameter,
             CancellationToken cancellationToken)
         {
-            using var scope = _tracer.BuildSpan(nameof(GetSchedule)).StartActive();
+            using var scope = _tracer.InitializeTrace(nameof(GetSchedule));
+
+            scope.LogStart(nameof(_scheduleService.GetGames));
 
             var games = await _scheduleService.GetGames(queryParameter, cancellationToken);
+
+            scope.LogEnd(nameof(_scheduleService.GetGames));
 
             _logger.LogInformation("Successful Games request");
 

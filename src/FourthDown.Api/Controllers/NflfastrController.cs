@@ -1,6 +1,7 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using FourthDown.Api.Extensions;
 using FourthDown.Api.Models;
 using FourthDown.Api.Parameters;
 using FourthDown.Api.Repositories;
@@ -13,6 +14,7 @@ using OpenTracing;
 namespace FourthDown.Api.Controllers
 {
     [Route("api/nflfastr")]
+    [ApiVersion( "1.0" )]
     [Authorize]
     [ApiController]
     public class NflfastrController : ControllerBase
@@ -42,7 +44,7 @@ namespace FourthDown.Api.Controllers
         /// <returns>List of game play by plays</returns>
         [HttpGet("")]
         [Produces("application/json")]
-        [ProducesResponseType(typeof(PlayByPlay),StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(PlayByPlay), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetPlayByPlays(
@@ -57,9 +59,13 @@ namespace FourthDown.Api.Controllers
                     Status = StatusCodes.Status400BadRequest
                 });
 
-            using var scope = _tracer.BuildSpan(nameof(GetPlayByPlays)).StartActive();
+            using var scope = _tracer.InitializeTrace(nameof(GetPlayByPlays));
+
+            scope.LogStart(nameof(_playByPlayRepository.GetPlayByPlaysAsync));
 
             var plays = await _playByPlayRepository.GetPlayByPlaysAsync(queryParameter, cancellationToken);
+
+            scope.LogEnd(nameof(_playByPlayRepository.GetPlayByPlaysAsync));
 
             if (plays == null || !plays.Any())
                 return NotFound(new ValidationProblemDetails

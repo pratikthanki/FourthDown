@@ -9,6 +9,7 @@ using OpenTracing;
 namespace FourthDown.Api.Controllers
 {
     [Route("api/auth")]
+    [ApiVersion( "1.0" )]
     [Authorize]
     [ApiController]
     public class AuthController : ControllerBase

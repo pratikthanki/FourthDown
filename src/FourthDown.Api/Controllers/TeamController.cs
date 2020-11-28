@@ -1,6 +1,8 @@
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Threading;
+using System.Threading.Tasks;
+using FourthDown.Api.Extensions;
 using FourthDown.Api.Models;
 using FourthDown.Api.Repositories;
 using Microsoft.AspNetCore.Authorization;
@@ -8,24 +10,23 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using OpenTracing;
+using OpenTracing.Tag;
 
 namespace FourthDown.Api.Controllers
 {
     [Route("api/teams")]
+    [ApiVersion( "1.0" )]
     [Authorize]
     [ApiController]
     public class TeamController : ControllerBase
     {
-        private readonly ILogger<TeamController> _logger;
         private readonly ITeamRepository _teamRepository;
         private readonly ITracer _tracer;
 
         public TeamController(
-            ILogger<TeamController> logger,
             ITracer tracer,
             ITeamRepository teamRepository)
         {
-            _logger = logger;
             _tracer = tracer;
             _teamRepository = teamRepository;
         }
@@ -39,14 +40,17 @@ namespace FourthDown.Api.Controllers
         [ProducesResponseType(typeof(IEnumerable<Team>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status404NotFound)]
-        public async IAsyncEnumerable<IActionResult> GetTeams(
-            [EnumeratorCancellation] CancellationToken cancellationToken)
+        public async Task<IActionResult> GetTeams(CancellationToken cancellationToken)
         {
-            using var scope = _tracer.BuildSpan(nameof(GetTeams)).StartActive();
+            using var scope = _tracer.InitializeTrace(nameof(GetTeams));
+            
+            scope.LogStart(nameof(_teamRepository.GetTeamsAsync));
 
-            _logger.LogInformation("Successful Teams request");
+            var team = await _teamRepository.GetTeamsAsync(cancellationToken);
 
-            await foreach (var team in _teamRepository.GetTeamsAsync(cancellationToken)) yield return Ok(team);
+            scope.LogEnd(nameof(_teamRepository.GetTeamsAsync));
+            
+            return Ok(team);
         }
     }
 }

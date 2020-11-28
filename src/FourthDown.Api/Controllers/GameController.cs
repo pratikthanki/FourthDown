@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using FourthDown.Api.Extensions;
 using FourthDown.Api.Models;
 using FourthDown.Api.Parameters;
 using FourthDown.Api.Services;
@@ -14,6 +15,7 @@ using OpenTracing;
 namespace FourthDown.Api.Controllers
 {
     [Route("api/game")]
+    [ApiVersion( "1.0" )]
     [Authorize]
     [ApiController]
     public class GameController : ControllerBase
@@ -57,9 +59,14 @@ namespace FourthDown.Api.Controllers
                     Title = "Looks like there are some errors with your request.",
                     Status = StatusCodes.Status400BadRequest
                 });
-            using var scope = _tracer.BuildSpan(nameof(GetPlays)).StartActive();
 
-            var plays = await _pbpService.GetGamePlays(queryParameter, cancellationToken);
+            using var scope = _tracer.InitializeTrace(nameof(GetPlays));
+            
+            scope.LogStart(nameof(_pbpService.GetGamePlaysAsync));
+            
+            var plays = await _pbpService.GetGamePlaysAsync(queryParameter, cancellationToken);
+            
+            scope.LogEnd(nameof(_pbpService.GetGamePlaysAsync));
 
             if (plays == null || !plays.Any())
                 return NotFound(new ValidationProblemDetails(queryParameter.ToKeyValues())
@@ -96,9 +103,13 @@ namespace FourthDown.Api.Controllers
                     Status = StatusCodes.Status400BadRequest
                 });
 
-            using var scope = _tracer.BuildSpan(nameof(GetDrives)).StartActive();
+            using var scope = _tracer.InitializeTrace(nameof(GetPlays));
+
+            scope.LogStart(nameof(_pbpService.GetGameDrives));
 
             var plays = await _pbpService.GetGameDrives(queryParameter, cancellationToken);
+
+            scope.LogEnd(nameof(_pbpService.GetGameDrives));
 
             if (plays == null || !plays.Any())
                 return NotFound(new ValidationProblemDetails(queryParameter.ToKeyValues())
@@ -135,9 +146,13 @@ namespace FourthDown.Api.Controllers
                     Status = StatusCodes.Status400BadRequest
                 });
 
-            using var scope = _tracer.BuildSpan(nameof(GetScoringSummaries)).StartActive();
+            using var scope = _tracer.InitializeTrace(nameof(GetPlays));
+
+            scope.LogStart(nameof(_pbpService.GetGameScoringSummaries));
 
             var plays = await _pbpService.GetGameScoringSummaries(queryParameter, cancellationToken);
+
+            scope.LogEnd(nameof(_pbpService.GetGameScoringSummaries));
 
             if (plays == null || !plays.Any())
                 return NotFound(new ValidationProblemDetails(queryParameter.ToKeyValues())
