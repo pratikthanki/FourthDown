@@ -22,7 +22,7 @@ namespace FourthDown.Api.Services
             _scheduleService = scheduleService;
         }
 
-        public async Task<IEnumerable<GamePlays>> GetGamePlays(
+        public async Task<IEnumerable<GamePlays>> GetGamePlaysAsync(
             PlayByPlayQueryParameter queryParameter,
             CancellationToken cancellationToken)
         {
