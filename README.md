@@ -16,11 +16,11 @@ From the game data and modelling of EPA, WP and CPOE amongst othe things availab
 
 Game schedule data going back to 1999 from [Lee Sharpe](https://twitter.com/LeeSharpeNFL).
 
-You can reach out to me on [Twitter](https://twitter.com/pratikthanki) with any feedback or questions. I also write about all things CS on my [blog](http://pratikthanki.github.io/).
-
 ## Feedback
 
-Should you have any thoughts, questions, bugs or suggestions! You can raise an [Issue]() with details and I will aim to fix or expand capabilities!
+You can reach out to me on [Twitter](https://twitter.com/pratikthanki) with any feedback or questions. I also write about all things CS on my [blog](http://pratikthanki.github.io/).
+
+Should you have any thoughts, questions, bugs or suggestions on the Fourth Down API you can also raise an [Issue]() with details and I will aim to fix or expand capabilities!
 
 Thanks and I hope this can be of use to you!
 
