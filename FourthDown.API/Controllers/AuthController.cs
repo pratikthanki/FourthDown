@@ -3,6 +3,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using OpenTracing;
 
 namespace FourthDown.Api.Controllers
 {
@@ -11,6 +13,17 @@ namespace FourthDown.Api.Controllers
     [ApiController]
     public class AuthController : ControllerBase
     {
+        private readonly ILogger<AuthController> _logger;
+        private readonly ITracer _tracer;
+
+        public AuthController(
+            ILogger<AuthController> logger, 
+            ITracer tracer)
+        {
+            _logger = logger;
+            _tracer = tracer;
+        }
+
         /// <summary>
         /// Create an API Key
         /// </summary>

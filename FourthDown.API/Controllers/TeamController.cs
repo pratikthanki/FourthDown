@@ -3,10 +3,13 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using FourthDown.Api.Models;
 using FourthDown.Api.Repositories;
+using FourthDown.Api.Utilities;
+using Jaeger;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using OpenTracing;
 
 namespace FourthDown.Api.Controllers
 {
@@ -16,13 +19,16 @@ namespace FourthDown.Api.Controllers
     public class TeamController : ControllerBase
     {
         private readonly ILogger<TeamController> _logger;
-        private ITeamRepository _teamRepository { get; }
+        private readonly ITracer _tracer;
+        private readonly ITeamRepository _teamRepository;
 
         public TeamController(
             ILogger<TeamController> logger,
+            ITracer tracer,
             ITeamRepository teamRepository)
         {
             _logger = logger;
+            _tracer = tracer;
             _teamRepository = teamRepository;
         }
 
@@ -36,6 +42,8 @@ namespace FourthDown.Api.Controllers
         public async IAsyncEnumerable<IActionResult> GetTeams(
             [EnumeratorCancellation] CancellationToken cancellationToken)
         {
+            using var scope = _tracer.BuildSpan(nameof(GetTeams)).StartActive();
+
             _logger.LogInformation("Successful Teams request");
 
             await foreach (var team in _teamRepository.GetTeamsAsync(cancellationToken))

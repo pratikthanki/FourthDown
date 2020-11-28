@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using OpenTracing;
 
 namespace FourthDown.Api.Controllers
 {
@@ -17,14 +18,17 @@ namespace FourthDown.Api.Controllers
     [ApiController]
     public class GameController : ControllerBase
     {
-        private readonly ILogger<ScheduleController> _logger;
-        private IGamePlayService _pbpService { get; }
+        private readonly ILogger<GameController> _logger;
+        private readonly ITracer _tracer;
+        private IGamePlayService _pbpService;
 
         public GameController(
-            ILogger<ScheduleController> logger,
+            ILogger<GameController> logger,
+            ITracer tracer,
             IGamePlayService pbpService)
         {
             _logger = logger;
+            _tracer = tracer;
             _pbpService = pbpService;
         }
 

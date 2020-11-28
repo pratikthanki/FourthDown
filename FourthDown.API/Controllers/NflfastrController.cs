@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using FourthDown.Api.Models;
 using FourthDown.Api.Parameters;
 using FourthDown.Api.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using OpenTracing;
 
 namespace FourthDown.Api.Controllers
 {
@@ -17,11 +18,18 @@ namespace FourthDown.Api.Controllers
     [ApiController]
     public class NflfastrController : ControllerBase
     {
-        private IPlayByPlayRepository _playByPlayRepository { get; }
+        private readonly ILogger<NflfastrController> _logger;
+        private readonly ITracer _tracer;
+        private IPlayByPlayRepository _playByPlayRepository;
 
-        public NflfastrController(IPlayByPlayRepository playByPlayRepository)
+        public NflfastrController(
+            IPlayByPlayRepository playByPlayRepository, 
+            ILogger<NflfastrController> logger, 
+            ITracer tracer)
         {
             _playByPlayRepository = playByPlayRepository;
+            _logger = logger;
+            _tracer = tracer;
         }
 
         /// <summary>

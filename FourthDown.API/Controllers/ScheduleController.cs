@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using OpenTracing;
 
 namespace FourthDown.Api.Controllers
 {
@@ -17,14 +18,17 @@ namespace FourthDown.Api.Controllers
     public class ScheduleController : ControllerBase
     {
         private readonly ILogger<ScheduleController> _logger;
+        private readonly ITracer _tracer;
         private readonly IScheduleService _scheduleService;
 
         public ScheduleController(
             ILogger<ScheduleController> logger,
-            IScheduleService scheduleService)
+            IScheduleService scheduleService, 
+            ITracer tracer)
         {
             _logger = logger;
             _scheduleService = scheduleService;
+            _tracer = tracer;
         }
 
         /// <summary>
