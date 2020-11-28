@@ -1,148 +1,17 @@
 @charset "UTF-8";
 
-/**
- * Swagger UI Theme Overrides
- * https://github.com/ostranme/swagger-ui-themes/blob/develop/themes/3.x/theme-flattop.css
- *
- * Theme: Flattop
- * Author: Mark Ostrander
- * Github: https://github.com/ostranme/swagger-ui-themes
- */
-
-.swagger-ui .opblock.opblock-post {
-    border-color: #DADFE1;
-    background: rgba(236, 240, 241, .1);
+.swagger-ui .opblock-tag {
+    font-size: 26px;
+    margin: 0 0 5px;
+    font-family: sans-serif;
+    color: #3b4151;
 }
 
-.swagger-ui .opblock.opblock-post .opblock-summary-method {
-    background: #049372;
+.swagger-ui .renderedMarkdown p {
+    margin: 0 auto 1em;
+    line-height: 1.4em;
 }
 
-.swagger-ui .opblock.opblock-post .opblock-summary {
-    border-color: #DADFE1;
-}
-
-.swagger-ui .opblock.opblock-put {
-    border-color: #DADFE1;
-    background: rgba(236, 240, 241, .1);
-}
-
-.swagger-ui .opblock.opblock-put .opblock-summary-method {
-    background: #EB9532;
-}
-
-.swagger-ui .opblock.opblock-put .opblock-summary {
-    border-color: #DADFE1;
-}
-
-.swagger-ui .opblock.opblock-delete {
-    border-color: #DADFE1;
-    background: rgba(236, 240, 241, .1);
-}
-
-.swagger-ui .opblock.opblock-delete .opblock-summary-method {
-    background: #C0392B;
-}
-
-.swagger-ui .opblock.opblock-delete .opblock-summary {
-    border-color: #DADFE1;
-}
-
-.swagger-ui .opblock.opblock-get {
-    border-color: #DADFE1;
-    background: rgba(236, 240, 241, .1);
-}
-
-.swagger-ui .opblock.opblock-get .opblock-summary-method {
-    background: #34495E;
-}
-
-.swagger-ui .opblock.opblock-get .opblock-summary {
-    border-color: #DADFE1;
-}
-
-.swagger-ui .opblock.opblock-patch {
-    border-color: #DADFE1;
-    background: rgba(236, 240, 241, .1);
-}
-
-.swagger-ui .opblock.opblock-patch .opblock-summary-method {
-    background: #F57C00;
-}
-
-.swagger-ui .opblock.opblock-patch .opblock-summary {
-    border-color: #DADFE1;
-}
-
-.swagger-ui .opblock.opblock-head {
-    border-color: #DADFE1;
-    background: rgba(236, 240, 241, .1);
-}
-
-.swagger-ui .opblock.opblock-head .opblock-summary-method {
-    background: #5C6BC0;
-}
-
-.swagger-ui .opblock.opblock-head .opblock-summary {
-    border-color: #DADFE1;
-}
-
-.swagger-ui .opblock.opblock-options {
-    border-color: #DADFE1;
-    background: rgba(236, 240, 241, .1);
-}
-
-.swagger-ui .opblock.opblock-options .opblock-summary-method {
-    background: #3F51B5;
-}
-
-.swagger-ui .opblock.opblock-options .opblock-summary {
-    border-color: #DADFE1;
-}
-
-.swagger-ui .topbar {
-    padding: 8px 30px;
-    background-color: #2C3E50;
-}
-
-.swagger-ui .topbar .download-url-wrapper input[type=text] {
-    min-width: 350px;
-    margin: 0;
-    border: 2px solid #DADFE1;
-    border-radius: 4px 0 0 4px;
-    outline: none;
-}
-
-.swagger-ui .topbar .download-url-wrapper .download-url-button {
-    font-size: 16px;
-    font-weight: 700;
-    padding: 4px 40px;
-    border: none;
-    border-radius: 0 4px 4px 0;
-    background: #DADFE1;
-    font-family: Titillium Web, sans-serif;
-    color: #2C3E50;
-}
-
-.swagger-ui .info a {
-    font-size: 14px;
-    -webkit-transition: all .4s;
-    transition: all .4s;
-    font-family: Open Sans, sans-serif;
-    color: #336E7B;
-}
-
-.swagger-ui .info a:hover {
-    color: #336E7B;
-}
-
-.swagger-ui .btn.authorize {
-    line-height: 1;
-    display: inline;
-    color: #336E7B;
-    border-color: #336E7B;
-}
-
-.swagger-ui .btn.authorize svg {
-    fill: #336E7B;
+.swagger-ui .renderedMarkdown code {
+    padding: 1px 4px;
 }

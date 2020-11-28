@@ -98,6 +98,12 @@ namespace FourthDown.Api
                         }
                     });
 
+                    c.AddSecurityDefinition("apiKey",
+                        new OpenApiSecurityScheme
+                        {
+                            Name = "X-API-KEY", In = ParameterLocation.Header, Type = SecuritySchemeType.ApiKey
+                        });
+
                     var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
                     var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
                     c.IncludeXmlComments(xmlPath);
@@ -136,9 +142,7 @@ namespace FourthDown.Api
                 app.UseExceptionHandler("/Error");
                 app.UseHsts();
             }
-
-            app.UseStaticFiles();
-
+            
             app.UseSwagger();
             app.UseSwaggerUI(c =>
             {

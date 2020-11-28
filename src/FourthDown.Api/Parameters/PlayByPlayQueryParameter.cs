@@ -5,22 +5,14 @@ namespace FourthDown.Api.Parameters
 {
     /// <summary>
     /// </summary>
-    public class PlayByPlayQueryParameter
+    public class PlayByPlayQueryParameter : QueryParameterBase
     {
         /// <summary>
+        /// Specific gameId in format Season_Week_VisitorAbr_HomeTAbr
         /// </summary>
-        public int? Week { get; set; }
-
-        /// <summary>
-        /// </summary>
-        public int? Season { get; set; }
-
-        /// <summary>
-        /// </summary>
-        public string Team { get; set; }
-
-        /// <summary>
-        /// </summary>
+        /// <example>
+        /// 2020_17_DAL_NYG
+        /// </example>
         public string GameId { get; set; }
 
         private bool NonGameIdParameterSet()
