@@ -9,7 +9,9 @@ using FourthDown.Api.Repositories.Csv;
 using FourthDown.Api.Repositories.Json;
 using FourthDown.Api.Services;
 using Jaeger;
+using Jaeger.Reporters;
 using Jaeger.Samplers;
+using Jaeger.Senders.Thrift;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Hosting;
@@ -37,7 +39,7 @@ namespace FourthDown.Api
         public void ConfigureServices(IServiceCollection services)
         {
             services
-                .Configure<ApiKeyOptions>(Configuration);
+                .Configure<AuthenticationOptions>(Configuration);
 
             services
                 .AddSingleton<IGamePlayService, GamePlayService>()
@@ -55,13 +57,18 @@ namespace FourthDown.Api
                     var loggerFactory = serviceProvider.GetRequiredService<ILoggerFactory>();
                     ISampler sampler = new ConstSampler(true);
 
+                    var remoteReporter = new RemoteReporter.Builder()
+                        .WithLoggerFactory(loggerFactory)
+                        .WithSender(new UdpSender("localhost", 6831, 0))
+                        .Build();
+
                     // This will log to a default localhost installation of Jaeger.
                     var tracer = new Tracer.Builder(serviceName)
+                        .WithReporter(remoteReporter)
                         .WithLoggerFactory(loggerFactory)
                         .WithSampler(sampler)
                         .Build();
 
-                    // Allows code that can't use DI to also access the tracer.
                     GlobalTracer.Register(tracer);
 
                     return tracer;
@@ -103,6 +110,11 @@ namespace FourthDown.Api
                         {
                             Name = "X-API-KEY", In = ParameterLocation.Header, Type = SecuritySchemeType.ApiKey
                         });
+                    
+                    c.AddServer(new OpenApiServer()
+                    {
+                        Url = "https://fourthdown.analytics.com"
+                    });
 
                     var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
                     var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);

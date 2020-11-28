@@ -1,45 +1,44 @@
 using System.Collections.Generic;
 using System.IO;
-using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Threading;
+using System.Threading.Tasks;
+using FourthDown.Api.Extensions;
 using FourthDown.Api.Models;
 using FourthDown.Api.Utilities;
-using Microsoft.Extensions.Logging;
 using OpenTracing;
 
 namespace FourthDown.Api.Repositories.Json
 {
     public class JsonTeamRepository : ITeamRepository
     {
-        private readonly ILogger<JsonTeamRepository> _logger;
         private readonly ITracer _tracer;
 
-        public JsonTeamRepository(
-            ILogger<JsonTeamRepository> logger,
-            ITracer tracer)
+        public JsonTeamRepository(ITracer tracer)
         {
-            _logger = logger;
             _tracer = tracer;
         }
 
-        public async IAsyncEnumerable<Team> GetTeamsAsync([EnumeratorCancellation] CancellationToken cancellationToken)
+        public async Task<IEnumerable<Team>> GetTeamsAsync(CancellationToken cancellationToken)
         {
-            await foreach (var team in ReadTeamsJson(cancellationToken))
-            {
-                yield return team;
-            }
+            using var scope = _tracer.BuildSpan(nameof(GetTeamsAsync)).StartActive(true);
+            
+            return await ReadTeamsJson(cancellationToken, scope);
         }
 
-        private static async IAsyncEnumerable<Team> ReadTeamsJson(
-            [EnumeratorCancellation] CancellationToken cancellationToken)
+        private static async Task<IEnumerable<Team>> ReadTeamsJson(
+            CancellationToken cancellationToken, IScope scope)
         {
+            scope.LogStart(nameof(ReadTeamsJson));
+
             const string file = "teams.json";
             var filePath = StringParser.GetDataFilePath(file);
 
             await using var SourceStream = File.Open(filePath, FileMode.Open);
-
-            yield return await JsonSerializer.DeserializeAsync<Team>(
+            
+            scope.LogEnd(nameof(ReadTeamsJson));
+            
+            return await JsonSerializer.DeserializeAsync<IEnumerable<Team>>(
                 SourceStream,
                 new JsonSerializerOptions
                 {

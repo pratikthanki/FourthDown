@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using Microsoft.AspNetCore.Hosting;
@@ -11,6 +12,9 @@ namespace FourthDown.Api
     {
         public static void Main(string[] args)
         {
+            Activity.DefaultIdFormat = ActivityIdFormat.W3C;
+            Activity.ForceDefaultIdFormat = true;
+
             CreateHostBuilder(args).Build().Run();
         }
 
