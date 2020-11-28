@@ -40,7 +40,7 @@ namespace FourthDown.Api.Models
                 TimeoutsUsed = gameDetail.VisitorTimeoutsUsed.Sum(),
                 TimeoutsRemaining = gameDetail.VisitorTimeoutsRemaining.Sum()
             };
-            
+
             Drives = gameDetail.Drives;
             Plays = gameDetail.Plays;
             ScoringSummaries = gameDetail.ScoringSummaries;
@@ -57,6 +57,51 @@ namespace FourthDown.Api.Models
         public IList<Play> Plays { get; set; }
         public IList<ScoringSummary> ScoringSummaries { get; set; }
 
+        public GameDrives ParseToGameDrives()
+        {
+            return new GameDrives
+            {
+                Id = Id,
+                Attendance = Attendance,
+                Stadium = Stadium,
+                StartTime = StartTime,
+                WeatherShortDescription = WeatherShortDescription,
+                HomeTeam = HomeTeam,
+                VisitorTeam = VisitorTeam,
+                Drives = Drives
+            };
+        }
+
+        public GamePlays ParseToGamePlays()
+        {
+            return new GamePlays
+            {
+                Id = Id,
+                Attendance = Attendance,
+                Stadium = Stadium,
+                StartTime = StartTime,
+                WeatherShortDescription = WeatherShortDescription,
+                HomeTeam = HomeTeam,
+                VisitorTeam = VisitorTeam,
+                Plays = Plays
+            };
+        }
+
+        public GameScoringSummaries ParseToGameScoringSummaries()
+        {
+            return new GameScoringSummaries
+            {
+                Id = Id,
+                Attendance = Attendance,
+                Stadium = Stadium,
+                StartTime = StartTime,
+                WeatherShortDescription = WeatherShortDescription,
+                HomeTeam = HomeTeam,
+                VisitorTeam = VisitorTeam,
+                ScoringSummaries = ScoringSummaries
+            };
+        }
+
         public class TeamStats
         {
             public string TeamAbbreviation { get; set; }
@@ -70,53 +115,8 @@ namespace FourthDown.Api.Models
             public int TimeoutsUsed { get; set; }
             public int TimeoutsRemaining { get; set; }
         }
-
-        public GameDrives ParseToGameDrives()
-        {
-            return new GameDrives()
-            {
-                Id = Id,
-                Attendance = Attendance,
-                Stadium = Stadium,
-                StartTime = StartTime,
-                WeatherShortDescription = WeatherShortDescription,
-                HomeTeam = HomeTeam,
-                VisitorTeam = VisitorTeam,
-                Drives = Drives
-            };
-        }
-        
-        public GamePlays ParseToGamePlays()
-        {
-            return new GamePlays()
-            {
-                Id = Id,
-                Attendance = Attendance,
-                Stadium = Stadium,
-                StartTime = StartTime,
-                WeatherShortDescription = WeatherShortDescription,
-                HomeTeam = HomeTeam,
-                VisitorTeam = VisitorTeam,
-                Plays = Plays
-            };
-        }
-        
-        public GameScoringSummaries ParseToGameScoringSummaries()
-        {
-            return new GameScoringSummaries()
-            {
-                Id = Id,
-                Attendance = Attendance,
-                Stadium = Stadium,
-                StartTime = StartTime,
-                WeatherShortDescription = WeatherShortDescription,
-                HomeTeam = HomeTeam,
-                VisitorTeam = VisitorTeam,
-                ScoringSummaries = ScoringSummaries
-            };
-        }
     }
-    
+
     public class GameDrives
     {
         public string Id { get; set; }
@@ -140,7 +140,7 @@ namespace FourthDown.Api.Models
         public GameDetailsFormatted.TeamStats VisitorTeam { get; set; }
         public IList<Play> Plays { get; set; }
     }
-    
+
     public class GameScoringSummaries
     {
         public string Id { get; set; }

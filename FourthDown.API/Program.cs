@@ -14,8 +14,9 @@ namespace FourthDown.Api
             CreateHostBuilder(args).Build().Run();
         }
 
-        private static IHostBuilder CreateHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder(args)
+        private static IHostBuilder CreateHostBuilder(string[] args)
+        {
+            return Host.CreateDefaultBuilder(args)
                 .ConfigureAppConfiguration((hostingContext, configuration) =>
                 {
                     configuration.Sources.Clear();
@@ -31,5 +32,6 @@ namespace FourthDown.Api
                     config.Enrich.FromLogContext();
                     config.WriteTo.Console();
                 });
+        }
     }
 }

@@ -8,7 +8,9 @@ namespace FourthDown.Api.Utilities
 {
     public static class RequestHelper
     {
-        public static async Task<HttpResponseMessage> GetRequestResponse(string url, CancellationToken cancellationToken)
+        public static async Task<HttpResponseMessage> GetRequestResponse(
+            string url,
+            CancellationToken cancellationToken)
         {
             var timeout = TimeSpan.FromSeconds(10);
             var httpClientHandler = new HttpClientHandler

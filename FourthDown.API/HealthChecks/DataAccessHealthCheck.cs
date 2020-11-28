@@ -18,10 +18,8 @@ namespace FourthDown.Api.HealthChecks
             var healthCheckResultHealthy = response.IsSuccessStatusCode;
 
             if (healthCheckResultHealthy)
-            {
                 return await Task.FromResult(
                     HealthCheckResult.Healthy("A healthy result."));
-            }
 
             return await Task.FromResult(
                 HealthCheckResult.Unhealthy("An unhealthy result."));

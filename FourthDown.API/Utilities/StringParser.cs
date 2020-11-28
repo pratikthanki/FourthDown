@@ -15,42 +15,67 @@ namespace FourthDown.Api.Utilities
             return num;
         }
 
-        public static int? ToNullableInt(string number) =>
-            IsNa(number) ? (int?) null : int.Parse(number);
+        public static int? ToNullableInt(string number)
+        {
+            return IsNa(number) ? (int?) null : int.Parse(number);
+        }
 
-        public static int ToIntDefaultZero(string number) =>
-            IsNa(number) ? 0 : int.Parse(number);
+        public static int ToIntDefaultZero(string number)
+        {
+            return IsNa(number) ? 0 : int.Parse(number);
+        }
 
-        public static double ToDouble(string number) =>
-            double.Parse(number);
+        public static double ToDouble(string number)
+        {
+            return double.Parse(number);
+        }
 
-        public static double? ToNullableDouble(string number) =>
-            IsNa(number) ? (double?) null : double.Parse(number);
+        public static double? ToNullableDouble(string number)
+        {
+            return IsNa(number) ? (double?) null : double.Parse(number);
+        }
 
-        public static double ToDoubleDefaultZero(string number) =>
-            IsNa(number) ? 0 : double.Parse(number);
+        public static double ToDoubleDefaultZero(string number)
+        {
+            return IsNa(number) ? 0 : double.Parse(number);
+        }
 
-        public static TimeSpan? ToTimeSpanOrNull(string time) =>
-            IsNa(time) || time == "0" ? (TimeSpan?) null : TimeSpan.Parse(time);
+        public static TimeSpan? ToTimeSpanOrNull(string time)
+        {
+            return IsNa(time) || time == "0" ? (TimeSpan?) null : TimeSpan.Parse(time);
+        }
 
-        public static DateTime? ToDateTimeOrNull(string dateTime) =>
-            IsNa(dateTime) || dateTime == "0"
+        public static DateTime? ToDateTimeOrNull(string dateTime)
+        {
+            return IsNa(dateTime) || dateTime == "0"
                 ? (DateTime?) null
                 : DateTime.ParseExact(dateTime, DateFormat, CultureInfo.InvariantCulture);
+        }
 
-        public static DateTime ToDateTime(string dateTime, string format) =>
-            DateTime.ParseExact(dateTime, format, CultureInfo.InvariantCulture);
+        public static DateTime ToDateTime(string dateTime, string format)
+        {
+            return DateTime.ParseExact(dateTime, format, CultureInfo.InvariantCulture);
+        }
 
-        public static bool ToBool(string number) =>
-            number == "1";
+        public static bool ToBool(string number)
+        {
+            return number == "1";
+        }
 
-        public static bool? ToNullableBool(string number) =>
-            IsNa(number) ? (bool?) null : number == "1";
+        public static bool? ToNullableBool(string number)
+        {
+            return IsNa(number) ? (bool?) null : number == "1";
+        }
 
-        public static string ToString(string str) =>
-            IsNa(str) ? "" : str;
+        public static string ToString(string str)
+        {
+            return IsNa(str) ? "" : str;
+        }
 
-        private static bool IsNa(string value) => value == "NA" || value == "";
+        private static bool IsNa(string value)
+        {
+            return value == "NA" || value == "";
+        }
 
         private static string GetAbsolutePath(string relativePath)
         {
@@ -64,7 +89,9 @@ namespace FourthDown.Api.Utilities
             return fullPath;
         }
 
-        public static string GetDataFilePath(string file) => GetAbsolutePath($@"../../../data/{file}");
-
+        public static string GetDataFilePath(string file)
+        {
+            return GetAbsolutePath($@"../../../data/{file}");
+        }
     }
 }

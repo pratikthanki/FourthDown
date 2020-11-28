@@ -9,7 +9,7 @@ namespace FourthDown.Api.Services
     public interface IScheduleService
     {
         Task<IEnumerable<Game>> GetGames(
-            ScheduleQueryParameter queryParameter, 
+            ScheduleQueryParameter queryParameter,
             CancellationToken cancellationToken);
 
         Task<IEnumerable<Game>> GetGameById(

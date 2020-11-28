@@ -18,7 +18,6 @@ namespace FourthDown.Api.Authentication
     public class ApiKeyAuthenticationHandler : AuthenticationHandler<ApiKeyAuthenticationOptions>
     {
         private const string ProblemDetailsContentType = "application/problem+json";
-        private readonly IAuthClient _authClient;
         private const string ApiKeyHeaderName = "X-Api-Key";
 
         private static readonly JsonSerializerOptions SerializerOptions = new JsonSerializerOptions
@@ -26,6 +25,8 @@ namespace FourthDown.Api.Authentication
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
             PropertyNameCaseInsensitive = true
         };
+
+        private readonly IAuthClient _authClient;
 
         public ApiKeyAuthenticationHandler(
             IOptionsMonitor<ApiKeyAuthenticationOptions> options,
@@ -58,7 +59,8 @@ namespace FourthDown.Api.Authentication
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.Name, existingApiKey.Alias),
-                new Claim(ClaimTypes.Expiration, existingApiKey.ExpirationDateTime.ToString(CultureInfo.InvariantCulture)),
+                new Claim(ClaimTypes.Expiration,
+                    existingApiKey.ExpirationDateTime.ToString(CultureInfo.InvariantCulture))
             };
 
             var identity = new ClaimsIdentity(claims, ApiKeyAuthenticationOptions.AuthenticationType);
@@ -76,11 +78,14 @@ namespace FourthDown.Api.Authentication
 
             await base.HandleChallengeAsync(properties);
 
-            var message = new Dictionary<string, string>()
+            var message = new Dictionary<string, string>
             {
                 {"Title", HttpStatusCode.Unauthorized.ToString()},
                 {"Status", ((int) HttpStatusCode.Unauthorized).ToString()},
-                {"Detail", "Provided API key is either invalid or has expired. Use the POST '/api/auth' endpoint to create an API Key."}
+                {
+                    "Detail",
+                    "Provided API key is either invalid or has expired. Use the POST '/api/auth' endpoint to create an API Key."
+                }
             };
 
             var text = JsonConvert.SerializeObject(message);

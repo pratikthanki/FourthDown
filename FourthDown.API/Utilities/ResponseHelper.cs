@@ -15,7 +15,7 @@ namespace FourthDown.Api.Utilities
 
             var buffer = new byte[4096];
             StreamUtils.Copy(inStream, MemoryStream, buffer);
-            
+
             var data = Encoding.UTF8.GetString(MemoryStream.ToArray());
 
             return data;

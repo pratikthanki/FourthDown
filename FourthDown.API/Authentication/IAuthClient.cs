@@ -14,13 +14,13 @@ namespace FourthDown.Api.Authentication
 
     public class AuthClient : IAuthClient
     {
-        private readonly ApiKeyOptions _apiKeyOptions;
-
         private static readonly JsonSerializerOptions SerializerOptions = new JsonSerializerOptions
         {
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
             PropertyNameCaseInsensitive = true
         };
+
+        private readonly ApiKeyOptions _apiKeyOptions;
 
         public AuthClient(IOptions<ApiKeyOptions> apiKeyOptions)
         {
@@ -31,18 +31,14 @@ namespace FourthDown.Api.Authentication
         {
             Dictionary<string, ApiKey> apiKeys;
             if (!_apiKeyOptions.UseSampleAuth)
-            {
                 // TODO: get apiKeys from apikey management service
                 apiKeys = new Dictionary<string, ApiKey>
                 {
                     {"some-key", new ApiKey()}
                 };
-            }
             else
-            {
                 apiKeys = await JsonSerializer.DeserializeAsync<Dictionary<string, ApiKey>>(
                     File.OpenRead("Data/api-keys.json"), SerializerOptions);
-            }
 
             apiKeys.TryGetValue(apiKey, out var key);
 

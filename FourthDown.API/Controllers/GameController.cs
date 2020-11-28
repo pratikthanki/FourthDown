@@ -20,7 +20,7 @@ namespace FourthDown.Api.Controllers
     {
         private readonly ILogger<GameController> _logger;
         private readonly ITracer _tracer;
-        private IGamePlayService _pbpService;
+        private readonly IGamePlayService _pbpService;
 
         public GameController(
             ILogger<GameController> logger,
@@ -33,10 +33,10 @@ namespace FourthDown.Api.Controllers
         }
 
         /// <summary>
-        /// Play by Play data for a set of games
+        ///     Play by Play data for a set of games
         /// </summary>
         /// <remarks>
-        /// Either GameId or a combination of Season, Week and Team should be provided 
+        ///     Either GameId or a combination of Season, Week and Team should be provided
         /// </remarks>
         /// <param name="queryParameter">Combination of Season, Week and Team</param>
         /// <param name="cancellationToken"></param>
@@ -56,7 +56,7 @@ namespace FourthDown.Api.Controllers
                     Status = StatusCodes.Status400BadRequest
                 });
             using var scope = _tracer.BuildSpan(nameof(GetPlays)).StartActive();
-            
+
             var plays = await _pbpService.GetGamePlays(queryParameter, cancellationToken);
 
             if (plays == null || !plays.Any())
@@ -70,10 +70,10 @@ namespace FourthDown.Api.Controllers
         }
 
         /// <summary>
-        /// game drives summarised from plays 
+        ///     Game drives summarised from plays
         /// </summary>
         /// <remarks>
-        /// Either GameId or a combination of Season, Week and Team should be provided 
+        ///     Either GameId or a combination of Season, Week and Team should be provided
         /// </remarks>
         /// <param name="queryParameter">Combination of Season, Week and Team</param>
         /// <param name="cancellationToken"></param>
@@ -108,10 +108,10 @@ namespace FourthDown.Api.Controllers
         }
 
         /// <summary>
-        /// List of scoring drives with updated team scores
+        ///     List of scoring drives with updated team scores
         /// </summary>
         /// <remarks>
-        /// Either GameId or a combination of Season, Week and Team should be provided 
+        ///     Either GameId or a combination of Season, Week and Team should be provided
         /// </remarks>
         /// <param name="queryParameter">Combination of Season, Week and Team</param>
         /// <param name="cancellationToken"></param>

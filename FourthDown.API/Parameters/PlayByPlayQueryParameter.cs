@@ -1,36 +1,32 @@
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
 
 namespace FourthDown.Api.Parameters
 {
     /// <summary>
-    /// 
     /// </summary>
     public class PlayByPlayQueryParameter
     {
         /// <summary>
-        /// 
         /// </summary>
         public int? Week { get; set; }
 
         /// <summary>
-        /// 
         /// </summary>
         public int? Season { get; set; }
 
         /// <summary>
-        /// 
         /// </summary>
         public string Team { get; set; }
 
         /// <summary>
-        /// 
         /// </summary>
         public string GameId { get; set; }
 
-        private bool NonGameIdParameterSet() => Week != null || Season != null || Team != null;
+        private bool NonGameIdParameterSet()
+        {
+            return Week != null || Season != null || Team != null;
+        }
 
         public Dictionary<string, string[]> ToKeyValues()
         {

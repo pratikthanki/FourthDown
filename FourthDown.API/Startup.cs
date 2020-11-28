@@ -1,6 +1,6 @@
 using System;
-using System.Reflection;
 using System.IO;
+using System.Reflection;
 using FourthDown.Api.Authentication;
 using FourthDown.Api.Configuration;
 using FourthDown.Api.HealthChecks;
@@ -14,12 +14,12 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.OpenApi.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.OpenApi.Models;
 using OpenTracing;
 using OpenTracing.Util;
 
@@ -27,12 +27,12 @@ namespace FourthDown.Api
 {
     public class Startup
     {
-        private IConfiguration Configuration { get; }
-
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
         }
+
+        private IConfiguration Configuration { get; }
 
         public void ConfigureServices(IServiceCollection services)
         {
@@ -46,28 +46,34 @@ namespace FourthDown.Api
                 .AddSingleton<IGameRepository, CsvGameRepository>()
                 .AddSingleton<IGamePlayRepository, JsonGamePlayRepository>()
                 .AddSingleton<IPlayByPlayRepository, CsvPlayByPlayRepository>()
-                .AddSingleton<IAuthClient, AuthClient>();
+                .AddSingleton<IAuthClient, AuthClient>()
+                .AddSingleton<ITracer>(serviceProvider =>
+                {
+                    // Adds the Jaeger Trace.
+
+                    var serviceName = serviceProvider.GetRequiredService<IWebHostEnvironment>().ApplicationName;
+                    var loggerFactory = serviceProvider.GetRequiredService<ILoggerFactory>();
+                    ISampler sampler = new ConstSampler(true);
+
+                    // This will log to a default localhost installation of Jaeger.
+                    var tracer = new Tracer.Builder(serviceName)
+                        .WithLoggerFactory(loggerFactory)
+                        .WithSampler(sampler)
+                        .Build();
+
+                    // Allows code that can't use DI to also access the tracer.
+                    GlobalTracer.Register(tracer);
+
+                    return tracer;
+                });
 
             services.AddControllers();
             services.AddOpenTracing();
 
-            // Adds the Jaeger Trace.
-            services.AddSingleton<ITracer>(serviceProvider =>
+            services.AddLogging(config =>
             {
-                var serviceName = serviceProvider.GetRequiredService<IWebHostEnvironment>().ApplicationName;
-                var loggerFactory = serviceProvider.GetRequiredService<ILoggerFactory>();
-                ISampler sampler = new ConstSampler(true);
-
-                // This will log to a default localhost installation of Jaeger.
-                var tracer = new Tracer.Builder(serviceName)
-                    .WithLoggerFactory(loggerFactory)
-                    .WithSampler(sampler)
-                    .Build();
-
-                // Allows code that can't use DI to also access the tracer.
-                GlobalTracer.Register(tracer);
-
-                return tracer;
+                config.AddDebug();
+                config.AddConsole();
             });
 
             services
@@ -83,12 +89,12 @@ namespace FourthDown.Api
                         {
                             Name = "Pratik Thanki",
                             Email = "pratikthanki1@gmail.com",
-                            Url = new Uri("http://pratikthanki.github.io/"),
+                            Url = new Uri("http://pratikthanki.github.io/")
                         },
                         License = new OpenApiLicense
                         {
                             Name = "MIT License",
-                            Url = new Uri("https://choosealicense.com/licenses/mit/"),
+                            Url = new Uri("https://choosealicense.com/licenses/mit/")
                         }
                     });
 
@@ -101,8 +107,8 @@ namespace FourthDown.Api
                 .AddHealthChecks()
                 .AddCheck<DataAccessHealthCheck>(
                     "Health check for access to data repository",
-                    failureStatus: HealthStatus.Degraded,
-                    tags: new[] {"data"});
+                    HealthStatus.Degraded,
+                    new[] {"data"});
 
             services
                 .AddAuthentication(options =>
@@ -148,7 +154,7 @@ namespace FourthDown.Api
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
-                endpoints.MapHealthChecks("/health", new HealthCheckOptions()
+                endpoints.MapHealthChecks("/health", new HealthCheckOptions
                 {
                     AllowCachingResponses = false,
                     ResultStatusCodes =

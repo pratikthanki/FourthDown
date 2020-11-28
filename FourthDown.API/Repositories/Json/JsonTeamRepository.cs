@@ -5,13 +5,22 @@ using System.Text.Json;
 using System.Threading;
 using FourthDown.Api.Models;
 using FourthDown.Api.Utilities;
+using Microsoft.Extensions.Logging;
+using OpenTracing;
 
 namespace FourthDown.Api.Repositories.Json
 {
     public class JsonTeamRepository : ITeamRepository
     {
-        public JsonTeamRepository()
+        private readonly ILogger<JsonTeamRepository> _logger;
+        private readonly ITracer _tracer;
+
+        public JsonTeamRepository(
+            ILogger<JsonTeamRepository> logger,
+            ITracer tracer)
         {
+            _logger = logger;
+            _tracer = tracer;
         }
 
         public async IAsyncEnumerable<Team> GetTeamsAsync([EnumeratorCancellation] CancellationToken cancellationToken)

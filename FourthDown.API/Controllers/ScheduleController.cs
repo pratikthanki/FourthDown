@@ -18,12 +18,12 @@ namespace FourthDown.Api.Controllers
     public class ScheduleController : ControllerBase
     {
         private readonly ILogger<ScheduleController> _logger;
-        private readonly ITracer _tracer;
         private readonly IScheduleService _scheduleService;
+        private readonly ITracer _tracer;
 
         public ScheduleController(
             ILogger<ScheduleController> logger,
-            IScheduleService scheduleService, 
+            IScheduleService scheduleService,
             ITracer tracer)
         {
             _logger = logger;
@@ -32,10 +32,10 @@ namespace FourthDown.Api.Controllers
         }
 
         /// <summary>
-        /// Query for a set of games and accompanying details
+        ///     Query for a set of games and accompanying details
         /// </summary>
         /// <remarks>
-        /// If no parameters are passed, all team games for the current week for this season are returned
+        ///     If no parameters are passed, all team games for the current week for this season are returned
         /// </remarks>
         /// <param name="queryParameter">Combination of Season, Week and Team</param>
         /// <param name="cancellationToken"></param>

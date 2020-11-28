@@ -9,7 +9,7 @@ namespace FourthDown.Api.Repositories
     public interface IPlayByPlayRepository
     {
         Task<IEnumerable<PlayByPlay>> GetPlayByPlaysAsync(
-            PlayByPlayQueryParameter queryParameter, 
+            PlayByPlayQueryParameter queryParameter,
             CancellationToken cancellationToken);
     }
 }

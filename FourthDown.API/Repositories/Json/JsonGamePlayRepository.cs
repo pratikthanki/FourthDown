@@ -16,9 +16,6 @@ namespace FourthDown.Api.Repositories.Json
             _logger = logger;
         }
 
-        private string GetGameUrl(string gameId, int season) =>
-            $"https://github.com/pratikthanki/nflfastR-raw/blob/master/raw/{season}/{gameId}.json.gz?raw=true";
-
         public async Task<GameDetail> GetGamePlaysAsync(
             string gameId,
             int season,
@@ -27,6 +24,11 @@ namespace FourthDown.Api.Repositories.Json
             var url = GetGameUrl(gameId, season);
 
             return await GetGameJson(url, cancellationToken);
+        }
+
+        private string GetGameUrl(string gameId, int season)
+        {
+            return $"https://github.com/pratikthanki/nflfastR-raw/blob/master/raw/{season}/{gameId}.json.gz?raw=true";
         }
 
         private static async Task<GameDetail> GetGameJson(string url, CancellationToken cancellationToken)

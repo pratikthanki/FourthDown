@@ -17,7 +17,7 @@ namespace FourthDown.Api.Controllers
         private readonly ITracer _tracer;
 
         public AuthController(
-            ILogger<AuthController> logger, 
+            ILogger<AuthController> logger,
             ITracer tracer)
         {
             _logger = logger;
@@ -25,10 +25,10 @@ namespace FourthDown.Api.Controllers
         }
 
         /// <summary>
-        /// Create an API Key
+        ///     Create an API Key
         /// </summary>
         /// <remarks>
-        /// Create an API Key with an expiry 
+        ///     Create an API Key with an expiry
         /// </remarks>
         /// <param name="name">Name/alias for the created API Key</param>
         /// <param name="cancellationToken"></param>
@@ -38,7 +38,7 @@ namespace FourthDown.Api.Controllers
         [Produces("application/json")]
         [ProducesResponseType(typeof(string), StatusCodes.Status201Created)]
         public async Task<ActionResult> CreateApiKey(
-            [FromQuery] string name, 
+            [FromQuery] string name,
             CancellationToken cancellationToken)
         {
             using var scope = _tracer.BuildSpan(nameof(CreateApiKey)).StartActive();

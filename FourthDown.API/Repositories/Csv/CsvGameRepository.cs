@@ -11,10 +11,6 @@ namespace FourthDown.Api.Repositories.Csv
     {
         private const string url = @"https://github.com/leesharpe/nfldata/blob/master/data/games.csv?raw=true";
 
-        public CsvGameRepository()
-        {
-        }
-
         public async Task<Dictionary<int, List<Game>>> GetGamesAsync(CancellationToken cancellationToken)
         {
             var response = await RequestHelper.GetRequestResponse(url, cancellationToken);
@@ -77,7 +73,6 @@ namespace FourthDown.Api.Repositories.Csv
                 };
 
                 games.Add(game);
-
             }
 
             return games

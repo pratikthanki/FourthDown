@@ -2,10 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using FourthDown.Api.Models;
-using FourthDown.Api.Repositories;
 using System.Threading.Tasks;
+using FourthDown.Api.Models;
 using FourthDown.Api.Parameters;
+using FourthDown.Api.Repositories;
 
 namespace FourthDown.Api.Services
 {
@@ -32,7 +32,7 @@ namespace FourthDown.Api.Services
         }
 
         public async Task<IEnumerable<GameDrives>> GetGameDrives(
-            PlayByPlayQueryParameter queryParameter, 
+            PlayByPlayQueryParameter queryParameter,
             CancellationToken cancellationToken)
         {
             var gameDetails = await QueryForGameStats(queryParameter, cancellationToken);
@@ -41,7 +41,7 @@ namespace FourthDown.Api.Services
         }
 
         public async Task<IEnumerable<GameScoringSummaries>> GetGameScoringSummaries(
-            PlayByPlayQueryParameter queryParameter, 
+            PlayByPlayQueryParameter queryParameter,
             CancellationToken cancellationToken)
         {
             var gameDetails = await QueryForGameStats(queryParameter, cancellationToken);
@@ -56,7 +56,7 @@ namespace FourthDown.Api.Services
             IEnumerable<Game> games;
             if (string.IsNullOrWhiteSpace(queryParameter.GameId))
             {
-                var scheduleParams = new ScheduleQueryParameter()
+                var scheduleParams = new ScheduleQueryParameter
                 {
                     Week = queryParameter.Week,
                     Season = queryParameter.Season,
@@ -79,10 +79,7 @@ namespace FourthDown.Api.Services
         {
             var games = await GetGamesFromQueryOptions(queryParameter, cancellationToken);
 
-            if (games == null || !games.Any())
-            {
-                return null;
-            }
+            if (games == null || !games.Any()) return null;
 
             var gamePlays = new List<GameDetailsFormatted>();
 

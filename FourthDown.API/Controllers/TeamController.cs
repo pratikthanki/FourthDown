@@ -3,8 +3,6 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using FourthDown.Api.Models;
 using FourthDown.Api.Repositories;
-using FourthDown.Api.Utilities;
-using Jaeger;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -19,8 +17,8 @@ namespace FourthDown.Api.Controllers
     public class TeamController : ControllerBase
     {
         private readonly ILogger<TeamController> _logger;
-        private readonly ITracer _tracer;
         private readonly ITeamRepository _teamRepository;
+        private readonly ITracer _tracer;
 
         public TeamController(
             ILogger<TeamController> logger,
@@ -33,7 +31,7 @@ namespace FourthDown.Api.Controllers
         }
 
         /// <summary>
-        /// Query for all 32 teams 
+        ///     Query for all 32 teams
         /// </summary>
         /// <returns>List of all teams with some details</returns>
         [HttpGet("")]
@@ -46,10 +44,7 @@ namespace FourthDown.Api.Controllers
 
             _logger.LogInformation("Successful Teams request");
 
-            await foreach (var team in _teamRepository.GetTeamsAsync(cancellationToken))
-            {
-                yield return Ok(team);
-            }
+            await foreach (var team in _teamRepository.GetTeamsAsync(cancellationToken)) yield return Ok(team);
         }
     }
 }

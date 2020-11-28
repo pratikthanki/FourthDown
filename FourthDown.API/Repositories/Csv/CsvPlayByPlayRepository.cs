@@ -12,14 +12,14 @@ namespace FourthDown.Api.Repositories.Csv
     public class CsvPlayByPlayRepository : IPlayByPlayRepository
     {
         public async Task<IEnumerable<PlayByPlay>> GetPlayByPlaysAsync(
-            PlayByPlayQueryParameter queryParameter, 
+            PlayByPlayQueryParameter queryParameter,
             CancellationToken cancellationToken)
         {
             var season = queryParameter.Season;
             var team = queryParameter.Team;
             var week = queryParameter.Week;
             var gameId = queryParameter.GameId;
-            
+
             var baseUrl = "https://github.com/";
             var path = $"{baseUrl}/guga31bb/nflfastR-data/blob/master/data/play_by_play_{season}.csv.gz?raw=true";
 
@@ -27,15 +27,15 @@ namespace FourthDown.Api.Repositories.Csv
             var stream = await response.Content.ReadAsStreamAsync();
 
             var data = await ResponseHelper.ReadCompressedStreamToString(stream);
-            
+
             var plaByPlays = ProcessPlayByPlayResponse(data);
 
             if (!string.IsNullOrWhiteSpace(team))
                 plaByPlays = plaByPlays.Where(x => x.AwayTeam == team || x.HomeTeam == team);
-            
+
             if (week != null)
                 plaByPlays = plaByPlays.Where(x => x.Week == week);
-            
+
             return plaByPlays.Where(x => x.Season == season);
         }
 
@@ -413,9 +413,10 @@ namespace FourthDown.Api.Repositories.Csv
             var inQuotes = false;
 
             foreach (var T in line)
-            {
                 if (T == '\"')
+                {
                     inQuotes = !inQuotes;
+                }
                 else if (T == ',')
                 {
                     if (!inQuotes)
@@ -424,13 +425,14 @@ namespace FourthDown.Api.Repositories.Csv
                         currentStr.Clear();
                     }
                     else
+                    {
                         currentStr.Append(T);
+                    }
                 }
                 else
                 {
                     currentStr.Append(T);
                 }
-            }
 
             result.Add(currentStr.ToString());
 
