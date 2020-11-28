@@ -1,9 +1,9 @@
 
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FourthDown.Api", "FourthDown.Api\FourthDown.Api.csproj", "{6177E492-9378-4541-9D3D-17808AB00B48}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FourthDown.Api", "src\FourthDown.Api\FourthDown.Api.csproj", "{6177E492-9378-4541-9D3D-17808AB00B48}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FourthDown.Api.Tests", "FourthDown.Api.Tests\FourthDown.Api.Tests.csproj", "{E897B2F3-1427-441B-98E2-0AE2980C2197}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FourthDown.Api.Tests", "src\FourthDown.Api.Tests\FourthDown.Api.Tests.csproj", "{E897B2F3-1427-441B-98E2-0AE2980C2197}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
