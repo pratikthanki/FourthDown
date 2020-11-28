@@ -20,17 +20,17 @@ namespace FourthDown.Api.Authentication
             PropertyNameCaseInsensitive = true
         };
 
-        private readonly ApiKeyOptions _apiKeyOptions;
+        private readonly AuthenticationOptions _authenticationOptions;
 
-        public AuthClient(IOptions<ApiKeyOptions> apiKeyOptions)
+        public AuthClient(IOptions<AuthenticationOptions> apiKeyOptions)
         {
-            _apiKeyOptions = apiKeyOptions.Value;
+            _authenticationOptions = apiKeyOptions.Value;
         }
 
         public async Task<ApiKey> Execute(string apiKey)
         {
             Dictionary<string, ApiKey> apiKeys;
-            if (!_apiKeyOptions.UseSampleAuth)
+            if (!_authenticationOptions.UseSampleAuth)
                 // TODO: get apiKeys from apikey management service
                 apiKeys = new Dictionary<string, ApiKey>
                 {

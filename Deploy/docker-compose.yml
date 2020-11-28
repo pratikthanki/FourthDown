@@ -3,13 +3,58 @@ version: '3.4'
 services:
   jaeger:
     image: jaegertracing/all-in-one:latest
+    container_name: jaeger
     environment:
       - COLLECTOR_ZIPKIN_HTTP_PORT=9411
     ports:
-    - 5775:5775/udp
-    - 6831:6831/udp
-    - 6832:6832/udp
-    - 5778:5778
-    - 16686:16686
-    - 14268:14268
-    - 19411:19411
+      - 9411:9411
+      - 5775:5775/udp
+      - 6831:6831/udp
+      - 6832:6832/udp
+      - 5778:5778
+      - 16686:16686
+      - 14268:14268
+      - 19411:19411
+    networks: 
+      - monitoring
+
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    ports:
+      - 9090:9090
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    networks:
+      - monitoring
+
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    ports:
+      - 3000:3000
+    volumes:
+      - ./grafana/config.ini:/etc/grafana/config.ini
+      - ./grafana/dashboards/:/var/lib/grafana/dashboards
+      - ./grafana/provisioning/:/etc/grafana/provisioning
+    environment:
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+      - GF_INSTALL_PLUGINS=grafana-clock-panel,grafana-simple-json-datasource,grafana-piechart-panel
+    depends_on: 
+      - prometheus 
+    networks:
+      - monitoring
+
+  consul:
+    image: consul
+    container_name: consul
+    ports:
+      - "8500:8500"
+    networks:
+      - monitoring
+
+networks: 
+  monitoring:
+    external:
+      name: monitoring

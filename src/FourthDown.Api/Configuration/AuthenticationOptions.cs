@@ -1,6 +1,6 @@
 namespace FourthDown.Api.Configuration
 {
-    public class ApiKeyOptions
+    public class AuthenticationOptions
     {
         public bool UseSampleAuth { get; set; }
     }
