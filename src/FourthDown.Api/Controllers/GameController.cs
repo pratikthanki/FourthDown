@@ -18,6 +18,10 @@ namespace FourthDown.Api.Controllers
     [ApiVersion( "1.0" )]
     [Authorize]
     [ApiController]
+    [Produces("application/json")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status404NotFound)]
     public class GameController : ControllerBase
     {
         private readonly ILogger<GameController> _logger;
@@ -44,11 +48,7 @@ namespace FourthDown.Api.Controllers
         /// <param name="cancellationToken"></param>
         /// <returns>List of game play by plays</returns>
         [HttpGet("plays")]
-        [Produces("application/json")]
-        [ProducesResponseType(typeof(IEnumerable<GamePlays>), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> GetPlays(
+        public async Task<ActionResult<IEnumerable<GamePlays>>> GetPlays(
             [FromQuery] PlayByPlayQueryParameter queryParameter,
             CancellationToken cancellationToken)
         {
@@ -88,10 +88,7 @@ namespace FourthDown.Api.Controllers
         /// <param name="cancellationToken"></param>
         /// <returns>List of game drives</returns>
         [HttpGet("drives")]
-        [Produces("application/json")]
-        [ProducesResponseType(typeof(IEnumerable<GameDrives>), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> GetDrives(
+        public async Task<ActionResult<IEnumerable<GameDrives>>> GetDrives(
             [FromQuery] PlayByPlayQueryParameter queryParameter,
             CancellationToken cancellationToken)
         {
@@ -131,10 +128,7 @@ namespace FourthDown.Api.Controllers
         /// <param name="cancellationToken"></param>
         /// <returns>List of game scoring summaries</returns>
         [HttpGet("scoringsummaries")]
-        [Produces("application/json")]
-        [ProducesResponseType(typeof(IEnumerable<GameScoringSummaries>), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> GetScoringSummaries(
+        public async Task<ActionResult<IEnumerable<GameScoringSummaries>>> GetScoringSummaries(
             [FromQuery] PlayByPlayQueryParameter queryParameter,
             CancellationToken cancellationToken)
         {

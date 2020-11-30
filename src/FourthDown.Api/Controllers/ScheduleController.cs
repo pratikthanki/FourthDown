@@ -16,6 +16,10 @@ namespace FourthDown.Api.Controllers
     [Route("api/schedule")]
     [ApiVersion( "1.0" )]
     [Authorize]
+    [Produces("application/json")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status404NotFound)]
     [ApiController]
     public class ScheduleController : ControllerBase
     {
@@ -43,11 +47,7 @@ namespace FourthDown.Api.Controllers
         /// <param name="cancellationToken"></param>
         /// <returns>List of games</returns>
         [HttpGet("")]
-        [Produces("application/json")]
-        [ProducesResponseType(typeof(IEnumerable<Game>), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status404NotFound)]
-        public async Task<ActionResult> GetSchedule(
+        public async Task<ActionResult<IEnumerable<Game>>> GetSchedule(
             [FromQuery] ScheduleQueryParameter queryParameter,
             CancellationToken cancellationToken)
         {

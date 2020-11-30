@@ -1,16 +1,13 @@
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Threading;
-using System.Threading.Tasks;
 using FourthDown.Api.Extensions;
 using FourthDown.Api.Models;
 using FourthDown.Api.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using OpenTracing;
-using OpenTracing.Tag;
 
 namespace FourthDown.Api.Controllers
 {
@@ -37,20 +34,23 @@ namespace FourthDown.Api.Controllers
         /// <returns>List of all teams with some details</returns>
         [HttpGet("")]
         [Produces("application/json")]
-        [ProducesResponseType(typeof(IEnumerable<Team>), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> GetTeams(CancellationToken cancellationToken)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async IAsyncEnumerable<Team> GetTeams([EnumeratorCancellation] CancellationToken cancellationToken)
         {
             using var scope = _tracer.InitializeTrace(nameof(GetTeams));
             
             scope.LogStart(nameof(_teamRepository.GetTeamsAsync));
 
-            var team = await _teamRepository.GetTeamsAsync(cancellationToken);
+            var teams = await _teamRepository.GetTeamsAsync(cancellationToken);
 
             scope.LogEnd(nameof(_teamRepository.GetTeamsAsync));
-            
-            return Ok(team);
+
+            foreach (var team in teams)
+            {
+                yield return team;
+            }
         }
     }
 }
