@@ -1,4 +1,6 @@
+using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using FourthDown.Api.Extensions;
@@ -14,8 +16,12 @@ using OpenTracing;
 namespace FourthDown.Api.Controllers
 {
     [Route("api/nflfastr")]
-    [ApiVersion( "1.0" )]
+    [ApiVersion("1.0")]
     [Authorize]
+    [Produces("application/json")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status404NotFound)]
     [ApiController]
     public class NflfastrController : ControllerBase
     {
@@ -44,21 +50,10 @@ namespace FourthDown.Api.Controllers
         /// <returns>List of game play by plays</returns>
         [HttpGet("")]
         [Produces("application/json")]
-        [ProducesResponseType(typeof(PlayByPlay), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> GetPlayByPlays(
+        public async Task<ActionResult<IEnumerable<PlayByPlay>>> GetPlayByPlays(
             [FromQuery] PlayByPlayQueryParameter queryParameter,
             CancellationToken cancellationToken)
         {
-            var errors = queryParameter.Validate();
-            if (errors.Count > 0)
-                return BadRequest(new ValidationProblemDetails(errors)
-                {
-                    Title = "Looks like there are some errors with your request.",
-                    Status = StatusCodes.Status400BadRequest
-                });
-
             using var scope = _tracer.InitializeTrace(nameof(GetPlayByPlays));
 
             scope.LogStart(nameof(_playByPlayRepository.GetPlayByPlaysAsync));

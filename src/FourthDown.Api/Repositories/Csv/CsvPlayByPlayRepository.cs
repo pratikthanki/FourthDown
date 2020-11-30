@@ -1,24 +1,30 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using FourthDown.Api.Models;
 using FourthDown.Api.Parameters;
 using FourthDown.Api.Utilities;
+using OpenTracing;
 
 namespace FourthDown.Api.Repositories.Csv
 {
     public class CsvPlayByPlayRepository : IPlayByPlayRepository
     {
+        private readonly ITracer _tracer;
+
+        public CsvPlayByPlayRepository(ITracer tracer)
+        {
+            _tracer = tracer;
+        }
+
         public async Task<IEnumerable<PlayByPlay>> GetPlayByPlaysAsync(
             PlayByPlayQueryParameter queryParameter,
             CancellationToken cancellationToken)
         {
             var season = queryParameter.Season;
-            var team = queryParameter.Team;
-            var week = queryParameter.Week;
-            var gameId = queryParameter.GameId;
 
             var baseUrl = "https://github.com/";
             var path = $"{baseUrl}/guga31bb/nflfastR-data/blob/master/data/play_by_play_{season}.csv.gz?raw=true";
@@ -28,15 +34,26 @@ namespace FourthDown.Api.Repositories.Csv
 
             var data = await ResponseHelper.ReadCompressedStreamToString(stream);
 
-            var plaByPlays = ProcessPlayByPlayResponse(data);
+            var team = queryParameter.Team;
+            var week = queryParameter.Week;
+            var results = new List<PlayByPlay>();
 
-            if (!string.IsNullOrWhiteSpace(team))
-                plaByPlays = plaByPlays.Where(x => x.AwayTeam == team || x.HomeTeam == team);
+            foreach (var play in ProcessPlayByPlayResponse(data))
+            {
+                if (!string.IsNullOrWhiteSpace(team))
+                {
+                    if (play.AwayTeam == team || play.HomeTeam == team)
+                        results.Add(play);
+                }
 
-            if (week != null)
-                plaByPlays = plaByPlays.Where(x => x.Week == week);
+                if (week != null)
+                {
+                    if (play.Week == week)
+                        results.Add(play);
+                }
+            }
 
-            return plaByPlays.Where(x => x.Season == season);
+            return results;
         }
 
         private static IEnumerable<PlayByPlay> ProcessPlayByPlayResponse(string responseBody)
@@ -45,8 +62,6 @@ namespace FourthDown.Api.Repositories.Csv
                 .Split("\n")
                 .Skip(1);
 
-            var results = new List<PlayByPlay>();
-
             foreach (var row in csvResponse)
             {
                 var x = SplitCsv(row);
@@ -54,9 +69,9 @@ namespace FourthDown.Api.Repositories.Csv
                 if (x.All(cell => cell == ""))
                     continue;
 
-                #region PlayByPlay fields
-
                 var Play = new PlayByPlay();
+
+                #region PlayByPlay fields
                 Play.PlayId = StringParser.ToInt(x[0]);
                 Play.GameId = StringParser.ToString(x[1]);
                 Play.OldGameId = StringParser.ToInt(x[2]);
@@ -400,10 +415,8 @@ namespace FourthDown.Api.Repositories.Csv
 
                 #endregion
 
-                results.Add(Play);
+                yield return Play;
             }
-
-            return results;
         }
 
         private static string[] SplitCsv(string line)
