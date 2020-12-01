@@ -1,0 +1,13 @@
+version: '3.4'
+
+services:
+  api:
+    image: api:latest
+    container_name: api
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_HTTPS_PORT=5254 
+      - ASPNETCORE_URLS=https://+;http://+;
+    ports:
+      - "5000:5000"
+      - "5001:5001"
