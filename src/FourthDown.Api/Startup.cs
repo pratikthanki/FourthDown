@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using FourthDown.Api.Authentication;
@@ -21,6 +22,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.OpenApi.Any;
+using Microsoft.OpenApi.Interfaces;
 using Microsoft.OpenApi.Models;
 using OpenTracing;
 using OpenTracing.Util;
@@ -106,6 +109,16 @@ namespace FourthDown.Api
                         {
                             Name = "MIT License",
                             Url = new Uri("https://choosealicense.com/licenses/mit/")
+                        },
+                        Extensions = new Dictionary<string, IOpenApiExtension>
+                        {
+                            {
+                                "x-logo", new OpenApiObject
+                                {
+                                    {"url", new OpenApiString("https://bit.ly/2VoPyFp")},
+                                    {"altText", new OpenApiString("Fourth Down")}
+                                }
+                            }
                         }
                     });
 
