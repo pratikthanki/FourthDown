@@ -97,7 +97,21 @@ namespace FourthDown.Api
                     {
                         Version = "v1",
                         Title = "Fourth Down API",
-                        Description = "Web API serving NFL data",
+                        Description = "The Fourth Down API is an HTTP REST-based API serving NFL data. This can be used " +
+                                      "to get schedule data and different types of game play by play data. The API is " +
+                                      "designed to be language/tool agnostic.\n" +
+                                      "\nMost endpoints can be interacted with the same set of query parameters: " +
+                                      "`GameId`, `Season`, `Team` and `Week`.",
+                        Extensions = new Dictionary<string, IOpenApiExtension>
+                        {
+                            {
+                                "x-logo", new OpenApiObject
+                                {
+                                    {"url", new OpenApiString("https://bit.ly/2VoPyFp")},
+                                    {"altText", new OpenApiString("Fourth Down")}
+                                }
+                            }
+                        },
                         TermsOfService = new Uri("https://example.com/terms"),
                         Contact = new OpenApiContact
                         {
@@ -109,16 +123,6 @@ namespace FourthDown.Api
                         {
                             Name = "MIT License",
                             Url = new Uri("https://choosealicense.com/licenses/mit/")
-                        },
-                        Extensions = new Dictionary<string, IOpenApiExtension>
-                        {
-                            {
-                                "x-logo", new OpenApiObject
-                                {
-                                    {"url", new OpenApiString("https://bit.ly/2VoPyFp")},
-                                    {"altText", new OpenApiString("Fourth Down")}
-                                }
-                            }
                         }
                     });
 
@@ -127,7 +131,7 @@ namespace FourthDown.Api
                         {
                             Name = "X-API-KEY", In = ParameterLocation.Header, Type = SecuritySchemeType.ApiKey
                         });
-                    
+
                     c.AddServer(new OpenApiServer()
                     {
                         Url = "https://fourthdown.analytics.com"
