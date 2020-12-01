@@ -2,7 +2,7 @@
   "openapi": "3.0.1",
   "info": {
     "title": "Fourth Down API",
-    "description": "Web API serving NFL data",
+    "description": "The Fourth Down API is an HTTP REST-based API serving NFL data. This can be used to get schedule data and different types of game play by play data. The API is designed to be language/tool agnostic.\n\nMost endpoints can be interacted with the same set of query parameters: `GameId`, `Season`, `Team` and `Week`.",
     "termsOfService": "https://example.com/terms",
     "contact": {
       "name": "Pratik Thanki",
@@ -13,7 +13,11 @@
       "name": "MIT License",
       "url": "https://choosealicense.com/licenses/mit/"
     },
-    "version": "v1"
+    "version": "v1",
+    "x-logo": {
+      "url": "https://bit.ly/2VoPyFp",
+      "altText": "Fourth Down"
+    }
   },
   "servers": [
     {
@@ -26,8 +30,7 @@
         "tags": [
           "Auth"
         ],
-        "summary": "Create an API Key",
-        "description": "Create an API Key with an expiry",
+        "summary": "Create an API Key ith an expiry datetime",
         "parameters": [
           {
             "name": "name",
@@ -79,8 +82,7 @@
         "tags": [
           "Game"
         ],
-        "summary": "Play by Play data for a set of games",
-        "description": "Either GameId or a combination of Season, Week and Team should be provided",
+        "summary": "Play by Play data for a set of games\r\nEither GameId or a combination of Season, Week and Team should be provided",
         "parameters": [
           {
             "name": "GameId",
@@ -168,8 +170,7 @@
         "tags": [
           "Game"
         ],
-        "summary": "Game drives summarised from plays",
-        "description": "Either GameId or a combination of Season, Week and Team should be provided",
+        "summary": "Game drives summarised from plays\r\nEither GameId or a combination of Season, Week and Team should be provided",
         "parameters": [
           {
             "name": "GameId",
@@ -229,6 +230,16 @@
               }
             }
           },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblemDetails"
+                }
+              }
+            }
+          },
           "404": {
             "description": "Not Found",
             "content": {
@@ -247,8 +258,7 @@
         "tags": [
           "Game"
         ],
-        "summary": "List of scoring drives with updated team scores",
-        "description": "Either GameId or a combination of Season, Week and Team should be provided",
+        "summary": "List of scoring drives with updated team scores\r\nEither GameId or a combination of Season, Week and Team should be provided",
         "parameters": [
           {
             "name": "GameId",
@@ -308,6 +318,16 @@
               }
             }
           },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblemDetails"
+                }
+              }
+            }
+          },
           "404": {
             "description": "Not Found",
             "content": {
@@ -326,8 +346,7 @@
         "tags": [
           "Nflfastr"
         ],
-        "summary": "Play by Play data for a set of games",
-        "description": "Either GameId or a combination of Season, Week and Team should be provided",
+        "summary": "Play by Play data for a set of games\r\nEither GameId or a combination of Season, Week and Team should be provided",
         "parameters": [
           {
             "name": "GameId",
@@ -379,7 +398,10 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PlayByPlay"
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PlayByPlay"
+                  }
                 }
               }
             }
@@ -412,8 +434,7 @@
         "tags": [
           "Schedule"
         ],
-        "summary": "Query for a set of games and accompanying details",
-        "description": "If no parameters are passed, all team games for the current week for this season are returned",
+        "summary": "Query for a set of games and accompanying details\r\nIf no parameters are passed, all team games for the current week for this season are returned",
         "parameters": [
           {
             "name": "Week",
@@ -510,7 +531,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ValidationProblemDetails"
+                  "$ref": "#/components/schemas/ProblemDetails"
                 }
               }
             }
@@ -520,7 +541,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ValidationProblemDetails"
+                  "$ref": "#/components/schemas/ProblemDetails"
                 }
               }
             }
@@ -2652,6 +2673,33 @@
           }
         },
         "additionalProperties": false
+      },
+      "ProblemDetails": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "nullable": true
+          },
+          "title": {
+            "type": "string",
+            "nullable": true
+          },
+          "status": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "detail": {
+            "type": "string",
+            "nullable": true
+          },
+          "instance": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": { }
       }
     },
     "securitySchemes": {
