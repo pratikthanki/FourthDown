@@ -11,13 +11,22 @@ namespace FourthDown.Api.HealthChecks
             HealthCheckContext context,
             CancellationToken cancellationToken = default)
         {
-            const string url =
+            async Task<bool> GetStatusCode(string s)
+            {
+                var response = await RequestHelper.GetRequestResponse(s, cancellationToken);
+                return response.IsSuccessStatusCode;
+            }
+
+            const string jsonDataUrl =
                 @"https://github.com/pratikthanki/nflfastR-raw/blob/master/raw/2020/2020_01_DAL_LA.json.gz?raw=true";
 
-            var response = await RequestHelper.GetRequestResponse(url, cancellationToken);
-            var healthCheckResultHealthy = response.IsSuccessStatusCode;
+            const string csvDataUrl =
+                @"https://github.com/pratikthanki/nflfastR-data/blob/master/data/play_by_play_2020.csv.gz?raw=true";
 
-            if (healthCheckResultHealthy)
+            var jsonDataResponse = await GetStatusCode(jsonDataUrl);
+            var csvDataResponse = await GetStatusCode(csvDataUrl);
+
+            if (jsonDataResponse && csvDataResponse)
                 return await Task.FromResult(
                     HealthCheckResult.Healthy("A healthy result."));
 

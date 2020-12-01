@@ -14,7 +14,7 @@ using OpenTracing;
 namespace FourthDown.Api.Controllers
 {
     [Route("api/schedule")]
-    [ApiVersion( "1.0" )]
+    [ApiVersion("1.0")]
     [Authorize]
     [Produces("application/json")]
     [ProducesResponseType(StatusCodes.Status200OK)]
@@ -39,10 +39,8 @@ namespace FourthDown.Api.Controllers
 
         /// <summary>
         ///     Query for a set of games and accompanying details
-        /// </summary>
-        /// <remarks>
         ///     If no parameters are passed, all team games for the current week for this season are returned
-        /// </remarks>
+        /// </summary>
         /// <param name="queryParameter">Combination of Season, Week and Team</param>
         /// <param name="cancellationToken"></param>
         /// <returns>List of games</returns>
@@ -51,7 +49,7 @@ namespace FourthDown.Api.Controllers
             [FromQuery] ScheduleQueryParameter queryParameter,
             CancellationToken cancellationToken)
         {
-            using var scope = _tracer.InitializeTrace(nameof(GetSchedule));
+            using var scope = _tracer.InitializeTrace(HttpContext, nameof(GetSchedule));
 
             scope.LogStart(nameof(_scheduleService.GetGames));
 

@@ -52,6 +52,10 @@ namespace FourthDown.Api
                 .AddSingleton<ITracer>(serviceProvider =>
                 {
                     // Adds the Jaeger Trace.
+                    Environment.SetEnvironmentVariable("JAEGER_SERVICE_NAME", "FourthDown-api");
+                    Environment.SetEnvironmentVariable("JAEGER_AGENT_HOST", "localhost");
+                    Environment.SetEnvironmentVariable("JAEGER_AGENT_PORT", "6831");
+                    Environment.SetEnvironmentVariable("JAEGER_SAMPLER_TYPE", "const");
 
                     var serviceName = serviceProvider.GetRequiredService<IWebHostEnvironment>().ApplicationName;
                     var loggerFactory = serviceProvider.GetRequiredService<ILoggerFactory>();
@@ -145,9 +149,6 @@ namespace FourthDown.Api
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                Environment.SetEnvironmentVariable("JAEGER_AGENT_HOST", "localhost");
-                Environment.SetEnvironmentVariable("JAEGER_AGENT_PORT", "6831");
-                Environment.SetEnvironmentVariable("JAEGER_SAMPLER_TYPE", "const");
             }
             else
             {

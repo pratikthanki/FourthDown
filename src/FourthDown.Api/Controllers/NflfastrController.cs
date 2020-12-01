@@ -41,10 +41,8 @@ namespace FourthDown.Api.Controllers
 
         /// <summary>
         ///     Play by Play data for a set of games
-        /// </summary>
-        /// <remarks>
         ///     Either GameId or a combination of Season, Week and Team should be provided
-        /// </remarks>
+        /// </summary>
         /// <param name="queryParameter">Combination of Season, Week and Team</param>
         /// <param name="cancellationToken"></param>
         /// <returns>List of game play by plays</returns>
@@ -54,7 +52,7 @@ namespace FourthDown.Api.Controllers
             [FromQuery] PlayByPlayQueryParameter queryParameter,
             CancellationToken cancellationToken)
         {
-            using var scope = _tracer.InitializeTrace(nameof(GetPlayByPlays));
+            using var scope = _tracer.InitializeTrace(HttpContext, nameof(GetPlayByPlays));
 
             scope.LogStart(nameof(_playByPlayRepository.GetPlayByPlaysAsync));
 

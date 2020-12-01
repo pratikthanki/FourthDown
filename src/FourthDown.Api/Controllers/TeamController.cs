@@ -12,7 +12,7 @@ using OpenTracing;
 namespace FourthDown.Api.Controllers
 {
     [Route("api/teams")]
-    [ApiVersion( "1.0" )]
+    [ApiVersion("1.0")]
     [Authorize]
     [ApiController]
     public class TeamController : ControllerBase
@@ -39,8 +39,8 @@ namespace FourthDown.Api.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async IAsyncEnumerable<Team> GetTeams([EnumeratorCancellation] CancellationToken cancellationToken)
         {
-            using var scope = _tracer.InitializeTrace(nameof(GetTeams));
-            
+            using var scope = _tracer.InitializeTrace(HttpContext, nameof(GetTeams));
+
             scope.LogStart(nameof(_teamRepository.GetTeamsAsync));
 
             var teams = await _teamRepository.GetTeamsAsync(cancellationToken);

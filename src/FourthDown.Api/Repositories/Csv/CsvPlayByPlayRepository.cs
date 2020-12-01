@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -26,8 +25,8 @@ namespace FourthDown.Api.Repositories.Csv
         {
             var season = queryParameter.Season;
 
-            var baseUrl = "https://github.com/";
-            var path = $"{baseUrl}/guga31bb/nflfastR-data/blob/master/data/play_by_play_{season}.csv.gz?raw=true";
+            var path =
+                $"https://github.com/pratikthanki/nflfastR-data/blob/master/data/play_by_play_{season}.csv.gz?raw=true";
 
             var response = await RequestHelper.GetRequestResponse(path, cancellationToken);
             var stream = await response.Content.ReadAsStreamAsync();

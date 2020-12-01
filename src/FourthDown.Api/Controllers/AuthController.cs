@@ -26,11 +26,8 @@ namespace FourthDown.Api.Controllers
         }
 
         /// <summary>
-        ///     Create an API Key
+        ///     Create an API Key ith an expiry datetime
         /// </summary>
-        /// <remarks>
-        ///     Create an API Key with an expiry
-        /// </remarks>
         /// <param name="name">Name/alias for the created API Key</param>
         /// <param name="cancellationToken"></param>
         /// <returns>List of game play by plays</returns>

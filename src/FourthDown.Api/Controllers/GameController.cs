@@ -15,7 +15,7 @@ using OpenTracing;
 namespace FourthDown.Api.Controllers
 {
     [Route("api/game")]
-    [ApiVersion( "1.0" )]
+    [ApiVersion("1.0")]
     [Authorize]
     [ApiController]
     [Produces("application/json")]
@@ -40,10 +40,8 @@ namespace FourthDown.Api.Controllers
 
         /// <summary>
         ///     Play by Play data for a set of games
-        /// </summary>
-        /// <remarks>
         ///     Either GameId or a combination of Season, Week and Team should be provided
-        /// </remarks>
+        /// </summary>
         /// <param name="queryParameter">Combination of Season, Week and Team</param>
         /// <param name="cancellationToken"></param>
         /// <returns>List of game play by plays</returns>
@@ -60,12 +58,12 @@ namespace FourthDown.Api.Controllers
                     Status = StatusCodes.Status400BadRequest
                 });
 
-            using var scope = _tracer.InitializeTrace(nameof(GetPlays));
-            
+            using var scope = _tracer.InitializeTrace(HttpContext, nameof(GetPlays));
+
             scope.LogStart(nameof(_pbpService.GetGamePlaysAsync));
-            
+
             var plays = await _pbpService.GetGamePlaysAsync(queryParameter, cancellationToken);
-            
+
             scope.LogEnd(nameof(_pbpService.GetGamePlaysAsync));
 
             if (plays == null || !plays.Any())
@@ -80,10 +78,8 @@ namespace FourthDown.Api.Controllers
 
         /// <summary>
         ///     Game drives summarised from plays
-        /// </summary>
-        /// <remarks>
         ///     Either GameId or a combination of Season, Week and Team should be provided
-        /// </remarks>
+        /// </summary>
         /// <param name="queryParameter">Combination of Season, Week and Team</param>
         /// <param name="cancellationToken"></param>
         /// <returns>List of game drives</returns>
@@ -100,7 +96,7 @@ namespace FourthDown.Api.Controllers
                     Status = StatusCodes.Status400BadRequest
                 });
 
-            using var scope = _tracer.InitializeTrace(nameof(GetPlays));
+            using var scope = _tracer.InitializeTrace(HttpContext, nameof(GetPlays));
 
             scope.LogStart(nameof(_pbpService.GetGameDrives));
 
@@ -120,10 +116,8 @@ namespace FourthDown.Api.Controllers
 
         /// <summary>
         ///     List of scoring drives with updated team scores
-        /// </summary>
-        /// <remarks>
         ///     Either GameId or a combination of Season, Week and Team should be provided
-        /// </remarks>
+        /// </summary>
         /// <param name="queryParameter">Combination of Season, Week and Team</param>
         /// <param name="cancellationToken"></param>
         /// <returns>List of game scoring summaries</returns>
@@ -140,7 +134,7 @@ namespace FourthDown.Api.Controllers
                     Status = StatusCodes.Status400BadRequest
                 });
 
-            using var scope = _tracer.InitializeTrace(nameof(GetPlays));
+            using var scope = _tracer.InitializeTrace(HttpContext, nameof(GetPlays));
 
             scope.LogStart(nameof(_pbpService.GetGameScoringSummaries));
 
