@@ -22,8 +22,30 @@
 </head>
 
 <body>
-    <redoc spec-url='./swagger.json'></redoc>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <div id="redoc-container"></div>
+    <!-- <redoc spec-url='./swagger.json'></redoc> -->
     <script src="https://cdn.jsdelivr.net/npm/redoc@next/bundles/redoc.standalone.js">
+    </script>
+    <script type="text/javascript">
+        (function() {
+            Redoc.init(
+                "./swagger.json", {
+                    "showExtensions": true,
+                    "disableSearch": true,
+                    "requiredPropsFirst": true,
+                    "expandResponses": "200",
+                    "menuToggle": true,
+                    "theme": {
+                        "colors": {
+                            "primary": {
+                                "main": '#007CBD'
+                            }
+                        }
+                    }
+                },
+                document.getElementById('redoc-container'));
+        })();
     </script>
 </body>
 
