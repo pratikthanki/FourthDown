@@ -108,7 +108,7 @@ namespace FourthDown.Api
                             {
                                 "x-logo", new OpenApiObject
                                 {
-                                    {"url", new OpenApiString("https://bit.ly/2VoPyFp")},
+                                    {"url", new OpenApiString("https://bit.ly/37qIayZ")},
                                     {"backgroundColor", new OpenApiString("#007CBD")},
                                     {"altText", new OpenApiString("Fourth Down")}
                                 }
