@@ -30,15 +30,19 @@ namespace FourthDown.Api.Authentication
         public async Task<ApiKey> Execute(string apiKey)
         {
             Dictionary<string, ApiKey> apiKeys;
-            if (!_authenticationOptions.UseSampleAuth)
+            if (_authenticationOptions.UseSampleAuth)
+            {
+                apiKeys = await JsonSerializer.DeserializeAsync<Dictionary<string, ApiKey>>(
+                    File.OpenRead("Data/api-keys.json"), SerializerOptions);
+            }
+            else
+            {
                 // TODO: get apiKeys from apikey management service
                 apiKeys = new Dictionary<string, ApiKey>
                 {
                     {"some-key", new ApiKey()}
                 };
-            else
-                apiKeys = await JsonSerializer.DeserializeAsync<Dictionary<string, ApiKey>>(
-                    File.OpenRead("Data/api-keys.json"), SerializerOptions);
+            }
 
             apiKeys.TryGetValue(apiKey, out var key);
 
