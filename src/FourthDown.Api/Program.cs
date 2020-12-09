@@ -29,11 +29,7 @@ namespace FourthDown.Api
                         .SetBasePath(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location))
                         .AddJsonFile("appsettings.json");
                 })
-                .ConfigureWebHostDefaults(webBuilder =>
-                {
-                    webBuilder.UseStartup<Startup>();
-                    webBuilder.UseUrls("http://*:80", "http://*:443");
-                })
+                .ConfigureWebHostDefaults(webBuilder => { webBuilder.UseStartup<Startup>(); })
                 .UseSerilog((context, services, config) =>
                 {
                     config.ReadFrom.Configuration(context.Configuration);

@@ -18,7 +18,7 @@ WORKDIR /app
 COPY --from=build /app/publish .
 COPY /entrypoint.sh .
 
-EXPOSE 80/tcp
+EXPOSE 5000
 
 RUN chmod +x ./entrypoint.sh
 

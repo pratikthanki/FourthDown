@@ -5,9 +5,6 @@ services:
     image: api:latest
     container_name: api
     environment:
-      ASPNETCORE_ENVIRONMENT: Production
-      ASPNETCORE_HTTPS_PORT: 5254
-      ASPNETCORE_URLS: http://+:80;https://+:443
       JAEGER_AGENT_HOST: "localhost"
       JAEGER_AGENT_PORT: "6831"
       JAEGER_SAMPLER_TYPE: "const"
@@ -15,5 +12,4 @@ services:
       JAEGER_SERVICE_NAME: "FourthDown-api"
 
     ports:
-    - "80:80"
-    - "443:443"
+    - "5000:5000"
