@@ -3,13 +3,11 @@ version: '3.4'
 services:
   api:
     image: api:latest
-    container_name: api
     environment:
       JAEGER_AGENT_HOST: "localhost"
       JAEGER_AGENT_PORT: "6831"
       JAEGER_SAMPLER_TYPE: "const"
       JAEGER_SAMPLER_PARAM: "1"
-      JAEGER_SERVICE_NAME: "FourthDown-api"
-
+      JAEGER_SERVICE_NAME: "fourthDown-api"
     ports:
     - "5000:5000"
