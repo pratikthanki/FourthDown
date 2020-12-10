@@ -11,7 +11,7 @@ namespace FourthDown.Api.Repositories.Csv
     {
         private const string url = @"https://github.com/leesharpe/nfldata/blob/master/data/games.csv?raw=true";
 
-        public async Task<Dictionary<int, List<Game>>> GetGamesAsync(CancellationToken cancellationToken)
+        public async Task<Dictionary<int, IEnumerable<Game>>> GetGamesAsync(CancellationToken cancellationToken)
         {
             var response = await RequestHelper.GetRequestResponse(url, cancellationToken);
             var responseBody = await response.Content.ReadAsStringAsync();
@@ -19,7 +19,7 @@ namespace FourthDown.Api.Repositories.Csv
             return ProcessGamesResponse(responseBody);
         }
 
-        private static Dictionary<int, List<Game>> ProcessGamesResponse(string responseBody)
+        private static Dictionary<int, IEnumerable<Game>> ProcessGamesResponse(string responseBody)
         {
             var csvResponse = responseBody
                 .Split("\n")
@@ -77,7 +77,7 @@ namespace FourthDown.Api.Repositories.Csv
 
             return games
                 .GroupBy(x => x.Season)
-                .ToDictionary(x => x.Key, x => x.ToList());
+                .ToDictionary(x => x.Key, x => x.AsEnumerable());
         }
     }
 }

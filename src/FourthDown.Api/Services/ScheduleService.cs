@@ -22,14 +22,19 @@ namespace FourthDown.Api.Services
             _currentSeason = CurrentSeason();
         }
 
-        public async Task<IEnumerable<Game>> GetGameById(
-            string gameId,
+        public async Task<IEnumerable<Game>> GetGamesById(
+            Dictionary<int, List<string>> gameIdsBySeason,
             CancellationToken cancellationToken)
         {
-            var gamesPerSeason = await GetAllGames(cancellationToken);
-            var season = gameId.Substring(0, 4);
+            var gamesBySeason = await GetAllGames(cancellationToken);
 
-            return gamesPerSeason[StringParser.ToInt(season)].Where(x => x.GameId == gameId);
+            var games = new List<Game>();
+            foreach (var season in gameIdsBySeason.Keys)
+            {
+                games.AddRange(gamesBySeason[season].ToList().Where(x => gameIdsBySeason[season].Contains(x.GameId)));
+            }
+
+            return games;
         }
 
         public async Task<IEnumerable<Game>> GetGames(
@@ -70,7 +75,7 @@ namespace FourthDown.Api.Services
                 .Max(x => x.Week);
         }
 
-        private async Task<Dictionary<int, List<Game>>> GetAllGames(CancellationToken cancellationToken)
+        private async Task<Dictionary<int, IEnumerable<Game>>> GetAllGames(CancellationToken cancellationToken)
         {
             return await _gameRepository.GetGamesAsync(cancellationToken);
         }

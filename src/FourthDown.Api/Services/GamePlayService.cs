@@ -67,7 +67,8 @@ namespace FourthDown.Api.Services
             }
             else
             {
-                games = await _scheduleService.GetGameById(queryParameter.GameId, cancellationToken);
+                var gameIdsBySeason = queryParameter.GetGameIdsBySeason();
+                games = await _scheduleService.GetGamesById(gameIdsBySeason, cancellationToken);
             }
 
             return games.Where(game => game.Gameday < DateTime.UtcNow.Date).ToList();

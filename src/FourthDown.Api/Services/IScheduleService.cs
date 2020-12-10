@@ -12,8 +12,8 @@ namespace FourthDown.Api.Services
             ScheduleQueryParameter queryParameter,
             CancellationToken cancellationToken);
 
-        Task<IEnumerable<Game>> GetGameById(
-            string gameId,
+        Task<IEnumerable<Game>> GetGamesById(
+            Dictionary<int, List<string>> gameIdsBySeason,
             CancellationToken cancellationToken);
     }
 }
