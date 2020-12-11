@@ -3,7 +3,6 @@ version: '3.4'
 services:
   jaeger:
     image: jaegertracing/all-in-one:latest
-    container_name: jaeger
     environment:
       - COLLECTOR_ZIPKIN_HTTP_PORT=9411
     ports:
@@ -15,6 +14,28 @@ services:
       - 16686:16686
       - 14268:14268
       - 19411:19411
+    networks: 
+      - monitoring
+
+  prometheus:
+    image: prom/prometheus
+    volumes: 
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    command: 
+      - '--config.file=/etc/prometheus/prometheus.yml'
+    ports:
+        - 9090:9090
+    networks: 
+      - monitoring
+
+  grafana:
+    image: grafana/grafana
+    environment: 
+      - GF_SECURITY_ADMIN_PASSWORD=password1
+    depends_on:
+      - prometheus
+    ports:
+      - 3000:3000
     networks: 
       - monitoring
 
