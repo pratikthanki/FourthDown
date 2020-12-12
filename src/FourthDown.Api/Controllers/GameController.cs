@@ -74,8 +74,9 @@ namespace FourthDown.Api.Controllers
                     Status = StatusCodes.Status404NotFound
                 });
 
+            PrometheusMetrics.PathCounter.WithLabels(Request.Method, Request.Path).Inc();
             PrometheusMetrics.RecordsReturned.WithLabels(HttpContext.GetEndpoint().DisplayName).Observe(plays.Count());
-            
+
             return Ok(plays);
         }
 
@@ -113,6 +114,8 @@ namespace FourthDown.Api.Controllers
                     Title = "No data for the request parameters given.",
                     Status = StatusCodes.Status404NotFound
                 });
+
+            PrometheusMetrics.PathCounter.WithLabels(Request.Method, Request.Path).Inc();
             PrometheusMetrics.RecordsReturned.WithLabels(HttpContext.GetEndpoint().DisplayName).Observe(plays.Count());
 
             return Ok(plays);
@@ -153,6 +156,7 @@ namespace FourthDown.Api.Controllers
                     Status = StatusCodes.Status404NotFound
                 });
 
+            PrometheusMetrics.PathCounter.WithLabels(Request.Method, Request.Path).Inc();
             PrometheusMetrics.RecordsReturned.WithLabels(HttpContext.GetEndpoint().DisplayName).Observe(plays.Count());
 
             return Ok(plays);

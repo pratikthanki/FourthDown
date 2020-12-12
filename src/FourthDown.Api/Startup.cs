@@ -13,6 +13,7 @@ using FourthDown.Api.Services;
 using Jaeger;
 using Jaeger.Reporters;
 using Jaeger.Samplers;
+using Jaeger.Senders;
 using Jaeger.Senders.Thrift;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
@@ -23,6 +24,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Interfaces;
 using Microsoft.OpenApi.Models;
@@ -44,7 +46,8 @@ namespace FourthDown.Api
         public void ConfigureServices(IServiceCollection services)
         {
             services
-                .Configure<AuthenticationOptions>(Configuration);
+                .Configure<AuthenticationOptions>(Configuration)
+                .Configure<TracerOptions>(Configuration.GetSection("tracer"));
 
             services
                 .AddSingleton<IGamePlayService, GamePlayService>()
@@ -56,18 +59,29 @@ namespace FourthDown.Api
                 .AddSingleton<IAuthClient, AuthClient>()
                 .AddSingleton<ITracer>(serviceProvider =>
                 {
-                    var serviceName = serviceProvider.GetRequiredService<IWebHostEnvironment>().ApplicationName;
+                    var tracerOptions = serviceProvider.GetRequiredService<IOptions<TracerOptions>>();
+
+                    var serviceName = tracerOptions.Value?.ServiceName ?? Assembly.GetEntryAssembly()?.GetName().Name;
+                    var mode = tracerOptions.Value?.Mode ?? TracerMode.Udp;
+
+                    var endpoint = tracerOptions.Value?.HttpEndPoint ?? "http://localhost:14268/api/traces";
+                    var udpEndpoint = tracerOptions.Value?.UdpEndPoint?.Host ?? "localhost";
+                    var port = tracerOptions.Value?.UdpEndPoint?.Port ?? 6831;
+
+                    var sender = mode == TracerMode.Http
+                        ? (ISender) new HttpSender(endpoint)
+                        : new UdpSender(udpEndpoint, port, 0);
+
                     var loggerFactory = serviceProvider.GetRequiredService<ILoggerFactory>();
                     ISampler sampler = new ConstSampler(true);
 
-                    var remoteReporter = new RemoteReporter.Builder()
+                    var reporter = new RemoteReporter.Builder()
                         .WithLoggerFactory(loggerFactory)
-                        .WithSender(new UdpSender("localhost", 6831, 0))
+                        .WithSender(sender)
                         .Build();
 
-                    // This will log to a default localhost installation of Jaeger.
                     var tracer = new Tracer.Builder(serviceName)
-                        .WithReporter(remoteReporter)
+                        .WithReporter(reporter)
                         .WithLoggerFactory(loggerFactory)
                         .WithSampler(sampler)
                         .Build();
@@ -181,12 +195,7 @@ namespace FourthDown.Api
             app.UseAuthentication();
             app.UseAuthorization();
             app.UseMetricServer();
-
-            app.Use((context, next) =>
-            {
-                PrometheusMetrics.PathCounter.WithLabels(context.Request.Method, context.Request.Path).Inc();
-                return next();
-            });
+            app.UseHttpMetrics();
 
             app.UseEndpoints(endpoints =>
             {

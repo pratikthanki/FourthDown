@@ -22,7 +22,7 @@ namespace FourthDown.Api.Tests
 
             Assert.AreEqual(expected, parameters.GetGameIdsBySeason());
         }
-        
+
         [Test]
         public void GetGameIdsBySeason_GameIdsOverMultipleSeasons()
         {
@@ -39,21 +39,7 @@ namespace FourthDown.Api.Tests
 
             Assert.AreEqual(expected, parameters.GetGameIdsBySeason());
         }
-        
-        [Test]
-        public void GetGameIdsBySeason_InvalidGameIdProvided()
-        {
-            var parameters = new PlayByPlayQueryParameter()
-            {
-                GameId = "2019_01_ABC_XZ,2020_02_DE_XYZ"
-            };
-            
-            var actual = parameters.Validate();
-            var message = "GameId's provided should be 15 characters long";
 
-            Assert.AreEqual(message, actual["gameId"][0]);
-        }
-        
         [Test]
         public void GetGameIdsBySeason_InvalidRequestWhenAllFieldsProvided()
         {

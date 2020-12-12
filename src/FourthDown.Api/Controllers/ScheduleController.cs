@@ -73,6 +73,7 @@ namespace FourthDown.Api.Controllers
             _logger.LogInformation(Environment.GetEnvironmentVariable("JAEGER_AGENT_HOST"));
             _logger.LogInformation(Environment.GetEnvironmentVariable("JAEGER_AGENT_PORT"));
 
+            PrometheusMetrics.PathCounter.WithLabels(Request.Method, Request.Path).Inc();
             PrometheusMetrics.RecordsReturned.WithLabels(HttpContext.GetEndpoint().DisplayName).Observe(games.Count());
 
             return Ok(games);

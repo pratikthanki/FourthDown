@@ -1,5 +1,6 @@
 using System.Threading;
 using System.Threading.Tasks;
+using FourthDown.Api.Monitoring;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -42,6 +43,8 @@ namespace FourthDown.Api.Controllers
             CancellationToken cancellationToken)
         {
             using var scope = _tracer.BuildSpan(nameof(CreateApiKey)).StartActive();
+            
+            PrometheusMetrics.PathCounter.WithLabels(Request.Method, Request.Path).Inc();
 
             return Ok();
         }

@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Threading;
+using System.Threading.Tasks;
 using FourthDown.Api.Extensions;
 using FourthDown.Api.Models;
 using FourthDown.Api.Monitoring;
@@ -16,6 +16,10 @@ namespace FourthDown.Api.Controllers
     [Route("api/teams")]
     [ApiVersion("1.0")]
     [Authorize]
+    [Produces("application/json")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ApiController]
     public class TeamController : ControllerBase
     {
@@ -35,11 +39,7 @@ namespace FourthDown.Api.Controllers
         /// </summary>
         /// <returns>List of all teams with details</returns>
         [HttpGet("")]
-        [Produces("application/json")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async IAsyncEnumerable<Team> GetTeams([EnumeratorCancellation] CancellationToken cancellationToken)
+        public async Task<ActionResult<IEnumerable<Team>>> GetTeams(CancellationToken cancellationToken)
         {
             using var scope = _tracer.InitializeTrace(HttpContext, nameof(GetTeams));
 
@@ -49,12 +49,10 @@ namespace FourthDown.Api.Controllers
 
             scope.LogEnd(nameof(_teamRepository.GetTeamsAsync));
 
+            PrometheusMetrics.PathCounter.WithLabels(Request.Method, Request.Path).Inc();
             PrometheusMetrics.RecordsReturned.WithLabels(HttpContext.GetEndpoint().DisplayName).Observe(teams.Count());
 
-            foreach (var team in teams)
-            {
-                yield return team;
-            }
+            return Ok(teams);
         }
     }
 }
