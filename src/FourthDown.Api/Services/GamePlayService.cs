@@ -28,7 +28,7 @@ namespace FourthDown.Api.Services
         {
             var gameDetails = await QueryForGameStats(queryParameter, cancellationToken);
 
-            return gameDetails.Select(x => x.ParseToGamePlays());
+            return gameDetails?.Select(x => x.ParseToGamePlays());
         }
 
         public async Task<IEnumerable<GameDrives>> GetGameDrives(
@@ -37,7 +37,7 @@ namespace FourthDown.Api.Services
         {
             var gameDetails = await QueryForGameStats(queryParameter, cancellationToken);
 
-            return gameDetails.Select(x => x.ParseToGameDrives());
+            return gameDetails?.Select(x => x.ParseToGameDrives());
         }
 
         public async Task<IEnumerable<GameScoringSummaries>> GetGameScoringSummaries(
@@ -46,10 +46,10 @@ namespace FourthDown.Api.Services
         {
             var gameDetails = await QueryForGameStats(queryParameter, cancellationToken);
 
-            return gameDetails.Select(x => x.ParseToGameScoringSummaries());
+            return gameDetails?.Select(x => x.ParseToGameScoringSummaries());
         }
 
-        private async Task<IEnumerable<Game>> GetGamesFromQueryOptions(
+        private async Task<IList<Game>> GetGamesFromQueryOptions(
             PlayByPlayQueryParameter queryParameter,
             CancellationToken cancellationToken)
         {
@@ -71,7 +71,7 @@ namespace FourthDown.Api.Services
                 games = await _scheduleService.GetGamesById(gameIdsBySeason, cancellationToken);
             }
 
-            return games.Where(game => game.Gameday < DateTime.UtcNow.Date).ToList();
+            return games.ToList();
         }
 
         private async Task<IEnumerable<GameDetailsFormatted>> QueryForGameStats(
@@ -80,7 +80,13 @@ namespace FourthDown.Api.Services
         {
             var games = await GetGamesFromQueryOptions(queryParameter, cancellationToken);
 
-            if (games == null || !games.Any()) return null;
+            if (games.Any(game => game.Gameday > DateTime.UtcNow.Date))
+                return Enumerable.Empty<GameDetailsFormatted>();
+
+            games = games.Where(game => game.Gameday < DateTime.UtcNow.Date).ToList();
+
+            if (!games.Any()) 
+                return null;
 
             var gamePlays = new List<GameDetailsFormatted>();
 
