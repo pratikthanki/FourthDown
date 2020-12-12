@@ -11,6 +11,6 @@ docker network inspect monitoring >/dev/null 2>&1 || \
     docker network create --driver bridge monitoring
 
 echo "docker-compose'ing up"
-docker-compose -f monitoring/docker-compose.yml up -d
+docker-compose -f src/FourthDown.Api/docker-compose.yml up -d
 
 echo "done"

@@ -1,10 +1,17 @@
+# See Prometheus configuration for more details
+# https://prometheus.io/docs/prometheus/latest/configuration/configuration/
+
 global:
-  # By default, scrape targets every 5 seconds.
   scrape_interval: 10s
 
-# A scrape configuration containing exactly one endpoint to scrape:
+  external_labels:
+    monitor: 'codelab-monitor'
+
 scrape_configs:
-    # The job name is added as a label `job=<job_name>` to any timeseries scraped from this config.
   - job_name: 'fourthdown-api-read-prometheus'
-    static_configs:
-    - targets: ['fourthdown-api:5000']
+    scrape_interval: 10s
+    dns_sd_configs:
+      - names:
+        - 'tasks.api'
+        type: 'A'
+        port: 5000

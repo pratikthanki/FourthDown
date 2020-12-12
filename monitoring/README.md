@@ -8,6 +8,6 @@ On linux-based systems you'll need permissions to execute the script. To do so r
 
 Check it out API tracing at:
 
-- Jaeger: http://localhost:16686
-- Prometheus: http://localhost:9090
-- Grafana: http://localhost:3000
+- Jaeger: <http://localhost:16686>
+- Prometheus: <http://localhost:9090>
+- Grafana: <http://localhost:3000>
