@@ -91,7 +91,7 @@ namespace FourthDown.Api.Utilities
 
         public static string GetDataFilePath(string file)
         {
-            return GetAbsolutePath($@"../../../data/{file}");
+            return GetAbsolutePath($@"../../../Data/{file}");
         }
     }
 }

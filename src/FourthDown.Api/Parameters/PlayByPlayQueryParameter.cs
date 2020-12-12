@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using FourthDown.Api.Utilities;
@@ -18,11 +17,6 @@ namespace FourthDown.Api.Parameters
         /// </example>
         public string GameId { get; set; }
 
-        private bool NonGameIdParameterSet()
-        {
-            return Week != null || Season != null || Team != null;
-        }
-
         public Dictionary<int, List<string>> GetGameIdsBySeason()
         {
             var gameIds = GameId.Split(",");
@@ -37,13 +31,16 @@ namespace FourthDown.Api.Parameters
 
         public Dictionary<string, string[]> ToKeyValues()
         {
-            var keys = new Dictionary<string, string[]>();
-
-            keys[nameof(PlayByPlayQueryParameter)] =
-                new[]
+            var keys = new Dictionary<string, string[]>
+            {
+                [nameof(PlayByPlayQueryParameter)] = new[]
                 {
-                    $"{nameof(Week)}: {Week.ToString()}, {nameof(Season)}: {Week.ToString()}, {nameof(Team)}: {Team}, {nameof(GameId)}: {GameId}"
-                };
+                    $"{nameof(Week)}: {Week.ToString()}, " +
+                    $"{nameof(Season)}: {Week.ToString()}, " +
+                    $"{nameof(Team)}: {Team}, " +
+                    $"{nameof(GameId)}: {GameId}"
+                }
+            };
 
             return keys;
         }
@@ -51,7 +48,7 @@ namespace FourthDown.Api.Parameters
 #pragma warning disable 1591
         public Dictionary<string, string[]> Validate()
         {
-            var errors = new Dictionary<string, string[]>();
+            var errors = base.ValidateBase();
 
             if (GameId == null)
             {
@@ -67,12 +64,6 @@ namespace FourthDown.Api.Parameters
                 if (games.Any(x => x.Length != 15))
                     errors["gameId"] = new[] {"GameId's provided should be 15 characters long"};
             }
-
-            var Today = DateTime.UtcNow;
-            var currentSeason = Today.Month > 8 ? Today.Year : Today.Year - 1;
-
-            if (Season > currentSeason || Season < 1999)
-                errors["query"] = new[] {$"Season must be between 1999 and {currentSeason}"};
 
             return errors;
         }

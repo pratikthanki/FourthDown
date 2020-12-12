@@ -62,7 +62,7 @@ namespace FourthDown.Api.Tests
                 Season = 2020,
                 Week = 1,
                 Team = "DAL",
-                GameId = "2019_01_ABC_XZ,2020_02_DE_XYZ"
+                GameId = "2019_01_ABC_XYZ,2020_02_DE_XYZ"
             };
 
             var actual = parameters.Validate();
