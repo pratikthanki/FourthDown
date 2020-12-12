@@ -4,10 +4,17 @@ services:
   api:
     image: api:latest
     environment:
-      JAEGER_AGENT_HOST: "localhost"
-      JAEGER_AGENT_PORT: "6831"
-      JAEGER_SAMPLER_TYPE: "const"
-      JAEGER_SAMPLER_PARAM: "1"
-      JAEGER_SERVICE_NAME: "fourthDown-api"
+      JAEGER_AGENT_HOST: tasks.jaeger
+      JAEGER_AGENT_PORT: 9411
+      JAEGER_SAMPLER_TYPE: const
+      JAEGER_SAMPLER_PARAM: 1
+      JAEGER_SERVICE_NAME: fourthdown-api
     ports:
-    - "5000:5000"
+    - 5000:5000
+    networks: 
+      - monitoring
+
+networks: 
+  monitoring:
+    external:
+      name: monitoring

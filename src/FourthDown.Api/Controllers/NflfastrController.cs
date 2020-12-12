@@ -1,10 +1,10 @@
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using FourthDown.Api.Extensions;
 using FourthDown.Api.Models;
+using FourthDown.Api.Monitoring;
 using FourthDown.Api.Parameters;
 using FourthDown.Api.Repositories;
 using Microsoft.AspNetCore.Authorization;
@@ -66,6 +66,8 @@ namespace FourthDown.Api.Controllers
                     Title = $"No play by play data for the season {queryParameter.Season} found.",
                     Status = StatusCodes.Status404NotFound
                 });
+
+            PrometheusMetrics.RecordsReturned.WithLabels(HttpContext.GetEndpoint().DisplayName).Observe(plays.Count());
 
             return Ok(plays);
         }

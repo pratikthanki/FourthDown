@@ -5,6 +5,7 @@ using System.Reflection;
 using FourthDown.Api.Authentication;
 using FourthDown.Api.Configuration;
 using FourthDown.Api.HealthChecks;
+using FourthDown.Api.Monitoring;
 using FourthDown.Api.Repositories;
 using FourthDown.Api.Repositories.Csv;
 using FourthDown.Api.Repositories.Json;
@@ -27,6 +28,7 @@ using Microsoft.OpenApi.Interfaces;
 using Microsoft.OpenApi.Models;
 using OpenTracing;
 using OpenTracing.Util;
+using Prometheus;
 
 namespace FourthDown.Api
 {
@@ -178,6 +180,13 @@ namespace FourthDown.Api
             app.UseRouting();
             app.UseAuthentication();
             app.UseAuthorization();
+            app.UseMetricServer();
+
+            app.Use((context, next) =>
+            {
+                PrometheusMetrics.PathCounter.WithLabels(context.Request.Method, context.Request.Path).Inc();
+                return next();
+            });
 
             app.UseEndpoints(endpoints =>
             {

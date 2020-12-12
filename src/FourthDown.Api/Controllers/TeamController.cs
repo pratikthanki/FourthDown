@@ -1,8 +1,10 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using FourthDown.Api.Extensions;
 using FourthDown.Api.Models;
+using FourthDown.Api.Monitoring;
 using FourthDown.Api.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -31,7 +33,7 @@ namespace FourthDown.Api.Controllers
         /// <summary>
         ///     Query for all 32 teams
         /// </summary>
-        /// <returns>List of all teams with some details</returns>
+        /// <returns>List of all teams with details</returns>
         [HttpGet("")]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -46,6 +48,8 @@ namespace FourthDown.Api.Controllers
             var teams = await _teamRepository.GetTeamsAsync(cancellationToken);
 
             scope.LogEnd(nameof(_teamRepository.GetTeamsAsync));
+
+            PrometheusMetrics.RecordsReturned.WithLabels(HttpContext.GetEndpoint().DisplayName).Observe(teams.Count());
 
             foreach (var team in teams)
             {

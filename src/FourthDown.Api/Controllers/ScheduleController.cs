@@ -1,8 +1,11 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using FourthDown.Api.Extensions;
 using FourthDown.Api.Models;
+using FourthDown.Api.Monitoring;
 using FourthDown.Api.Parameters;
 using FourthDown.Api.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -51,6 +54,14 @@ namespace FourthDown.Api.Controllers
         {
             using var scope = _tracer.InitializeTrace(HttpContext, nameof(GetSchedule));
 
+            var errors = queryParameter.ValidateBase();
+            if (errors.Count > 0)
+                return BadRequest(new ValidationProblemDetails(errors)
+                {
+                    Title = "There are errors with your request.",
+                    Status = StatusCodes.Status400BadRequest
+                });
+            
             scope.LogStart(nameof(_scheduleService.GetGames));
 
             var games = await _scheduleService.GetGames(queryParameter, cancellationToken);
@@ -58,6 +69,11 @@ namespace FourthDown.Api.Controllers
             scope.LogEnd(nameof(_scheduleService.GetGames));
 
             _logger.LogInformation("Successful Games request");
+            
+            _logger.LogInformation(Environment.GetEnvironmentVariable("JAEGER_AGENT_HOST"));
+            _logger.LogInformation(Environment.GetEnvironmentVariable("JAEGER_AGENT_PORT"));
+
+            PrometheusMetrics.RecordsReturned.WithLabels(HttpContext.GetEndpoint().DisplayName).Observe(games.Count());
 
             return Ok(games);
         }

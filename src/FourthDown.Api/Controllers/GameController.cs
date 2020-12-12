@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using FourthDown.Api.Extensions;
 using FourthDown.Api.Models;
+using FourthDown.Api.Monitoring;
 using FourthDown.Api.Parameters;
 using FourthDown.Api.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -54,7 +55,7 @@ namespace FourthDown.Api.Controllers
             if (errors.Count > 0)
                 return BadRequest(new ValidationProblemDetails(errors)
                 {
-                    Title = "Looks like there are some errors with your request.",
+                    Title = "There are errors with your request.",
                     Status = StatusCodes.Status400BadRequest
                 });
 
@@ -73,6 +74,8 @@ namespace FourthDown.Api.Controllers
                     Status = StatusCodes.Status404NotFound
                 });
 
+            PrometheusMetrics.RecordsReturned.WithLabels(HttpContext.GetEndpoint().DisplayName).Observe(plays.Count());
+            
             return Ok(plays);
         }
 
@@ -92,7 +95,7 @@ namespace FourthDown.Api.Controllers
             if (errors.Count > 0)
                 return BadRequest(new ValidationProblemDetails(errors)
                 {
-                    Title = "Looks like there are some errors with your request.",
+                    Title = "There are errors with your request.",
                     Status = StatusCodes.Status400BadRequest
                 });
 
@@ -110,6 +113,7 @@ namespace FourthDown.Api.Controllers
                     Title = "No data for the request parameters given.",
                     Status = StatusCodes.Status404NotFound
                 });
+            PrometheusMetrics.RecordsReturned.WithLabels(HttpContext.GetEndpoint().DisplayName).Observe(plays.Count());
 
             return Ok(plays);
         }
@@ -130,7 +134,7 @@ namespace FourthDown.Api.Controllers
             if (errors.Count > 0)
                 return BadRequest(new ValidationProblemDetails(errors)
                 {
-                    Title = "Looks like there are some errors with your request.",
+                    Title = "There are errors with your request.",
                     Status = StatusCodes.Status400BadRequest
                 });
 
@@ -148,6 +152,8 @@ namespace FourthDown.Api.Controllers
                     Title = "No data for the request parameters given.",
                     Status = StatusCodes.Status404NotFound
                 });
+
+            PrometheusMetrics.RecordsReturned.WithLabels(HttpContext.GetEndpoint().DisplayName).Observe(plays.Count());
 
             return Ok(plays);
         }

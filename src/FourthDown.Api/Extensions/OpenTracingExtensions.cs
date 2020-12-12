@@ -8,8 +8,8 @@ namespace FourthDown.Api.Extensions
 {
     public static class OpenTracingExtensions
     {
-        public static IScope InitializeTrace(this ITracer tracer, HttpContext httpContext, string action) =>
-            tracer.BuildSpan(action)
+        public static IScope InitializeTrace(this ITracer tracer, HttpContext httpContext, string actionName) =>
+            tracer.BuildSpan(actionName)
                 .WithTag(Tags.SpanKind, Tags.SpanKindClient)
                 .WithTag(Tags.HttpMethod, HttpMethod.Get.ToString())
                 .WithTag(Tags.HttpUrl, httpContext.Request.GetDisplayUrl())
@@ -17,8 +17,13 @@ namespace FourthDown.Api.Extensions
                 .WithTag(Tags.PeerHostIpv6, httpContext.Connection.RemoteIpAddress.MapToIPv6().ToString())
                 .StartActive(true);
 
-        public static void LogStart(this IScope scope, string method) => scope.Span.Log($"Start{method}");
+        public static ISpan CreateChildTrace(this ITracer tracer, string methodName) =>
+            tracer.BuildSpan(methodName).AsChildOf(tracer.ActiveSpan).Start();
 
-        public static void LogEnd(this IScope scope, string method) => scope.Span.Log($"End{method}");
+        public static void LogStart(this IScope scope, string method) =>
+            scope.Span.Log($"Start{method}");
+
+        public static void LogEnd(this IScope scope, string method) =>
+            scope.Span.Log($"End{method}");
     }
 }
