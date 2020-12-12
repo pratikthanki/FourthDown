@@ -28,13 +28,16 @@ namespace FourthDown.Api.Repositories.Json
 
         private string GetGameUrl(string gameId, int season)
         {
-            return $"https://github.com/pratikthanki/nflfastR-raw/blob/master/raw/{season}/{gameId}.json.gz?raw=true";
+            return $"{RepositoryEndpoints.GamePlayEndpoint}/{season}/{gameId}.json.gz?raw=true";
         }
 
         private static async Task<GameDetail> GetGameJson(string url, CancellationToken cancellationToken)
         {
             var response = await RequestHelper.GetRequestResponse(url, cancellationToken);
             var stream = await response.Content.ReadAsStreamAsync();
+
+            if (!response.IsSuccessStatusCode)
+                return new GameDetail();
 
             var data = await ResponseHelper.ReadCompressedStreamToString(stream);
 

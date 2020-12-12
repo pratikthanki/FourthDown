@@ -9,12 +9,13 @@ namespace FourthDown.Api.Repositories.Csv
 {
     public class CsvGameRepository : IGameRepository
     {
-        private const string url = @"https://github.com/leesharpe/nfldata/blob/master/data/games.csv?raw=true";
-
         public async Task<Dictionary<int, IEnumerable<Game>>> GetGamesAsync(CancellationToken cancellationToken)
         {
-            var response = await RequestHelper.GetRequestResponse(url, cancellationToken);
+            var response = await RequestHelper.GetRequestResponse(RepositoryEndpoints.GamesEndpoint, cancellationToken);
             var responseBody = await response.Content.ReadAsStringAsync();
+            
+            if (!response.IsSuccessStatusCode)
+                return new Dictionary<int, IEnumerable<Game>>();
 
             return ProcessGamesResponse(responseBody);
         }

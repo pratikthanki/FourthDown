@@ -25,11 +25,13 @@ namespace FourthDown.Api.Repositories.Csv
         {
             var season = queryParameter.Season;
 
-            var path =
-                $"https://github.com/pratikthanki/nflfastR-data/blob/master/data/play_by_play_{season}.csv.gz?raw=true";
+            var path = $"{RepositoryEndpoints.PlayByPlayEndpoint}/play_by_play_{season}.csv.gz?raw=true";
 
             var response = await RequestHelper.GetRequestResponse(path, cancellationToken);
             var stream = await response.Content.ReadAsStreamAsync();
+            
+            if (!response.IsSuccessStatusCode)
+                return Enumerable.Empty<PlayByPlay>();
 
             var data = await ResponseHelper.ReadCompressedStreamToString(stream);
 
