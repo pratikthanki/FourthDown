@@ -1,11 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
+using FourthDown.Api.Extensions;
 using FourthDown.Api.Models;
 using FourthDown.Api.Parameters;
 using FourthDown.Api.Repositories;
+using OpenTracing;
 
 namespace FourthDown.Api.Services
 {
@@ -13,40 +16,52 @@ namespace FourthDown.Api.Services
     {
         private readonly IGamePlayRepository _gamePlayRepository;
         private readonly IScheduleService _scheduleService;
+        private readonly ITracer _tracer;
 
         public GamePlayService(
+            ITracer tracer,
             IGamePlayRepository gamePlayRepository,
             IScheduleService scheduleService)
         {
+            _tracer = tracer;
             _gamePlayRepository = gamePlayRepository;
             _scheduleService = scheduleService;
         }
 
-        public async Task<IEnumerable<GamePlays>> GetGamePlaysAsync(
+        public async IAsyncEnumerable<GamePlays> GetGamePlaysAsync(
             PlayByPlayQueryParameter queryParameter,
-            CancellationToken cancellationToken)
+            [EnumeratorCancellation] CancellationToken cancellationToken)
         {
-            var gameDetails = await QueryForGameStats(queryParameter, cancellationToken);
+            _tracer.CreateChildTrace(nameof(GetGamePlaysAsync));
 
-            return gameDetails?.Select(x => x.ParseToGamePlays());
+            await foreach (var game in QueryForGameStats(queryParameter, cancellationToken))
+            {
+                yield return game.ParseToGamePlays();
+            }
         }
 
-        public async Task<IEnumerable<GameDrives>> GetGameDrives(
+        public async IAsyncEnumerable<GameDrives> GetGameDrivesAsync(
             PlayByPlayQueryParameter queryParameter,
-            CancellationToken cancellationToken)
+            [EnumeratorCancellation] CancellationToken cancellationToken)
         {
-            var gameDetails = await QueryForGameStats(queryParameter, cancellationToken);
+            _tracer.CreateChildTrace(nameof(GetGameDrivesAsync));
 
-            return gameDetails?.Select(x => x.ParseToGameDrives());
+            await foreach (var game in QueryForGameStats(queryParameter, cancellationToken))
+            {
+                yield return game.ParseToGameDrives();
+            }
         }
 
-        public async Task<IEnumerable<GameScoringSummaries>> GetGameScoringSummaries(
+        public async IAsyncEnumerable<GameScoringSummaries> GetGameScoringSummariesAsync(
             PlayByPlayQueryParameter queryParameter,
-            CancellationToken cancellationToken)
+            [EnumeratorCancellation] CancellationToken cancellationToken)
         {
-            var gameDetails = await QueryForGameStats(queryParameter, cancellationToken);
+            _tracer.CreateChildTrace(nameof(GetGameScoringSummariesAsync));
 
-            return gameDetails?.Select(x => x.ParseToGameScoringSummaries());
+            await foreach (var game in QueryForGameStats(queryParameter, cancellationToken))
+            {
+                yield return game.ParseToGameScoringSummaries();
+            }
         }
 
         private async Task<IList<Game>> GetGamesFromQueryOptions(
@@ -74,29 +89,27 @@ namespace FourthDown.Api.Services
             return games.ToList();
         }
 
-        private async Task<IEnumerable<GameDetailsFormatted>> QueryForGameStats(
+        private async IAsyncEnumerable<GameDetailsFormatted> QueryForGameStats(
             PlayByPlayQueryParameter queryParameter,
-            CancellationToken cancellationToken)
+            [EnumeratorCancellation] CancellationToken cancellationToken)
         {
+            _tracer.CreateChildTrace(nameof(QueryForGameStats));
+
             var games = await GetGamesFromQueryOptions(queryParameter, cancellationToken);
 
             if (games.Any(game => game.Gameday > DateTime.UtcNow.Date))
-                return Enumerable.Empty<GameDetailsFormatted>();
+                yield return null;
 
             games = games.Where(game => game.Gameday < DateTime.UtcNow.Date).ToList();
 
             if (!games.Any()) 
-                return null;
-
-            var gamePlays = new List<GameDetailsFormatted>();
+                yield return null;
 
             foreach (var game in games)
             {
                 var pbp = await _gamePlayRepository.GetGamePlaysAsync(game.GameId, game.Season, cancellationToken);
-                gamePlays.Add(new GameDetailsFormatted(pbp));
+                yield return new GameDetailsFormatted(pbp);
             }
-
-            return gamePlays.ToList();
         }
     }
 }

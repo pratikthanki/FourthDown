@@ -8,15 +8,15 @@ namespace FourthDown.Api.Services
 {
     public interface IGamePlayService
     {
-        public Task<IEnumerable<GamePlays>> GetGamePlaysAsync(
+        public IAsyncEnumerable<GamePlays> GetGamePlaysAsync(
             PlayByPlayQueryParameter queryParameter,
             CancellationToken cancellationToken);
 
-        public Task<IEnumerable<GameDrives>> GetGameDrives(
+        public IAsyncEnumerable<GameDrives> GetGameDrivesAsync(
             PlayByPlayQueryParameter queryParameter,
             CancellationToken cancellationToken);
 
-        public Task<IEnumerable<GameScoringSummaries>> GetGameScoringSummaries(
+        public IAsyncEnumerable<GameScoringSummaries> GetGameScoringSummariesAsync(
             PlayByPlayQueryParameter queryParameter,
             CancellationToken cancellationToken);
     }

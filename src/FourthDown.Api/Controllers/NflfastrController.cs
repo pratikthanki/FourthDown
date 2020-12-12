@@ -67,8 +67,7 @@ namespace FourthDown.Api.Controllers
                     Status = StatusCodes.Status404NotFound
                 });
 
-            PrometheusMetrics.PathCounter.WithLabels(Request.Method, Request.Path).Inc();
-            PrometheusMetrics.RecordsReturned.WithLabels(HttpContext.GetEndpoint().DisplayName).Observe(plays.Count());
+            MetricCollector.RegisterMetrics(HttpContext, Request, plays.Count());
 
             return Ok(plays);
         }

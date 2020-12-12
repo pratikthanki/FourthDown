@@ -192,10 +192,9 @@ namespace FourthDown.Api
             });
 
             app.UseRouting();
+            app.UseHttpMetrics();
             app.UseAuthentication();
             app.UseAuthorization();
-            app.UseMetricServer();
-            app.UseHttpMetrics();
 
             app.UseEndpoints(endpoints =>
             {
@@ -210,6 +209,8 @@ namespace FourthDown.Api
                         [HealthStatus.Unhealthy] = StatusCodes.Status503ServiceUnavailable
                     }
                 });
+
+                endpoints.MapMetrics();
             });
         }
     }

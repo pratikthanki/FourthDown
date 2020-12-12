@@ -1,18 +1,18 @@
 version: '3.4'
 
 services:
-  api:
-    image: api:latest
-    environment:
-      JAEGER_AGENT_HOST: tasks.jaeger
-      JAEGER_AGENT_PORT: 6831
-      JAEGER_SAMPLER_TYPE: const
-      JAEGER_SAMPLER_PARAM: 1
-      JAEGER_SERVICE_NAME: fourthdown-api
-    ports:
-    - 5000:5000
-    networks: 
-      - monitoring
+  # api:
+  #   image: api:latest
+  #   environment:
+  #     JAEGER_AGENT_HOST: tasks.jaeger
+  #     JAEGER_AGENT_PORT: 6831
+  #     JAEGER_SAMPLER_TYPE: const
+  #     JAEGER_SAMPLER_PARAM: 1
+  #     JAEGER_SERVICE_NAME: fourthdown-api
+  #   ports:
+  #   - 5000:5000
+  #   networks: 
+  #     - monitoring
 
   jaeger:
     image: jaegertracing/all-in-one:latest

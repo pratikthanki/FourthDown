@@ -70,11 +70,7 @@ namespace FourthDown.Api.Controllers
 
             _logger.LogInformation("Successful Games request");
             
-            _logger.LogInformation(Environment.GetEnvironmentVariable("JAEGER_AGENT_HOST"));
-            _logger.LogInformation(Environment.GetEnvironmentVariable("JAEGER_AGENT_PORT"));
-
-            PrometheusMetrics.PathCounter.WithLabels(Request.Method, Request.Path).Inc();
-            PrometheusMetrics.RecordsReturned.WithLabels(HttpContext.GetEndpoint().DisplayName).Observe(games.Count());
+            MetricCollector.RegisterMetrics(HttpContext, Request, games.Count());
 
             return Ok(games);
         }

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using FourthDown.Api.Extensions;
@@ -25,16 +26,11 @@ namespace FourthDown.Api.Controllers
     [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status404NotFound)]
     public class GameController : ControllerBase
     {
-        private readonly ILogger<GameController> _logger;
         private readonly ITracer _tracer;
         private readonly IGamePlayService _pbpService;
 
-        public GameController(
-            ILogger<GameController> logger,
-            ITracer tracer,
-            IGamePlayService pbpService)
+        public GameController(ITracer tracer, IGamePlayService pbpService)
         {
-            _logger = logger;
             _tracer = tracer;
             _pbpService = pbpService;
         }
@@ -47,37 +43,24 @@ namespace FourthDown.Api.Controllers
         /// <param name="cancellationToken"></param>
         /// <returns>List of game play by plays</returns>
         [HttpGet("plays")]
-        public async Task<ActionResult<IEnumerable<GamePlays>>> GetPlays(
+        public async IAsyncEnumerable<GamePlays> GetPlays(
             [FromQuery] PlayByPlayQueryParameter queryParameter,
-            CancellationToken cancellationToken)
+            [EnumeratorCancellation] CancellationToken cancellationToken)
         {
-            var errors = queryParameter.Validate();
-            if (errors.Count > 0)
-                return BadRequest(new ValidationProblemDetails(errors)
-                {
-                    Title = "There are errors with your request.",
-                    Status = StatusCodes.Status400BadRequest
-                });
-
             using var scope = _tracer.InitializeTrace(HttpContext, nameof(GetPlays));
 
             scope.LogStart(nameof(_pbpService.GetGamePlaysAsync));
 
-            var plays = await _pbpService.GetGamePlaysAsync(queryParameter, cancellationToken);
+            int count = 0;
+            await foreach (var play in _pbpService.GetGamePlaysAsync(queryParameter, cancellationToken))
+            {
+                ++count;
+                yield return play;
+            }
 
             scope.LogEnd(nameof(_pbpService.GetGamePlaysAsync));
 
-            if (plays == null || !plays.Any())
-                return NotFound(new ValidationProblemDetails(queryParameter.ToKeyValues())
-                {
-                    Title = "No data for the request parameters given.",
-                    Status = StatusCodes.Status404NotFound
-                });
-
-            PrometheusMetrics.PathCounter.WithLabels(Request.Method, Request.Path).Inc();
-            PrometheusMetrics.RecordsReturned.WithLabels(HttpContext.GetEndpoint().DisplayName).Observe(plays.Count());
-
-            return Ok(plays);
+            MetricCollector.RegisterMetrics(HttpContext, Request, count);
         }
 
         /// <summary>
@@ -88,37 +71,40 @@ namespace FourthDown.Api.Controllers
         /// <param name="cancellationToken"></param>
         /// <returns>List of game drives</returns>
         [HttpGet("drives")]
-        public async Task<ActionResult<IEnumerable<GameDrives>>> GetDrives(
+        public async IAsyncEnumerable<GameDrives> GetDrives(
             [FromQuery] PlayByPlayQueryParameter queryParameter,
-            CancellationToken cancellationToken)
+            [EnumeratorCancellation] CancellationToken cancellationToken)
         {
-            var errors = queryParameter.Validate();
-            if (errors.Count > 0)
-                return BadRequest(new ValidationProblemDetails(errors)
-                {
-                    Title = "There are errors with your request.",
-                    Status = StatusCodes.Status400BadRequest
-                });
+            // var errors = queryParameter.Validate();
+            // if (errors.Count > 0)
+            //     return BadRequest(new ValidationProblemDetails(errors)
+            //     {
+            //         Title = "There are errors with your request.",
+            //         Status = StatusCodes.Status400BadRequest
+            //     });
 
             using var scope = _tracer.InitializeTrace(HttpContext, nameof(GetPlays));
 
-            scope.LogStart(nameof(_pbpService.GetGameDrives));
+            scope.LogStart(nameof(_pbpService.GetGameDrivesAsync));
 
-            var plays = await _pbpService.GetGameDrives(queryParameter, cancellationToken);
+            int count = 0;
+            await foreach (var play in _pbpService.GetGameDrivesAsync(queryParameter, cancellationToken))
+            {
+                ++count;
+                yield return play;
+            }
 
-            scope.LogEnd(nameof(_pbpService.GetGameDrives));
+            scope.LogEnd(nameof(_pbpService.GetGameDrivesAsync));
 
-            if (plays == null || !plays.Any())
-                return NotFound(new ValidationProblemDetails(queryParameter.ToKeyValues())
-                {
-                    Title = "No data for the request parameters given.",
-                    Status = StatusCodes.Status404NotFound
-                });
+            MetricCollector.RegisterMetrics(HttpContext, Request, count);
 
-            PrometheusMetrics.PathCounter.WithLabels(Request.Method, Request.Path).Inc();
-            PrometheusMetrics.RecordsReturned.WithLabels(HttpContext.GetEndpoint().DisplayName).Observe(plays.Count());
+            // if (plays == null || !plays.Any())
+            //     return NotFound(new ValidationProblemDetails(queryParameter.ToKeyValues())
+            //     {
+            //         Title = "No data for the request parameters given.",
+            //         Status = StatusCodes.Status404NotFound
+            //     });
 
-            return Ok(plays);
         }
 
         /// <summary>
@@ -129,37 +115,24 @@ namespace FourthDown.Api.Controllers
         /// <param name="cancellationToken"></param>
         /// <returns>List of game scoring summaries</returns>
         [HttpGet("scoringsummaries")]
-        public async Task<ActionResult<IEnumerable<GameScoringSummaries>>> GetScoringSummaries(
+        public async IAsyncEnumerable<GameScoringSummaries> GetScoringSummaries(
             [FromQuery] PlayByPlayQueryParameter queryParameter,
-            CancellationToken cancellationToken)
+            [EnumeratorCancellation] CancellationToken cancellationToken)
         {
-            var errors = queryParameter.Validate();
-            if (errors.Count > 0)
-                return BadRequest(new ValidationProblemDetails(errors)
-                {
-                    Title = "There are errors with your request.",
-                    Status = StatusCodes.Status400BadRequest
-                });
-
             using var scope = _tracer.InitializeTrace(HttpContext, nameof(GetPlays));
 
-            scope.LogStart(nameof(_pbpService.GetGameScoringSummaries));
+            scope.LogStart(nameof(_pbpService.GetGameScoringSummariesAsync));
 
-            var plays = await _pbpService.GetGameScoringSummaries(queryParameter, cancellationToken);
+            int count = 0;
+            await foreach (var play in _pbpService.GetGameScoringSummariesAsync(queryParameter, cancellationToken))
+            {
+                ++count;
+                yield return play;
+            }
 
-            scope.LogEnd(nameof(_pbpService.GetGameScoringSummaries));
+            scope.LogEnd(nameof(_pbpService.GetGameScoringSummariesAsync));
 
-            if (plays == null || !plays.Any())
-                return NotFound(new ValidationProblemDetails(queryParameter.ToKeyValues())
-                {
-                    Title = "No data for the request parameters given.",
-                    Status = StatusCodes.Status404NotFound
-                });
-
-            PrometheusMetrics.PathCounter.WithLabels(Request.Method, Request.Path).Inc();
-            PrometheusMetrics.RecordsReturned.WithLabels(HttpContext.GetEndpoint().DisplayName).Observe(plays.Count());
-
-            return Ok(plays);
+            MetricCollector.RegisterMetrics(HttpContext, Request, count);
         }
     }
 }

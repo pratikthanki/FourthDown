@@ -1,18 +1,24 @@
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using FourthDown.Api.Extensions;
 using FourthDown.Api.Models;
 using FourthDown.Api.Utilities;
 using Microsoft.Extensions.Logging;
+using OpenTracing;
 
 namespace FourthDown.Api.Repositories.Json
 {
     public class JsonGamePlayRepository : IGamePlayRepository
     {
+        private static ITracer _tracer;
         private static ILogger<JsonGamePlayRepository> _logger;
 
-        public JsonGamePlayRepository(ILogger<JsonGamePlayRepository> logger)
+        public JsonGamePlayRepository(
+            ITracer tracer,
+            ILogger<JsonGamePlayRepository> logger)
         {
+            _tracer = tracer;
             _logger = logger;
         }
 
@@ -21,6 +27,8 @@ namespace FourthDown.Api.Repositories.Json
             int season,
             CancellationToken cancellationToken)
         {
+            _tracer.CreateChildTrace(nameof(GetGamePlaysAsync));
+
             var url = GetGameUrl(gameId, season);
 
             return await GetGameJson(url, cancellationToken);
@@ -33,6 +41,8 @@ namespace FourthDown.Api.Repositories.Json
 
         private static async Task<GameDetail> GetGameJson(string url, CancellationToken cancellationToken)
         {
+            _tracer.CreateChildTrace(nameof(GetGameJson));
+
             var response = await RequestHelper.GetRequestResponse(url, cancellationToken);
             var stream = await response.Content.ReadAsStreamAsync();
 

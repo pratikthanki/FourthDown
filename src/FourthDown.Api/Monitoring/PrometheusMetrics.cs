@@ -11,6 +11,13 @@ namespace FourthDown.Api.Monitoring
                 LabelNames = new[] {"method", "endpoint"}
             });
 
+        public static readonly Summary RequestSize = Metrics.CreateSummary(
+            "api_request_size_bytes", "Summary of request sizes (in bytes) over last 10 minutes.",
+            new SummaryConfiguration
+            {
+                LabelNames = new[] {"method", "endpoint"}
+            });
+
         public static readonly Histogram RecordsReturned = Metrics
             .CreateHistogram($"records_returned", "Total records returned by the endpoint",
                 new HistogramConfiguration
@@ -27,7 +34,7 @@ namespace FourthDown.Api.Monitoring
                         10000,
                         20000
                     },
-                    LabelNames = new[] {"endpoint"}
+                    LabelNames = new[] {"method", "endpoint"}
                 });
     }
 }
