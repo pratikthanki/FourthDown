@@ -4,11 +4,10 @@ services:
   api:
     image: api:latest
     environment:
-      JAEGER_AGENT_HOST: tasks.jaeger
-      JAEGER_AGENT_PORT: 9411
-      JAEGER_SAMPLER_TYPE: const
-      JAEGER_SAMPLER_PARAM: 1
-      JAEGER_SERVICE_NAME: fourthdown-api
+      Telemetry__UseApplicationInsights: ${USE_APPLICATIONINSIGHTS-false}
+      Telemetry__UseOpenTelemetry: ${USE_OPENTELEMETRY-true}
+      Telemetry__ApplicationInsightsInstrumentationKey: ${AI_INSTRUMENTATIONKEY-}
+      Telemetry__ApplicationInsightsForOpenTelemetryInstrumentationKey: ${AI_INSTRUMENTATIONKEY_OPENTELEMETRY-}
     ports:
     - 5000:5000
     networks: 

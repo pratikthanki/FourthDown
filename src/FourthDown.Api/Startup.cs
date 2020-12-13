@@ -5,7 +5,6 @@ using System.Reflection;
 using FourthDown.Api.Authentication;
 using FourthDown.Api.Configuration;
 using FourthDown.Api.HealthChecks;
-using FourthDown.Api.Monitoring;
 using FourthDown.Api.Repositories;
 using FourthDown.Api.Repositories.Csv;
 using FourthDown.Api.Repositories.Json;
@@ -13,7 +12,6 @@ using FourthDown.Api.Services;
 using Jaeger;
 using Jaeger.Reporters;
 using Jaeger.Samplers;
-using Jaeger.Senders;
 using Jaeger.Senders.Thrift;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
@@ -24,7 +22,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Interfaces;
 using Microsoft.OpenApi.Models;
@@ -47,7 +44,7 @@ namespace FourthDown.Api
         {
             services
                 .Configure<AuthenticationOptions>(Configuration)
-                .Configure<TracerOptions>(Configuration.GetSection("tracer"));
+                .Configure<TelemetryOptions>(Configuration.GetSection("Telemetry"));
 
             services
                 .AddSingleton<IGamePlayService, GamePlayService>()
@@ -59,29 +56,19 @@ namespace FourthDown.Api
                 .AddSingleton<IAuthClient, AuthClient>()
                 .AddSingleton<ITracer>(serviceProvider =>
                 {
-                    var tracerOptions = serviceProvider.GetRequiredService<IOptions<TracerOptions>>();
-
-                    var serviceName = tracerOptions.Value?.ServiceName ?? Assembly.GetEntryAssembly()?.GetName().Name;
-                    var mode = tracerOptions.Value?.Mode ?? TracerMode.Udp;
-
-                    var endpoint = tracerOptions.Value?.HttpEndPoint ?? "http://localhost:14268/api/traces";
-                    var udpEndpoint = tracerOptions.Value?.UdpEndPoint?.Host ?? "localhost";
-                    var port = tracerOptions.Value?.UdpEndPoint?.Port ?? 6831;
-
-                    var sender = mode == TracerMode.Http
-                        ? (ISender) new HttpSender(endpoint)
-                        : new UdpSender(udpEndpoint, port, 0);
-
+                    var serviceName = serviceProvider.GetRequiredService<IWebHostEnvironment>().ApplicationName;
                     var loggerFactory = serviceProvider.GetRequiredService<ILoggerFactory>();
                     ISampler sampler = new ConstSampler(true);
 
-                    var reporter = new RemoteReporter.Builder()
+                    var host = Environment.GetEnvironmentVariable("JAEGER_AGENT_HOST") ?? "localhost";
+
+                    var remoteReporter = new RemoteReporter.Builder()
                         .WithLoggerFactory(loggerFactory)
-                        .WithSender(sender)
+                        .WithSender(new UdpSender(host, 6831, 0))
                         .Build();
 
                     var tracer = new Tracer.Builder(serviceName)
-                        .WithReporter(reporter)
+                        .WithReporter(remoteReporter)
                         .WithLoggerFactory(loggerFactory)
                         .WithSampler(sampler)
                         .Build();
@@ -94,6 +81,7 @@ namespace FourthDown.Api
             services.AddControllers();
             services.AddOpenTracing();
             services.AddResponseCaching();
+            services.AddApplicationInsightsTelemetry();
 
             services.AddLogging(config =>
             {
@@ -160,7 +148,8 @@ namespace FourthDown.Api
                 .AddCheck<DataAccessHealthCheck>(
                     "Health check for access to data repository",
                     HealthStatus.Degraded,
-                    new[] {"data"});
+                    new[] {"data"})
+                .ForwardToPrometheus();
 
             services
                 .AddAuthentication(options =>
@@ -194,10 +183,7 @@ namespace FourthDown.Api
 
             app.UseRouting();
             app.UseResponseCaching();
-
-            // Prometheus metrics
             app.UseHttpMetrics();
-            app.UseMetricServer();
 
             app.UseAuthentication();
             app.UseAuthorization();
@@ -215,6 +201,7 @@ namespace FourthDown.Api
                         [HealthStatus.Unhealthy] = StatusCodes.Status503ServiceUnavailable
                     }
                 });
+                endpoints.MapMetrics();
             });
         }
     }
