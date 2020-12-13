@@ -2,11 +2,21 @@ using System;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+using System.Text.Json;
 
 namespace FourthDown.Api.Utilities
 {
     public static class StringParser
     {
+        public static readonly JsonSerializerOptions JsonSerializerOptions = new JsonSerializerOptions
+        {
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            PropertyNameCaseInsensitive = true,
+            IgnoreNullValues = true,
+            AllowTrailingCommas = true,
+            IgnoreReadOnlyProperties = true
+        };
+
         private const string DateFormat = "yyyy-MM-dd";
 
         public static int ToInt(string number)

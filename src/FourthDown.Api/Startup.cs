@@ -93,6 +93,7 @@ namespace FourthDown.Api
 
             services.AddControllers();
             services.AddOpenTracing();
+            services.AddResponseCaching();
 
             services.AddLogging(config =>
             {
@@ -192,7 +193,12 @@ namespace FourthDown.Api
             });
 
             app.UseRouting();
+            app.UseResponseCaching();
+
+            // Prometheus metrics
             app.UseHttpMetrics();
+            app.UseMetricServer();
+
             app.UseAuthentication();
             app.UseAuthorization();
 
@@ -209,8 +215,6 @@ namespace FourthDown.Api
                         [HealthStatus.Unhealthy] = StatusCodes.Status503ServiceUnavailable
                     }
                 });
-
-                endpoints.MapMetrics();
             });
         }
     }

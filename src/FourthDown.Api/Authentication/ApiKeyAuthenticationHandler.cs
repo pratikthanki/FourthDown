@@ -20,12 +20,6 @@ namespace FourthDown.Api.Authentication
         private const string ProblemDetailsContentType = "application/problem+json";
         private const string ApiKeyHeaderName = "X-Api-Key";
 
-        private static readonly JsonSerializerOptions SerializerOptions = new JsonSerializerOptions
-        {
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-            PropertyNameCaseInsensitive = true
-        };
-
         private readonly IAuthClient _authClient;
 
         public ApiKeyAuthenticationHandler(

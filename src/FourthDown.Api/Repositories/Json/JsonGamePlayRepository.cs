@@ -51,15 +51,15 @@ namespace FourthDown.Api.Repositories.Json
 
             var data = await ResponseHelper.ReadCompressedStreamToString(stream);
 
-            var jsonSerializerOptions = new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true
-            };
+            return ParseResponseString(url, data);
+        }
 
+        private static GameDetail ParseResponseString(string url, string data)
+        {
             GameRaw gameRaw = null;
             try
             {
-                gameRaw = JsonSerializer.Deserialize<GameRaw>(data, jsonSerializerOptions);
+                gameRaw = JsonSerializer.Deserialize<GameRaw>(data, StringParser.JsonSerializerOptions);
             }
             catch (JsonException JsonException)
             {

@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using FourthDown.Api.Extensions;
 using FourthDown.Api.Models;
+using FourthDown.Api.Utilities;
 using Microsoft.AspNetCore.Hosting;
 using OpenTracing;
 
@@ -37,15 +38,13 @@ namespace FourthDown.Api.Repositories.Json
             var filePath = Path.Join(_webHostEnvironment.WebRootPath, "data", file);
 
             await using var SourceStream = File.Open(filePath, FileMode.Open);
-            
+
             scope.LogEnd(nameof(ReadTeamsJson));
-            
+
             return await JsonSerializer.DeserializeAsync<IEnumerable<Team>>(
                 SourceStream,
-                new JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true
-                }, cancellationToken);
+                StringParser.JsonSerializerOptions,
+                cancellationToken);
         }
     }
 }

@@ -3,6 +3,7 @@ using System.IO;
 using System.Text.Json;
 using System.Threading.Tasks;
 using FourthDown.Api.Configuration;
+using FourthDown.Api.Utilities;
 using Microsoft.Extensions.Options;
 
 namespace FourthDown.Api.Authentication
@@ -14,12 +15,6 @@ namespace FourthDown.Api.Authentication
 
     public class AuthClient : IAuthClient
     {
-        private static readonly JsonSerializerOptions SerializerOptions = new JsonSerializerOptions
-        {
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-            PropertyNameCaseInsensitive = true
-        };
-
         private readonly AuthenticationOptions _authenticationOptions;
 
         public AuthClient(IOptions<AuthenticationOptions> apiKeyOptions)
@@ -33,7 +28,8 @@ namespace FourthDown.Api.Authentication
             if (_authenticationOptions.UseSampleAuth)
             {
                 apiKeys = await JsonSerializer.DeserializeAsync<Dictionary<string, ApiKey>>(
-                    File.OpenRead("Data/api-keys.json"), SerializerOptions);
+                    File.OpenRead("Data/api-keys.json"),
+                    StringParser.JsonSerializerOptions);
             }
             else
             {
