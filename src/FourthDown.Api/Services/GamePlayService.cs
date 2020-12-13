@@ -36,6 +36,9 @@ namespace FourthDown.Api.Services
 
             await foreach (var game in QueryForGameStats(queryParameter, cancellationToken))
             {
+                if (game == null)
+                    continue;
+
                 yield return game.ParseToGamePlays();
             }
         }
@@ -48,6 +51,9 @@ namespace FourthDown.Api.Services
 
             await foreach (var game in QueryForGameStats(queryParameter, cancellationToken))
             {
+                if (game == null)
+                    continue;
+
                 yield return game.ParseToGameDrives();
             }
         }
@@ -60,6 +66,9 @@ namespace FourthDown.Api.Services
 
             await foreach (var game in QueryForGameStats(queryParameter, cancellationToken))
             {
+                if (game == null)
+                    continue;
+
                 yield return game.ParseToGameScoringSummaries();
             }
         }
@@ -102,12 +111,24 @@ namespace FourthDown.Api.Services
 
             games = games.Where(game => game.Gameday < DateTime.UtcNow.Date).ToList();
 
-            if (!games.Any()) 
+            if (!games.Any())
                 yield return null;
 
-            foreach (var game in games)
+            var requests = games
+                .Select(game => _gamePlayRepository.GetGamePlaysAsync(game.GameId, game.Season, cancellationToken))
+                .ToList();
+
+            //Wait for all the requests to finish
+            await Task.WhenAll(requests);
+
+            //Get the responses
+            var responses = requests.Select
+            (
+                task => task.Result
+            );
+
+            foreach (var pbp in responses)
             {
-                var pbp = await _gamePlayRepository.GetGamePlaysAsync(game.GameId, game.Season, cancellationToken);
                 yield return new GameDetailsFormatted(pbp);
             }
         }

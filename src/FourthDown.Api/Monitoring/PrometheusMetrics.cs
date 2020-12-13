@@ -4,18 +4,20 @@ namespace FourthDown.Api.Monitoring
 {
     public class PrometheusMetrics
     {
+        private static readonly string[] LabelNames = {"method", "endpoint"};
+
         public static readonly Counter PathCounter = Metrics.CreateCounter
         ("path_counter", "Count request by endpoint and http method",
             new CounterConfiguration
             {
-                LabelNames = new[] {"method", "endpoint"}
+                LabelNames = LabelNames
             });
 
         public static readonly Summary RequestSize = Metrics.CreateSummary(
             "api_request_size_bytes", "Summary of request sizes (in bytes) over last 10 minutes.",
             new SummaryConfiguration
             {
-                LabelNames = new[] {"method", "endpoint"}
+                LabelNames = LabelNames
             });
 
         public static readonly Histogram RecordsReturned = Metrics
@@ -34,7 +36,7 @@ namespace FourthDown.Api.Monitoring
                         10000,
                         20000
                     },
-                    LabelNames = new[] {"method", "endpoint"}
+                    LabelNames = LabelNames
                 });
     }
 }

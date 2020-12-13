@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace FourthDown.Api.Models
 {
@@ -160,7 +161,7 @@ namespace FourthDown.Api.Models
     public class GameDetail
     {
         public IList<string> Id { get; set; }
-        public IList<string> Attendance { get; set; }
+        [JsonIgnore] public IList<string> Attendance { get; set; }
         public IList<int> Distance { get; set; }
         public IList<int> Down { get; set; }
         public IList<string> GameClock { get; set; }
@@ -180,7 +181,7 @@ namespace FourthDown.Api.Models
         public PossessionTeam PossessionTeam { get; set; }
         public IList<bool> Redzone { get; set; }
         public IList<ScoringSummary> ScoringSummaries { get; set; }
-        public IList<string> Stadium { get; set; }
+        [JsonIgnore] public IList<string> Stadium { get; set; }
         public IList<string> StartTime { get; set; }
         public VisitorPointsOvertime VisitorPointsOvertime { get; set; }
         public IList<int> VisitorPointsOvertimeTotal { get; set; }
@@ -193,7 +194,7 @@ namespace FourthDown.Api.Models
         public IList<int> VisitorTimeoutsUsed { get; set; }
         public IList<int> VisitorTimeoutsRemaining { get; set; }
         public IList<int> HomePointsOvertimeTotal { get; set; }
-        public Weather Weather { get; set; }
+        [JsonIgnore] public Weather Weather { get; set; }
         public YardLine YardLine { get; set; }
         public IList<int> YardsToGo { get; set; }
         public IList<Drive> Drives { get; set; }
