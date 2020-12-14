@@ -148,8 +148,7 @@ namespace FourthDown.Api
                 .AddCheck<DataAccessHealthCheck>(
                     "Health check for access to data repository",
                     HealthStatus.Degraded,
-                    new[] {"data"})
-                .ForwardToPrometheus();
+                    new[] {"data"});
 
             services
                 .AddAuthentication(options =>

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
@@ -118,6 +119,25 @@ namespace FourthDown.Api.Services
                 .Select(game => _gamePlayRepository.GetGamePlaysAsync(game.GameId, game.Season, cancellationToken))
                 .ToList();
 
+            const int batchSize = 12;
+            var numberOfBatches = (int) Math.Ceiling((double) requests.Count / batchSize);
+
+            // for (var i = 0; i < numberOfBatches; i++)
+            // {
+            //     var tasks = requests.Skip(i * batchSize).Take(batchSize).ToList();
+            //
+            //     //Wait for all the requests to finish
+            //     await Task.WhenAll(tasks);
+            //
+            //     //Get the responses
+            //     var responses = tasks.Select(task => task.Result);
+            //
+            //     foreach (var pbp in responses)
+            //     {
+            //         yield return new GameDetailsFormatted(pbp);
+            //     }
+            // }
+            
             //Wait for all the requests to finish
             await Task.WhenAll(requests);
 
