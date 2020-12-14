@@ -43,8 +43,7 @@ namespace FourthDown.Api
         public void ConfigureServices(IServiceCollection services)
         {
             services
-                .Configure<AuthenticationOptions>(Configuration)
-                .Configure<TelemetryOptions>(Configuration.GetSection("Telemetry"));
+                .Configure<AuthenticationOptions>(Configuration);
 
             services
                 .AddSingleton<IGamePlayService, GamePlayService>()
@@ -81,7 +80,6 @@ namespace FourthDown.Api
             services.AddControllers();
             services.AddOpenTracing();
             services.AddResponseCaching();
-            services.AddApplicationInsightsTelemetry();
 
             services.AddLogging(config =>
             {
