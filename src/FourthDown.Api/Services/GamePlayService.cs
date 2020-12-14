@@ -37,8 +37,7 @@ namespace FourthDown.Api.Services
 
             await foreach (var game in QueryForGameStats(queryParameter, cancellationToken))
             {
-                if (game == null)
-                    continue;
+                if (game == null) continue;
 
                 yield return game.ParseToGamePlays();
             }
@@ -52,8 +51,7 @@ namespace FourthDown.Api.Services
 
             await foreach (var game in QueryForGameStats(queryParameter, cancellationToken))
             {
-                if (game == null)
-                    continue;
+                if (game == null) continue;
 
                 yield return game.ParseToGameDrives();
             }
@@ -67,8 +65,7 @@ namespace FourthDown.Api.Services
 
             await foreach (var game in QueryForGameStats(queryParameter, cancellationToken))
             {
-                if (game == null)
-                    continue;
+                if (game == null) continue;
 
                 yield return game.ParseToGameScoringSummaries();
             }
@@ -119,25 +116,6 @@ namespace FourthDown.Api.Services
                 .Select(game => _gamePlayRepository.GetGamePlaysAsync(game.GameId, game.Season, cancellationToken))
                 .ToList();
 
-            const int batchSize = 12;
-            var numberOfBatches = (int) Math.Ceiling((double) requests.Count / batchSize);
-
-            // for (var i = 0; i < numberOfBatches; i++)
-            // {
-            //     var tasks = requests.Skip(i * batchSize).Take(batchSize).ToList();
-            //
-            //     //Wait for all the requests to finish
-            //     await Task.WhenAll(tasks);
-            //
-            //     //Get the responses
-            //     var responses = tasks.Select(task => task.Result);
-            //
-            //     foreach (var pbp in responses)
-            //     {
-            //         yield return new GameDetailsFormatted(pbp);
-            //     }
-            // }
-            
             //Wait for all the requests to finish
             await Task.WhenAll(requests);
 
@@ -149,6 +127,9 @@ namespace FourthDown.Api.Services
 
             foreach (var pbp in responses)
             {
+                if (pbp.Id == null || !pbp.Id.Any())
+                    continue;
+
                 yield return new GameDetailsFormatted(pbp);
             }
         }

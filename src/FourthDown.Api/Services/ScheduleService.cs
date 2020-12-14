@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using FourthDown.Api.Models;
 using FourthDown.Api.Parameters;
 using FourthDown.Api.Repositories;
-using FourthDown.Api.Utilities;
 
 namespace FourthDown.Api.Services
 {
@@ -47,18 +46,17 @@ namespace FourthDown.Api.Services
 
             var team = queryParameter.Team;
             var season = queryParameter.Season ?? _currentSeason;
-            var week = queryParameter.Week;
+            var week = queryParameter.Week ?? currentWeek;
 
             var games = gamesPerSeason[season];
+            
+            games = games.Where(x => x.Week == week);
 
             if (queryParameter.IsNull())
-                games = games.Where(x => x.Week == currentWeek).ToList();
-
-            if (week != null)
-                games = games.Where(x => x.Week == week).ToList();
+                games = games.Where(x => x.Week == currentWeek);
 
             if (!string.IsNullOrWhiteSpace(team))
-                games = games.Where(x => x.HomeTeam == team || x.AwayTeam == team).ToList();
+                games = games.Where(x => x.HomeTeam == team || x.AwayTeam == team);
 
             return games;
         }
@@ -71,7 +69,7 @@ namespace FourthDown.Api.Services
         private int GetCurrentWeek(IEnumerable<Game> games)
         {
             return games
-                .Where(x => x.Season == _currentSeason && x.Gameday <= Today.Date)
+                .Where(x => x.Season == _currentSeason && x.Gameday < Today.Date)
                 .Max(x => x.Week);
         }
 

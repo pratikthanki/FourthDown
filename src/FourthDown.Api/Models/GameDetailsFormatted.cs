@@ -8,10 +8,10 @@ namespace FourthDown.Api.Models
         public GameDetailsFormatted(GameDetail gameDetail)
         {
             Id = gameDetail.Id.First();
-            Attendance = gameDetail.Attendance.First();
-            Stadium = gameDetail.Stadium.First();
+            Attendance = "NA";
+            Stadium = "NA";
             StartTime = gameDetail.StartTime.First();
-            WeatherShortDescription = gameDetail.Weather.ShortDescription.First();
+            WeatherShortDescription = "NA";
 
             HomeTeam = new TeamStats
             {
