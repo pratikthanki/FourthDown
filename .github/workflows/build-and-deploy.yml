@@ -12,28 +12,28 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout GitHub Action
-      uses: actions/checkout@v2
-
-    - name: Login to Azure
+    - name: 'Checkout GitHub Action'
+      uses: actions/checkout@master
+      
+    - name: 'Login via Azure CLI'
       uses: azure/login@v1
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-    - name: Set up Docker to push to Azure Repository
+    - name: 'Set up Docker to push to Azure Repository'
       uses: azure/docker-login@v1
       with:
         login-server: ${{ secrets.REGISTRY_LOGIN_SERVER }}
         username: ${{ secrets.REGISTRY_USERNAME }}
         password: ${{ secrets.REGISTRY_PASSWORD }}
 
-    - name: Build fourthdown-api, create image and push to Azure Repository
+    - name: 'Build fourthdown-api, create image and push to Azure Repository'
       run: |
         cd src/FourthDown.Api
         docker build -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/fourthdown-api:${{ github.sha }} .
         docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/fourthdown-api:${{ github.sha }}
 
-    - name: Deploy fourthdown-api to Azure Container Instances
+    - name: 'Deploy fourthdown-api to Azure Container Instances'
       uses: azure/aci-deploy@v1
       with:
         resource-group: ${{ secrets.RESOURCE_GROUP }}
