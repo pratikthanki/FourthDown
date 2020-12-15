@@ -80,6 +80,7 @@ namespace FourthDown.Api
             services.AddControllers();
             services.AddOpenTracing();
             services.AddResponseCaching();
+            services.AddApplicationInsightsTelemetry();
 
             services.AddLogging(config =>
             {
@@ -95,11 +96,16 @@ namespace FourthDown.Api
                         Version = "v1",
                         Title = "Fourth Down API",
                         Description =
-                            "The Fourth Down API is an HTTP REST-based API serving NFL data. This can be used " +
-                            "to get schedule data and different types of game play by play data. The API is " +
-                            "designed to be language/tool agnostic.\n" +
-                            "\nMost endpoints can be interacted with the same set of query parameters: " +
-                            "`GameId`, `Season`, `Team` and `Week`.",
+                            "The Fourth Down API is organised around the HTTP [REST](https://en.wikipedia.org/wiki/Representational_state_transfer) protocol. " +
+                            "Our API has predictable resource-oriented URLs and will returns [JSON-encoded](http://www.json.org/) responses, " +
+                            "and uses standard HTTP response codes, authentication, and verbs.\n" +
+                            "The API can be used to get NFL schedule and team details, as well as the more sophisticated and " +
+                            "different types of play-by-play game data. The API is designed with the primary goal of " +
+                            "being language/tool agnostic, a shortfall in NFL data resources currently available.\n" +
+                            "\nMost endpoints share the same set of base query parameters: `GameId`, `Season`, " +
+                            "`Team` and `Week`.\n" +
+                            "This API is documented in **OpenAPI format** and supported by a few " +
+                            "[vendor extensions](https://github.com/Redocly/redoc/blob/master/docs/redoc-vendor-extensions.md).",
                         Extensions = new Dictionary<string, IOpenApiExtension>
                         {
                             {
@@ -130,11 +136,6 @@ namespace FourthDown.Api
                         {
                             Name = "X-API-KEY", In = ParameterLocation.Header, Type = SecuritySchemeType.ApiKey
                         });
-
-                    c.AddServer(new OpenApiServer()
-                    {
-                        Url = "https://fourthdown.analytics.com"
-                    });
 
                     var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
                     var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
@@ -171,19 +172,13 @@ namespace FourthDown.Api
             }
             
             app.UseSwagger();
-            app.UseSwaggerUI(c =>
-            {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Fourth Down V1");
-                c.InjectStylesheet("/swagger-ui/custom.css");
-                c.RoutePrefix = string.Empty;
-            });
-
             app.UseRouting();
             app.UseResponseCaching();
             app.UseHttpMetrics();
 
             app.UseAuthentication();
             app.UseAuthorization();
+            app.UseStaticFiles();
 
             app.UseEndpoints(endpoints =>
             {
@@ -198,6 +193,18 @@ namespace FourthDown.Api
                         [HealthStatus.Unhealthy] = StatusCodes.Status503ServiceUnavailable
                     }
                 });
+
+                endpoints.MapGet("/", async context =>
+                {
+                    var file = Path.Join(env.WebRootPath, "index.html");
+                    await context.Response.WriteAsync(file);
+                });
+
+                endpoints.MapGet("/hello", async context =>
+                {
+                    await context.Response.WriteAsync("Hello World!");
+                });
+
                 endpoints.MapMetrics();
             });
         }
