@@ -5,7 +5,7 @@ WORKDIR /src
 COPY src/FourthDown.Api/FourthDown.Api.csproj .
 RUN dotnet restore FourthDown.Api.csproj
 
-COPY . .
+COPY src/FourthDown.Api/ .
 
 WORKDIR /src
 
