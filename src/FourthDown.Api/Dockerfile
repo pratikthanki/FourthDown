@@ -16,7 +16,7 @@ FROM mcr.microsoft.com/dotnet/core/aspnet:3.1 AS runtime
 WORKDIR /app
 
 COPY --from=build /app/publish .
-COPY /entrypoint.sh .
+COPY src/FourthDown.Api/entrypoint.sh .
 
 EXPOSE 5000
 
