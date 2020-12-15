@@ -10,6 +10,25 @@ The aim of this API is to make it easier to work with NFL data, without having t
 
 There are a set of API endpoints to query team, schedule and various aspects of game data. You can find more details on the [Swagger](https://pratikthanki.github.io/FourthDown/) page.
 
+## Try it out
+
+You don't need an API Key to get started, if you want to see how the API works and if it can meet your needs you can pull the docker image from [dockerhub](https://hub.docker.com/repository/docker/pratikthanki9/fourthdown).
+
+Loosely from your favourite command line tool you can pull the image and run the API locally.
+
+```shell
+
+$ docker pull pratikthanki9/fourthdown:latest
+
+$ docker images
+
+REPOSITORY                      TAG      IMAGE ID        CREATED      SIZE
+pratikthanki9/fourthdown       latest   f50f9524513f    1 days ago   85.1 MB
+
+$ docker run pratikthanki9/fourthdown:latest
+
+```
+
 ## Thanks
 
 Shoutout to the following people and their projects for making this API feasible.
