@@ -6,6 +6,7 @@ using FourthDown.Api.Extensions;
 using FourthDown.Api.Models;
 using FourthDown.Api.Monitoring;
 using FourthDown.Api.Repositories;
+using FourthDown.Api.Schemas;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -17,9 +18,9 @@ namespace FourthDown.Api.Controllers
     [ApiVersion("1.0")]
     [Authorize]
     [Produces("application/json")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(TeamResponse[]), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ValidationProblemDetailsResponse),StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ValidationProblemDetailsResponse), StatusCodes.Status404NotFound)]
     [ApiController]
     public class TeamController : ControllerBase
     {

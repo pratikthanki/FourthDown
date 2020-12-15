@@ -7,6 +7,7 @@ using FourthDown.Api.Extensions;
 using FourthDown.Api.Models;
 using FourthDown.Api.Monitoring;
 using FourthDown.Api.Parameters;
+using FourthDown.Api.Schemas;
 using FourthDown.Api.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -20,9 +21,9 @@ namespace FourthDown.Api.Controllers
     [ApiVersion("1.0")]
     [Authorize]
     [Produces("application/json")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ScheduleResponse[]), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ValidationProblemDetailsResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ValidationProblemDetailsResponse), StatusCodes.Status404NotFound)]
     [ApiController]
     public class ScheduleController : ControllerBase
     {
@@ -41,8 +42,9 @@ namespace FourthDown.Api.Controllers
         }
 
         /// <summary>
-        ///     Query for a set of games and accompanying details
-        ///     If no parameters are passed, all team games for the current week for this season are returned
+        /// Query for a range of games and accompanying details.
+        /// If a parameter is not given it will default to the current week/season.
+        /// When a team is not given, all team games are returned.
         /// </summary>
         /// <param name="queryParameter">Combination of Season, Week and Team</param>
         /// <param name="cancellationToken"></param>

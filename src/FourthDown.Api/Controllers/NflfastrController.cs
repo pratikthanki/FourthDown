@@ -7,6 +7,7 @@ using FourthDown.Api.Models;
 using FourthDown.Api.Monitoring;
 using FourthDown.Api.Parameters;
 using FourthDown.Api.Repositories;
+using FourthDown.Api.Schemas;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -20,8 +21,8 @@ namespace FourthDown.Api.Controllers
     [Authorize]
     [Produces("application/json")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ValidationProblemDetailsResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ValidationProblemDetailsResponse), StatusCodes.Status404NotFound)]
     [ResponseCache(Duration = 600, Location = ResponseCacheLocation.Any, VaryByQueryKeys = new [] {"impactlevel", "pii"})]
     [ApiController]
     public class NflfastrController : ControllerBase
@@ -41,8 +42,9 @@ namespace FourthDown.Api.Controllers
         }
 
         /// <summary>
-        ///     Play by Play data for a set of games
-        ///     Either GameId or a combination of Season, Week and Team should be provided
+        /// Play-by-Play data for a set of games.
+        /// Either GameId or a combination of Season, Week and Team should be provided.
+        /// Game data sourced from the R package nflfastrR.
         /// </summary>
         /// <param name="queryParameter">Combination of Season, Week and Team</param>
         /// <param name="cancellationToken"></param>

@@ -27,7 +27,7 @@ namespace FourthDown.Api.Controllers
         }
 
         /// <summary>
-        ///     Create an API Key ith an expiry datetime
+        /// Create an API Key with time-based expiry.
         /// </summary>
         /// <param name="name">Name/alias for the created API Key</param>
         /// <param name="cancellationToken"></param>

@@ -7,6 +7,7 @@ using FourthDown.Api.Extensions;
 using FourthDown.Api.Models;
 using FourthDown.Api.Monitoring;
 using FourthDown.Api.Parameters;
+using FourthDown.Api.Schemas;
 using FourthDown.Api.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -21,9 +22,8 @@ namespace FourthDown.Api.Controllers
     [Authorize]
     [ApiController]
     [Produces("application/json")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ValidationProblemDetailsResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ValidationProblemDetailsResponse), StatusCodes.Status404NotFound)]
     public class GameController : ControllerBase
     {
         private readonly ITracer _tracer;
@@ -36,13 +36,14 @@ namespace FourthDown.Api.Controllers
         }
 
         /// <summary>
-        ///     Play by Play data for a set of games
-        ///     Either GameId or a combination of Season, Week and Team should be provided
+        ///     Play by Play data for a set of games. 
+        ///     Either GameId or a combination of Season, Week and Team should be provided.
         /// </summary>
         /// <param name="queryParameter">Combination of Season, Week and Team</param>
         /// <param name="cancellationToken"></param>
         /// <returns>List of game play by plays</returns>
         [HttpGet("plays")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async IAsyncEnumerable<GamePlays> GetPlays(
             [FromQuery] PlayByPlayQueryParameter queryParameter,
             [EnumeratorCancellation] CancellationToken cancellationToken)
@@ -64,8 +65,8 @@ namespace FourthDown.Api.Controllers
         }
 
         /// <summary>
-        ///     Game drives summarised from plays
-        ///     Either GameId or a combination of Season, Week and Team should be provided
+        ///     Game drives summarised from plays. 
+        ///     Either GameId or a combination of Season, Week and Team should be provided.
         /// </summary>
         /// <param name="queryParameter">Combination of Season, Week and Team</param>
         /// <param name="cancellationToken"></param>
@@ -108,8 +109,8 @@ namespace FourthDown.Api.Controllers
         }
 
         /// <summary>
-        ///     List of scoring drives with updated team scores
-        ///     Either GameId or a combination of Season, Week and Team should be provided
+        ///     List of scoring drives with updated team scores. 
+        ///     Either GameId or a combination of Season, Week and Team should be provided.
         /// </summary>
         /// <param name="queryParameter">Combination of Season, Week and Team</param>
         /// <param name="cancellationToken"></param>
