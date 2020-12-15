@@ -1,10 +1,9 @@
-using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
 
 namespace FourthDown.Api.Parameters
 {
     /// <summary>
-    /// 
+    /// A combination of Season, Week and Team can be provided.
+    /// When an option is not given, it will default to the current Season and/or Week.
     /// </summary>
     public class ScheduleQueryParameter : QueryParameterBase
     {

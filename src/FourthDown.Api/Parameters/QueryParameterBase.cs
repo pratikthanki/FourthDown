@@ -6,7 +6,7 @@ namespace FourthDown.Api.Parameters
     public class QueryParameterBase
     {
         /// <summary>
-        /// Week based on the football schedule
+        /// Week based on the football schedule:
         /// ```
         /// - REG (1-17)
         /// - Wild Card (18)
@@ -18,12 +18,12 @@ namespace FourthDown.Api.Parameters
         public int? Week { get; set; }
 
         /// <summary>
-        /// Seasons between 1999 and current season
+        /// Valid seasons from 1999 to the current season.
         /// </summary>
         public int? Season { get; set; }
 
         /// <summary>
-        /// Team abbreviation. See `/api/teams` for the `abr` attribute
+        /// Team abbreviation. See `/api/teams` for the `abr` attribute.
         /// </summary>
         public string Team { get; set; }
 
@@ -47,7 +47,7 @@ namespace FourthDown.Api.Parameters
                 errors["week"] = new[]
                     {"week must be between 1-17 (REG), Divisional (19), Conference (20) and Super Bowl (21)"};
 
-            if (!string.IsNullOrWhiteSpace(Team) && Team.Length != 3)
+            if (!string.IsNullOrWhiteSpace(Team) && Team.Length < 2)
                 errors["team"] = new[] {"Invalid team abbreviation given"};
 
             return errors;

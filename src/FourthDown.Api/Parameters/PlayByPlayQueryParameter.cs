@@ -9,10 +9,14 @@ namespace FourthDown.Api.Parameters
     public class PlayByPlayQueryParameter : QueryParameterBase
     {
         /// <summary>
-        /// Single or comma-separated list of GameId's in the format `Season_Week_VisitorAbr_HomeTAbr`
-        /// One game: `2020_17_DAL_NYG`
-        /// Multiple games: `2020_01_DAL_LA,2020_02_ATL_DAL`
+        /// Single or comma-separated list of GameId's.
         /// </summary>
+        /// <remarks>
+        /// GameId should be in the format `Season_Week_VisitorAbr_HomeTAbr`.
+        /// For example:
+        ///    - One game: `2020_17_DAL_NYG`
+        ///    - Multiple games: `2020_01_DAL_LA,2020_02_ATL_DAL`
+        /// </remarks>
         public string GameId { get; set; }
 
         public Dictionary<int, List<string>> GetGameIdsBySeason()
@@ -57,10 +61,6 @@ namespace FourthDown.Api.Parameters
             {
                 if (NonGameIdParameterSet())
                     errors["query"] = new[] {"If gameId is used then Week, Season and Team do not need to be provided"};
-
-                // var games = GameId.Split(",");
-                // if (games.Any(x => x.Length != 15))
-                //     errors["gameId"] = new[] {"GameId's provided should be 15 characters long"};
             }
 
             return errors;
