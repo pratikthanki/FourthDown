@@ -1,8 +1,6 @@
 using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
-using System.Threading.Tasks;
 using FourthDown.Api.Extensions;
 using FourthDown.Api.Models;
 using FourthDown.Api.Monitoring;
@@ -12,7 +10,6 @@ using FourthDown.Api.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using OpenTracing;
 
 namespace FourthDown.Api.Controllers
@@ -43,7 +40,7 @@ namespace FourthDown.Api.Controllers
         /// <param name="cancellationToken"></param>
         /// <returns>List of game play by plays</returns>
         [HttpGet("plays")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(GamePlays[]),StatusCodes.Status200OK)]
         public async IAsyncEnumerable<GamePlays> GetPlays(
             [FromQuery] PlayByPlayQueryParameter queryParameter,
             [EnumeratorCancellation] CancellationToken cancellationToken)
@@ -72,6 +69,7 @@ namespace FourthDown.Api.Controllers
         /// <param name="cancellationToken"></param>
         /// <returns>List of game drives</returns>
         [HttpGet("drives")]
+        [ProducesResponseType(typeof(GameDrives[]),StatusCodes.Status200OK)]
         public async IAsyncEnumerable<GameDrives> GetDrives(
             [FromQuery] PlayByPlayQueryParameter queryParameter,
             [EnumeratorCancellation] CancellationToken cancellationToken)
@@ -116,6 +114,7 @@ namespace FourthDown.Api.Controllers
         /// <param name="cancellationToken"></param>
         /// <returns>List of game scoring summaries</returns>
         [HttpGet("scoringsummaries")]
+        [ProducesResponseType(typeof(GameScoringSummaries[]),StatusCodes.Status200OK)]
         public async IAsyncEnumerable<GameScoringSummaries> GetScoringSummaries(
             [FromQuery] PlayByPlayQueryParameter queryParameter,
             [EnumeratorCancellation] CancellationToken cancellationToken)

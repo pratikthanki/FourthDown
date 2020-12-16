@@ -3,9 +3,9 @@ using System.Linq;
 
 namespace FourthDown.Api.Models
 {
-    public class GameDetailsFormatted
+    public class ApiGamePlay
     {
-        public GameDetailsFormatted(GameDetail gameDetail)
+        public ApiGamePlay(GameDetail gameDetail)
         {
             Id = gameDetail.Id.First();
             Attendance = "NA";
@@ -57,7 +57,7 @@ namespace FourthDown.Api.Models
         public IList<Play> Plays { get; set; }
         public IList<ScoringSummary> ScoringSummaries { get; set; }
 
-        public GameDrives ParseToGameDrives()
+        public GameDrives ToGameDrives()
         {
             return new GameDrives
             {
@@ -72,7 +72,7 @@ namespace FourthDown.Api.Models
             };
         }
 
-        public GamePlays ParseToGamePlays()
+        public GamePlays ToGamePlays()
         {
             return new GamePlays
             {
@@ -87,7 +87,7 @@ namespace FourthDown.Api.Models
             };
         }
 
-        public GameScoringSummaries ParseToGameScoringSummaries()
+        public GameScoringSummaries ToGameScoringSummaries()
         {
             return new GameScoringSummaries
             {
@@ -124,8 +124,8 @@ namespace FourthDown.Api.Models
         public string Stadium { get; set; }
         public string StartTime { get; set; }
         public string WeatherShortDescription { get; set; }
-        public GameDetailsFormatted.TeamStats HomeTeam { get; set; }
-        public GameDetailsFormatted.TeamStats VisitorTeam { get; set; }
+        public ApiGamePlay.TeamStats HomeTeam { get; set; }
+        public ApiGamePlay.TeamStats VisitorTeam { get; set; }
         public IList<Drive> Drives { get; set; }
     }
 
@@ -136,8 +136,8 @@ namespace FourthDown.Api.Models
         public string Stadium { get; set; }
         public string StartTime { get; set; }
         public string WeatherShortDescription { get; set; }
-        public GameDetailsFormatted.TeamStats HomeTeam { get; set; }
-        public GameDetailsFormatted.TeamStats VisitorTeam { get; set; }
+        public ApiGamePlay.TeamStats HomeTeam { get; set; }
+        public ApiGamePlay.TeamStats VisitorTeam { get; set; }
         public IList<Play> Plays { get; set; }
     }
 
@@ -148,8 +148,8 @@ namespace FourthDown.Api.Models
         public string Stadium { get; set; }
         public string StartTime { get; set; }
         public string WeatherShortDescription { get; set; }
-        public GameDetailsFormatted.TeamStats HomeTeam { get; set; }
-        public GameDetailsFormatted.TeamStats VisitorTeam { get; set; }
+        public ApiGamePlay.TeamStats HomeTeam { get; set; }
+        public ApiGamePlay.TeamStats VisitorTeam { get; set; }
         public IList<ScoringSummary> ScoringSummaries { get; set; }
     }
 }

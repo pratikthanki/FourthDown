@@ -50,7 +50,7 @@ namespace FourthDown.Api.Controllers
         /// <param name="cancellationToken"></param>
         /// <returns>List of game play by plays</returns>
         [HttpGet("")]
-        [Produces("application/json")]
+        [ProducesResponseType(typeof(PlayByPlayResponse[]),StatusCodes.Status200OK)]
         public async Task<ActionResult<IEnumerable<PlayByPlay>>> GetPlayByPlays(
             [FromQuery] PlayByPlayQueryParameter queryParameter,
             CancellationToken cancellationToken)
