@@ -170,7 +170,7 @@ namespace FourthDown.Api
                 app.UseExceptionHandler("/Error");
                 app.UseHsts();
             }
-            
+
             app.UseSwagger();
             app.UseRouting();
             app.UseResponseCaching();
@@ -178,6 +178,7 @@ namespace FourthDown.Api
 
             app.UseAuthentication();
             app.UseAuthorization();
+            app.UseDefaultFiles();
             app.UseStaticFiles();
 
             app.UseEndpoints(endpoints =>
@@ -194,16 +195,7 @@ namespace FourthDown.Api
                     }
                 });
 
-                endpoints.MapGet("/", async context =>
-                {
-                    var file = Path.Join(env.WebRootPath, "index.html");
-                    await context.Response.WriteAsync(file);
-                });
-
-                endpoints.MapGet("/hello", async context =>
-                {
-                    await context.Response.WriteAsync("Hello World!");
-                });
+                endpoints.MapGet("/hello", async context => { await context.Response.WriteAsync("Hello World!"); });
 
                 endpoints.MapMetrics();
             });

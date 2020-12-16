@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
@@ -39,7 +38,7 @@ namespace FourthDown.Api.Services
             {
                 if (game == null) continue;
 
-                yield return game.ParseToGamePlays();
+                yield return game.ToGamePlays();
             }
         }
 
@@ -53,7 +52,7 @@ namespace FourthDown.Api.Services
             {
                 if (game == null) continue;
 
-                yield return game.ParseToGameDrives();
+                yield return game.ToGameDrives();
             }
         }
 
@@ -67,7 +66,7 @@ namespace FourthDown.Api.Services
             {
                 if (game == null) continue;
 
-                yield return game.ParseToGameScoringSummaries();
+                yield return game.ToGameScoringSummaries();
             }
         }
 
@@ -96,7 +95,7 @@ namespace FourthDown.Api.Services
             return games.ToList();
         }
 
-        private async IAsyncEnumerable<GameDetailsFormatted> QueryForGameStats(
+        private async IAsyncEnumerable<ApiGamePlay> QueryForGameStats(
             PlayByPlayQueryParameter queryParameter,
             [EnumeratorCancellation] CancellationToken cancellationToken)
         {
@@ -120,17 +119,14 @@ namespace FourthDown.Api.Services
             await Task.WhenAll(requests);
 
             //Get the responses
-            var responses = requests.Select
-            (
-                task => task.Result
-            );
+            var responses = requests.Select(task => task.Result);
 
             foreach (var pbp in responses)
             {
                 if (pbp.Id == null || !pbp.Id.Any())
                     continue;
 
-                yield return new GameDetailsFormatted(pbp);
+                yield return new ApiGamePlay(pbp);
             }
         }
     }
