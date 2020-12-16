@@ -17,21 +17,18 @@ namespace FourthDown.Api.HealthChecks
                 return response.IsSuccessStatusCode;
             }
 
-            const string jsonDataUrl =
-                @"https://github.com/pratikthanki/nflfastR-raw/blob/master/raw/2020/2020_01_DAL_LA.json.gz?raw=true";
-
-            const string csvDataUrl =
-                @"https://github.com/pratikthanki/nflfastR-data/blob/master/data/play_by_play_2020.csv.gz?raw=true";
+            var jsonDataUrl = $"{RepositoryEndpoints.GamePlayEndpoint}/2020/2020_01_DAL_LA.json.gz?raw=true";
+            var csvDataUrl = $"{RepositoryEndpoints.PlayByPlayEndpoint}/play_by_play_2020.csv.gz?raw=true";
+            var gamesDataUrl = RepositoryEndpoints.GamesEndpoint;
 
             var jsonDataResponse = await GetStatusCode(jsonDataUrl);
             var csvDataResponse = await GetStatusCode(csvDataUrl);
+            var gamesDataResponse = await GetStatusCode(gamesDataUrl);
 
-            if (jsonDataResponse && csvDataResponse)
-                return await Task.FromResult(
-                    HealthCheckResult.Healthy("A healthy result."));
+            if (jsonDataResponse && csvDataResponse && gamesDataResponse)
+                return await Task.FromResult(HealthCheckResult.Healthy("A healthy result."));
 
-            return await Task.FromResult(
-                HealthCheckResult.Unhealthy("An unhealthy result."));
+            return await Task.FromResult(HealthCheckResult.Unhealthy("An unhealthy result."));
         }
     }
 }
