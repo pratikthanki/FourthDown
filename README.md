@@ -31,11 +31,9 @@ $ docker run pratikthanki9/fourthdown:latest
 
 ## Thanks
 
-Shoutout to the following people and their projects for making this API feasible.
+Shoutout to the guys of the R package [nflfastR](https://github.com/mrcaseb/nflfastR) ([Ben Baldwin](https://twitter.com/benbbaldwin) and [Sebastian Carl](https://twitter.com/mrcaseb)) on the game data and modelling of EPA, WP and CPOE amongst other things available.
 
-Game data and modelling of EPA, WP and CPOE amongst othe things available by the guys of the R package [nflfastR](https://github.com/mrcaseb/nflfastR) ([Ben Baldwin](https://twitter.com/benbbaldwin) and [Sebastian Carl](https://twitter.com/mrcaseb)).
-
-Game schedule data going back to 1999 from [Lee Sharpe](https://twitter.com/LeeSharpeNFL).
+[Lee Sharpe](https://twitter.com/LeeSharpeNFL) for the game schedule data going back to 1999.
 
 ## Feedback
 
