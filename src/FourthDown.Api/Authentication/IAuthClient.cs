@@ -1,5 +1,7 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 using FourthDown.Api.Configuration;
@@ -10,39 +12,51 @@ namespace FourthDown.Api.Authentication
 {
     public interface IAuthClient
     {
-        Task<ApiKey> Execute(string apiKey);
+        Task<ApiKey> CreateApiKey(string name);
+        Task<ApiKey> GetApiKey(string apiKey);
     }
 
     public class AuthClient : IAuthClient
     {
+        private readonly ISlackClient _slackClient;
         private readonly AuthenticationOptions _authenticationOptions;
 
-        public AuthClient(IOptions<AuthenticationOptions> apiKeyOptions)
+        public AuthClient(
+            ISlackClient slackClient,
+            IOptions<AuthenticationOptions> apiKeyOptions)
         {
+            _slackClient = slackClient;
             _authenticationOptions = apiKeyOptions.Value;
         }
 
-        public async Task<ApiKey> Execute(string apiKey)
+        public async Task<ApiKey> GetApiKey(string apiKey)
         {
-            Dictionary<string, ApiKey> apiKeys;
+            IEnumerable<ApiKey> apiKeys;
             if (_authenticationOptions.UseSampleAuth)
             {
-                apiKeys = await JsonSerializer.DeserializeAsync<Dictionary<string, ApiKey>>(
+                apiKeys = await JsonSerializer.DeserializeAsync<List<ApiKey>>(
                     File.OpenRead("Data/api-keys.json"),
                     StringParser.JsonSerializerOptions);
             }
             else
             {
-                // TODO: get apiKeys from apikey management service
-                apiKeys = new Dictionary<string, ApiKey>
-                {
-                    {"some-key", new ApiKey()}
-                };
+                apiKeys = await _slackClient.ReadMessages();
             }
 
-            apiKeys.TryGetValue(apiKey, out var key);
+            return apiKeys.FirstOrDefault(k => k.Key == apiKey);;
+        }
 
-            return key;
+        public async Task<ApiKey> CreateApiKey(string name)
+        {
+            var apiKey = new ApiKey()
+            {
+                Name = name,
+                Key = Guid.NewGuid().ToString(),
+                CreationDateTime = DateTime.UtcNow,
+                ExpirationDateTime = DateTime.UtcNow.AddDays(7)
+            };
+            
+            return await _slackClient.PostMessage(apiKey) ? apiKey : null;
         }
     }
 }

@@ -77,6 +77,11 @@ namespace FourthDown.Api
                     return tracer;
                 });
 
+            services.AddHttpClient<ISlackClient, SlackClient>(c =>
+            {
+                c.BaseAddress = new Uri("https://hooks.slack.com");
+            });
+
             services.AddControllers();
             services.AddOpenTracing();
             services.AddResponseCaching();

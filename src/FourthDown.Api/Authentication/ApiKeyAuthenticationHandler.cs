@@ -6,7 +6,6 @@ using System.Net;
 using System.Security.Claims;
 using System.Text;
 using System.Text.Encodings.Web;
-using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Logging;
@@ -42,7 +41,7 @@ namespace FourthDown.Api.Authentication
             if (apiKeyHeaderValues.Count == 0 || string.IsNullOrWhiteSpace(providedApiKey))
                 return AuthenticateResult.NoResult();
 
-            var existingApiKey = await _authClient.Execute(providedApiKey);
+            var existingApiKey = await _authClient.GetApiKey(providedApiKey);
 
             if (existingApiKey == null)
                 return AuthenticateResult.Fail("Invalid API Key provided.");
@@ -52,7 +51,7 @@ namespace FourthDown.Api.Authentication
 
             var claims = new List<Claim>
             {
-                new Claim(ClaimTypes.Name, existingApiKey.Alias),
+                new Claim(ClaimTypes.Name, existingApiKey.Name),
                 new Claim(ClaimTypes.Expiration,
                     existingApiKey.ExpirationDateTime.ToString(CultureInfo.InvariantCulture))
             };
@@ -91,8 +90,19 @@ namespace FourthDown.Api.Authentication
 
     public class ApiKey
     {
-        public string Alias { get; set; }
+        public string Key { get; set; }
+        public string Name { get; set; }
         public DateTime CreationDateTime { get; set; }
         public DateTime ExpirationDateTime { get; set; }
+
+        public override string ToString()
+        {
+            const string datePattern = "yyyy-MM-ddTHH:mm:ss";
+
+            return $"\n\t'{nameof(Name)}': '{Name}', " +
+                   $"\n\t'{nameof(Key)}': '{Key}', " +
+                   $"\n\t'{nameof(CreationDateTime)}': '{CreationDateTime.ToString(datePattern)}', " +
+                   $"\n\t'{nameof(ExpirationDateTime)}': '{ExpirationDateTime.ToString(datePattern)}'";
+        }
     }
 }

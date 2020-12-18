@@ -1,5 +1,5 @@
-using System.Threading;
 using System.Threading.Tasks;
+using FourthDown.Api.Authentication;
 using FourthDown.Api.Monitoring;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -15,38 +15,46 @@ namespace FourthDown.Api.Controllers
     [ApiController]
     public class AuthController : ControllerBase
     {
+        private readonly IAuthClient _authClient;
         private readonly ILogger<AuthController> _logger;
         private readonly ITracer _tracer;
 
         public AuthController(
+            IAuthClient authClient,
             ILogger<AuthController> logger,
             ITracer tracer)
         {
             _logger = logger;
             _tracer = tracer;
+            _authClient = authClient;
         }
 
         /// <summary>
         /// Create an API Key with time-based expiry.
         /// </summary>
         /// <param name="name">Name/alias for the created API Key</param>
-        /// <param name="cancellationToken"></param>
         /// <returns>List of game play by plays</returns>
         [HttpPost]
         [AllowAnonymous]
         [Produces("application/json")]
-        [ProducesResponseType(typeof(string), StatusCodes.Status201Created)]
-        [ProducesResponseType(typeof(string), StatusCodes.Status401Unauthorized)]
-        [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
-        public async Task<ActionResult> CreateApiKey(
-            [FromQuery] string name,
-            CancellationToken cancellationToken)
+        [ProducesResponseType(typeof(ApiKey), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+        public async Task<ActionResult<ApiKey>> CreateApiKey([FromQuery] string name)
         {
             using var scope = _tracer.BuildSpan(nameof(CreateApiKey)).StartActive();
             
             PrometheusMetrics.PathCounter.WithLabels(Request.Method, Request.Path).Inc();
 
-            return Ok();
+            var createdKey = await _authClient.CreateApiKey(name);
+
+            if (createdKey == null)
+                return BadRequest(new ValidationProblemDetails()
+                {
+                    Title = "Unable to create a new apiKey at this moment. Please try again.",
+                    Status = StatusCodes.Status400BadRequest
+                });
+
+            return Ok(createdKey);
         }
     }
 }
