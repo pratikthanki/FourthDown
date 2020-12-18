@@ -160,7 +160,7 @@ namespace FourthDown.Api.Schemas
         public string Id { get; set; }
         /// <example>78165</example>
         public string Attendance { get; set; }
-        /// <example>AT&T Stadium</example>
+        /// <example>AT+T Stadium</example>
         public string Stadium { get; set; }
         /// <example>20:20:00</example>
         public string StartTime { get; set; }
@@ -178,7 +178,7 @@ namespace FourthDown.Api.Schemas
         public string Id { get; set; }
         /// <example>78165</example>
         public string Attendance { get; set; }
-        /// <example>AT&T Stadium</example>
+        /// <example>AT+T Stadium</example>
         public string Stadium { get; set; }
         /// <example>20:20:00</example>
         public string StartTime { get; set; }
@@ -196,7 +196,7 @@ namespace FourthDown.Api.Schemas
         public string Id { get; set; }
         /// <example>78165</example>
         public string Attendance { get; set; }
-        /// <example>AT&T Stadium</example>
+        /// <example>AT+T Stadium</example>
         public string Stadium { get; set; }
         /// <example>20:20:00</example>
         public string StartTime { get; set; }
