@@ -84,7 +84,10 @@ namespace FourthDown.Api.Services
                     Team = queryParameter.Team
                 };
 
-                games = await _scheduleService.GetGames(scheduleParams, cancellationToken);
+                games = (await _scheduleService.GetGames(scheduleParams, cancellationToken)).ToList();
+                ;
+                var week = queryParameter.Week ?? GetLatestWeek(games);
+                games = games.Where(x => x.Week == week);
             }
             else
             {
@@ -128,6 +131,16 @@ namespace FourthDown.Api.Services
 
                 yield return new ApiGamePlay(pbp);
             }
+        }
+
+        private int GetLatestWeek(IEnumerable<Game> games)
+        {
+            var Today = DateTime.UtcNow;
+            var season = Today.Month > 8 ? Today.Year : Today.Year - 1;
+
+            return games
+                .Where(x => x.Season == season && x.Gameday < Today.Date)
+                .Max(x => x.Week);
         }
     }
 }

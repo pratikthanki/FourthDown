@@ -11,14 +11,12 @@ namespace FourthDown.Api.Services
 {
     public class ScheduleService : IScheduleService
     {
-        private readonly int _currentSeason;
         private readonly IGameRepository _gameRepository;
         private readonly DateTime Today = DateTime.UtcNow;
 
         public ScheduleService(IGameRepository gameRepository)
         {
             _gameRepository = gameRepository;
-            _currentSeason = CurrentSeason();
         }
 
         public async Task<IEnumerable<Game>> GetGamesById(
@@ -30,7 +28,7 @@ namespace FourthDown.Api.Services
             var games = new List<Game>();
             foreach (var season in gameIdsBySeason.Keys)
             {
-                games.AddRange(gamesBySeason[season].ToList().Where(x => gameIdsBySeason[season].Contains(x.GameId)));
+                games.AddRange(gamesBySeason[season].Where(x => gameIdsBySeason[season].Contains(x.GameId)));
             }
 
             return games;
@@ -42,35 +40,20 @@ namespace FourthDown.Api.Services
         {
             var gamesPerSeason = await GetAllGames(cancellationToken);
 
-            var currentWeek = GetCurrentWeek(gamesPerSeason[_currentSeason]);
-
+            var currentSeason = Today.Month > 8 ? Today.Year : Today.Year - 1;
+            var season = queryParameter.Season ?? currentSeason;
             var team = queryParameter.Team;
-            var season = queryParameter.Season ?? _currentSeason;
-            var week = queryParameter.Week ?? currentWeek;
+            var week = queryParameter.Week;
 
             var games = gamesPerSeason[season];
-            
-            games = games.Where(x => x.Week == week);
-
-            if (queryParameter.IsNull())
-                games = games.Where(x => x.Week == currentWeek);
 
             if (!string.IsNullOrWhiteSpace(team))
                 games = games.Where(x => x.HomeTeam == team || x.AwayTeam == team);
+            
+            if (week != null)
+                games = games.Where(x => x.Week == week);
 
             return games;
-        }
-
-        private int CurrentSeason()
-        {
-            return Today.Month > 8 ? Today.Year : Today.Year - 1;
-        }
-
-        private int GetCurrentWeek(IEnumerable<Game> games)
-        {
-            return games
-                .Where(x => x.Season == _currentSeason && x.Gameday < Today.Date)
-                .Max(x => x.Week);
         }
 
         private async Task<Dictionary<int, IEnumerable<Game>>> GetAllGames(CancellationToken cancellationToken)

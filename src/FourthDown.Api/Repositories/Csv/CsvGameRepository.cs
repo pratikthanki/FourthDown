@@ -13,11 +13,10 @@ namespace FourthDown.Api.Repositories.Csv
         {
             var response = await RequestHelper.GetRequestResponse(RepositoryEndpoints.GamesEndpoint, cancellationToken);
             var responseBody = await response.Content.ReadAsStringAsync();
-            
-            if (!response.IsSuccessStatusCode)
-                return new Dictionary<int, IEnumerable<Game>>();
 
-            return ProcessGamesResponse(responseBody);
+            return response.IsSuccessStatusCode
+                ? ProcessGamesResponse(responseBody)
+                : new Dictionary<int, IEnumerable<Game>>();
         }
 
         private static Dictionary<int, IEnumerable<Game>> ProcessGamesResponse(string responseBody)

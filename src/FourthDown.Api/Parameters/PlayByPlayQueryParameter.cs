@@ -19,16 +19,25 @@ namespace FourthDown.Api.Parameters
         /// - Super Bowl (21)
         /// ```
         /// </summary>
+        /// <remarks>
+        /// Defaults to the current week if not set.
+        /// </remarks>
         public int? Week { get; set; }
 
         /// <summary>
         /// Valid seasons from 1999 to the current season.
         /// </summary>
+        /// <remarks>
+        /// Defaults to the current season if not set.
+        /// </remarks>
         public int? Season { get; set; }
 
         /// <summary>
         /// Team abbreviation. See `/api/teams` for the `abr` attribute.
         /// </summary>
+        /// <remarks>
+        /// Returns data for all teams if not set.
+        /// </remarks>
         public string Team { get; set; }
 
         /// <summary>
