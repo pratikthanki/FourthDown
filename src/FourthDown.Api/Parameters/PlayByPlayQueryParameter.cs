@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using FourthDown.Api.Utilities;
@@ -6,8 +7,30 @@ namespace FourthDown.Api.Parameters
 {
     /// <summary>
     /// </summary>
-    public class PlayByPlayQueryParameter : QueryParameterBase
+    public class PlayByPlayQueryParameter
     {
+        /// <summary>
+        /// Week based on the football schedule:
+        /// ```
+        /// - REG (1-17)
+        /// - Wild Card (18)
+        /// - Divisional (19)
+        /// - Conference (20)
+        /// - Super Bowl (21)
+        /// ```
+        /// </summary>
+        public int? Week { get; set; }
+
+        /// <summary>
+        /// Valid seasons from 1999 to the current season.
+        /// </summary>
+        public int? Season { get; set; }
+
+        /// <summary>
+        /// Team abbreviation. See `/api/teams` for the `abr` attribute.
+        /// </summary>
+        public string Team { get; set; }
+
         /// <summary>
         /// Single or comma-separated list of GameId's.
         /// </summary>
@@ -31,26 +54,22 @@ namespace FourthDown.Api.Parameters
             return gameIdsBySeason;
         }
 
-        public Dictionary<string, string[]> ToKeyValues()
-        {
-            var keys = new Dictionary<string, string[]>
-            {
-                [nameof(PlayByPlayQueryParameter)] = new[]
-                {
-                    $"{nameof(Week)}: {Week.ToString()}, " +
-                    $"{nameof(Season)}: {Week.ToString()}, " +
-                    $"{nameof(Team)}: {Team}, " +
-                    $"{nameof(GameId)}: {GameId}"
-                }
-            };
-
-            return keys;
-        }
-
-#pragma warning disable 1591
         public Dictionary<string, string[]> Validate()
         {
-            var errors = base.ValidateBase();
+            var errors = new Dictionary<string, string[]>();
+
+            var Today = DateTime.UtcNow;
+            var currentSeason = Today.Month > 8 ? Today.Year : Today.Year - 1;
+
+            if (Season > currentSeason || Season < 1999)
+                errors["season"] = new[] {$"Season must be between 1999 and {currentSeason}"};
+
+            if (Week < 1 || Week > 21)
+                errors["week"] = new[]
+                    {"Week must be between 1-17 (REG), Divisional (19), Conference (20) and Super Bowl (21)"};
+
+            if (Team.Length < 2)
+                errors["team"] = new[] {"Invalid team abbreviation given"};
 
             if (GameId == null)
             {
@@ -65,6 +84,10 @@ namespace FourthDown.Api.Parameters
 
             return errors;
         }
-#pragma warning restore 1591
+
+        private bool NonGameIdParameterSet()
+        {
+            return Week != null || Season != null || string.IsNullOrWhiteSpace(Team);
+        }
     }
 }
