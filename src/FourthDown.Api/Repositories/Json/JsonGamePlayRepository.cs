@@ -38,7 +38,7 @@ namespace FourthDown.Api.Repositories.Json
             return await GetGameJson(url, cancellationToken, scope);
         }
 
-        private string GetGameUrl(string gameId, int season)
+        public static string GetGameUrl(string gameId, int season)
         {
             return $"{RepositoryEndpoints.GamePlayEndpoint}/{season}/{gameId}.json.gz?raw=true";
         }
