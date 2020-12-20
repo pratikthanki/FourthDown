@@ -6,6 +6,8 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using FourthDown.Api.Extensions;
+using OpenTracing;
 
 namespace FourthDown.Api.Authentication
 {
@@ -18,14 +20,18 @@ namespace FourthDown.Api.Authentication
     public class SlackClient : ISlackClient
     {
         private readonly HttpClient _client;
+        private readonly ITracer _tracer;
 
-        public SlackClient(HttpClient client)
+        public SlackClient(HttpClient client, ITracer tracer)
         {
             _client = client;
+            _tracer = tracer;
         }
 
         public async Task<bool> PostMessage(ApiKey apiKey)
         {
+            using var scope = _tracer.BuildTrace(nameof(PostMessage));
+            
             const string _uri = @"/services/T01GR4LAZKQ/B01H6NFQQDR/TVaCALXy2ZstHBEg0L7JheSy";
 
             var text = $"```\n{{\n{apiKey}\n}}\n```";
@@ -34,13 +40,19 @@ namespace FourthDown.Api.Authentication
             var contentObjectJson = JsonSerializer.Serialize(contentObject);
             var content = new StringContent(contentObjectJson, Encoding.UTF8, "application/json");
 
+            scope.LogStart(nameof(PostMessage));
+
             var result = await _client.PostAsync(_uri, content);
+
+            scope.LogEnd(nameof(PostMessage));
 
             return result.IsSuccessStatusCode;
         }
 
         public async Task<IEnumerable<ApiKey>> ReadMessages()
         {
+            using var scope = _tracer.BuildTrace(nameof(ReadMessages));
+
             const string botId = "B01H6NFQQDR";
             const string token = @"xoxb-1569156373670-1584021493538-IARGJ8wZvTESg37YoGYrVD2i";
             const string url = "https://slack.com/api/conversations.history?channel=C01H9GC8EEQ";
@@ -54,10 +66,10 @@ namespace FourthDown.Api.Authentication
 
             _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
+            scope.LogStart(nameof(ReadMessages));
+
             var response = await _client.GetAsync(url);
             var responseStream = await response.Content.ReadAsStreamAsync();
-
-            var responseString = await response.Content.ReadAsStringAsync();
 
             var messages = await JsonSerializer.DeserializeAsync<Channel>(responseStream);
 
@@ -65,6 +77,8 @@ namespace FourthDown.Api.Authentication
                 .Where(x => x.BotId == botId)
                 .Select(x => JsonSerializer.Deserialize<ApiKey>(RemoveCharacters(x.Text)))
                 .ToList();
+            
+            scope.LogEnd(nameof(ReadMessages));
 
             return apiKeys;
         }

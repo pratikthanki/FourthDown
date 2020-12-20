@@ -6,6 +6,7 @@ services:
     container_name: api
     environment:
       JAEGER_AGENT_HOST: jaeger
+      USESAMPLEAUTH: "false"
     ports:
     - 5000:5000
     networks: 

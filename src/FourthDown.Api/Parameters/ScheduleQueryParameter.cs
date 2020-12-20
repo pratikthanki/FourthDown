@@ -4,35 +4,13 @@ using System.Collections.Generic;
 namespace FourthDown.Api.Parameters
 {
     /// <summary>
-    /// A combination of Season and Team can be provided.
-    /// Default to the current season if not provided. Return all teams if not provided.
-    /// Use the `/api/teams` endpoint for team abbreviations.
+    /// A combination of `Season`, `Week` or `Team` can be provided.
+    /// Default to the current season if not provided and current week if not provided.
+    /// Returns all teams if not provided.
     /// </summary>
-    public class ScheduleQueryParameter
+    public class ScheduleQueryParameter : QueryParameterBase
     {
-        /// <summary>
-        /// Week based on the football schedule:
-        /// ```
-        /// - REG (1-17)
-        /// - Wild Card (18)
-        /// - Divisional (19)
-        /// - Conference (20)
-        /// - Super Bowl (21)
-        /// ```
-        /// </summary>
-        public int? Week { get; set; }
-
-        /// <summary>
-        /// Valid seasons from 1999 to the current season.
-        /// </summary>
-        public int? Season { get; set; }
-
-        /// <summary>
-        /// Team abbreviation. See `/api/teams` for the `abr` attribute.
-        /// </summary>
-        public string Team { get; set; }
-
-        public Dictionary<string, string[]> ValidateBase()
+        public Dictionary<string, string[]> Validate()
         {
             var errors = new Dictionary<string, string[]>();
 

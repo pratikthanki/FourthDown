@@ -3,6 +3,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using FourthDown.Api.Extensions;
 using FourthDown.Api.Models;
 using FourthDown.Api.Parameters;
 using FourthDown.Api.Utilities;
@@ -23,6 +24,10 @@ namespace FourthDown.Api.Repositories.Csv
             PlayByPlayQueryParameter queryParameter,
             CancellationToken cancellationToken)
         {
+            using var scope = _tracer.BuildTrace(nameof(GetPlayByPlaysAsync));
+            
+            scope.LogStart(nameof(GetPlayByPlaysAsync));
+            
             var season = queryParameter.Season;
 
             var path = $"{RepositoryEndpoints.PlayByPlayEndpoint}/play_by_play_{season}.csv.gz?raw=true";
@@ -33,26 +38,40 @@ namespace FourthDown.Api.Repositories.Csv
             if (!response.IsSuccessStatusCode)
                 return Enumerable.Empty<PlayByPlay>();
 
-            var data = await ResponseHelper.ReadCompressedStreamToString(stream);
+            var responseString = await ResponseHelper.ReadCompressedStreamToString(stream);
 
             var team = queryParameter.Team;
             var week = queryParameter.Week;
             var results = new List<PlayByPlay>();
 
-            foreach (var play in ProcessPlayByPlayResponse(data))
+            scope.LogStart(nameof(ProcessPlayByPlayResponse));
+
+            foreach (var play in ProcessPlayByPlayResponse(responseString))
             {
-                if (!string.IsNullOrWhiteSpace(team))
+                if (string.IsNullOrWhiteSpace(team))
+                {
+                    results.Add(play);
+                }
+                else
                 {
                     if (play.AwayTeam == team || play.HomeTeam == team)
                         results.Add(play);
                 }
-
-                if (week == null) continue;
-
-                if (play.Week == week)
-                    results.Add(play);
             }
 
+            scope.LogEnd(nameof(ProcessPlayByPlayResponse));
+            
+            if (week != null)
+            {
+                results = results
+                    .GroupBy(x => x.Week)
+                    .ToDictionary(x => x.Key, x => x.ToList())[(int) week];
+            }
+
+            scope.LogEnd(nameof(GetPlayByPlaysAsync));
+
+            scope.Span.SetTag("Total rows", results.Count);
+            
             return results;
         }
 

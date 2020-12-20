@@ -19,21 +19,6 @@ namespace FourthDown.Api.Services
             _gameRepository = gameRepository;
         }
 
-        public async Task<IEnumerable<Game>> GetGamesById(
-            Dictionary<int, List<string>> gameIdsBySeason,
-            CancellationToken cancellationToken)
-        {
-            var gamesBySeason = await GetAllGames(cancellationToken);
-
-            var games = new List<Game>();
-            foreach (var season in gameIdsBySeason.Keys)
-            {
-                games.AddRange(gamesBySeason[season].Where(x => gameIdsBySeason[season].Contains(x.GameId)));
-            }
-
-            return games;
-        }
-
         public async Task<IEnumerable<Game>> GetGames(
             ScheduleQueryParameter queryParameter,
             CancellationToken cancellationToken)
@@ -42,21 +27,19 @@ namespace FourthDown.Api.Services
 
             var currentSeason = Today.Month > 8 ? Today.Year : Today.Year - 1;
             var season = queryParameter.Season ?? currentSeason;
-            var team = queryParameter.Team;
-            var week = queryParameter.Week;
 
             var games = gamesPerSeason[season];
 
-            if (!string.IsNullOrWhiteSpace(team))
-                games = games.Where(x => x.HomeTeam == team || x.AwayTeam == team);
-            
-            if (week != null)
-                games = games.Where(x => x.Week == week);
+            if (!string.IsNullOrWhiteSpace(queryParameter.Team))
+                games = games.Where(x => x.HomeTeam == queryParameter.Team || x.AwayTeam == queryParameter.Team);
+
+            if (queryParameter.Week != null)
+                games = games.Where(x => x.Week == queryParameter.Week);
 
             return games;
         }
 
-        private async Task<Dictionary<int, IEnumerable<Game>>> GetAllGames(CancellationToken cancellationToken)
+        public async Task<Dictionary<int, IEnumerable<Game>>> GetAllGames(CancellationToken cancellationToken)
         {
             return await _gameRepository.GetGamesAsync(cancellationToken);
         }

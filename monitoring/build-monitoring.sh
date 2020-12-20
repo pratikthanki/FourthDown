@@ -4,7 +4,7 @@ set -e
 trap cleanup ERR TERM INT
 
 echo "Building Api docker image"
-docker build src/FourthDown.Api/ -t api
+docker build . -t api
 
 echo "Creating monitoring docker network if needed"
 docker network inspect monitoring >/dev/null 2>&1 || \

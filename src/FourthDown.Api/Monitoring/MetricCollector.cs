@@ -2,9 +2,9 @@ using Microsoft.AspNetCore.Http;
 
 namespace FourthDown.Api.Monitoring
 {
-    public class MetricCollector
+    public static class MetricCollector
     {
-        public static void RegisterMetrics(HttpContext httpContext, HttpRequest request, int data)
+        public static void RegisterMetrics(HttpContext httpContext, HttpRequest request)
         {
             PrometheusMetrics.PathCounter
                 .WithLabels(request.Method, httpContext.GetEndpoint().DisplayName)
@@ -14,10 +14,6 @@ namespace FourthDown.Api.Monitoring
                 PrometheusMetrics.RequestSize
                     .WithLabels(request.Method, httpContext.GetEndpoint().DisplayName)
                     .Observe((double) request.ContentLength);
-
-            PrometheusMetrics.RecordsReturned
-                .WithLabels(request.Method, httpContext.GetEndpoint().DisplayName)
-                .Observe(data);
         }
     }
 }

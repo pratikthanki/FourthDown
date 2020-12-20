@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using FourthDown.Api.Parameters;
 using NUnit.Framework;
 
@@ -7,39 +6,6 @@ namespace FourthDown.Api.Tests
     [TestFixture]
     public class PlayByPlayQueryParameterTests
     {
-        [Test]
-        public void GetGameIdsBySeason_SplitIdsBySeason()
-        {
-            var parameters = new PlayByPlayQueryParameter()
-            {
-                GameId = "2020_01_ABC_XYZ,2020_02_DEF_XYZ"
-            };
-
-            var expected = new Dictionary<int, List<string>>()
-            {
-                {2020, new List<string>() {"2020_01_ABC_XYZ", "2020_02_DEF_XYZ"}}
-            };
-
-            Assert.AreEqual(expected, parameters.GetGameIdsBySeason());
-        }
-
-        [Test]
-        public void GetGameIdsBySeason_GameIdsOverMultipleSeasons()
-        {
-            var parameters = new PlayByPlayQueryParameter()
-            {
-                GameId = "2019_01_ABC_XYZ,2020_02_DEF_XYZ"
-            };
-
-            var expected = new Dictionary<int, List<string>>()
-            {
-                {2019, new List<string>() {"2019_01_ABC_XYZ"}},
-                {2020, new List<string>() {"2020_02_DEF_XYZ"}}
-            };
-
-            Assert.AreEqual(expected, parameters.GetGameIdsBySeason());
-        }
-
         [Test]
         public void GetGameIdsBySeason_InvalidRequestWhenAllFieldsProvided()
         {

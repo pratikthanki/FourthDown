@@ -32,7 +32,9 @@ namespace FourthDown.Api.Services
             PlayByPlayQueryParameter queryParameter,
             [EnumeratorCancellation] CancellationToken cancellationToken)
         {
-            _tracer.CreateChildTrace(nameof(GetGamePlaysAsync));
+            using var scope = _tracer.BuildTrace(nameof(GetGamePlaysAsync));
+
+            scope.LogStart(nameof(GetGamePlaysAsync));
 
             await foreach (var game in QueryForGameStats(queryParameter, cancellationToken))
             {
@@ -40,13 +42,17 @@ namespace FourthDown.Api.Services
 
                 yield return game.ToGamePlays();
             }
+
+            scope.LogEnd(nameof(GetGamePlaysAsync));
         }
 
         public async IAsyncEnumerable<GameDrives> GetGameDrivesAsync(
             PlayByPlayQueryParameter queryParameter,
             [EnumeratorCancellation] CancellationToken cancellationToken)
         {
-            _tracer.CreateChildTrace(nameof(GetGameDrivesAsync));
+            using var scope = _tracer.BuildTrace(nameof(GetGameDrivesAsync));
+
+            scope.LogStart(nameof(GetGameDrivesAsync));
 
             await foreach (var game in QueryForGameStats(queryParameter, cancellationToken))
             {
@@ -54,55 +60,37 @@ namespace FourthDown.Api.Services
 
                 yield return game.ToGameDrives();
             }
+
+            scope.LogEnd(nameof(GetGameDrivesAsync));
         }
 
         public async IAsyncEnumerable<GameScoringSummaries> GetGameScoringSummariesAsync(
             PlayByPlayQueryParameter queryParameter,
             [EnumeratorCancellation] CancellationToken cancellationToken)
         {
-            _tracer.CreateChildTrace(nameof(GetGameScoringSummariesAsync));
+            using var scope = _tracer.BuildTrace(nameof(GetGameScoringSummariesAsync));
+
+            scope.LogStart(nameof(GetGameScoringSummariesAsync));
 
             await foreach (var game in QueryForGameStats(queryParameter, cancellationToken))
             {
                 if (game == null) continue;
 
+                scope.Span.SetTag("Total rows", 1);
+
                 yield return game.ToGameScoringSummaries();
             }
-        }
 
-        private async Task<IList<Game>> GetGamesFromQueryOptions(
-            PlayByPlayQueryParameter queryParameter,
-            CancellationToken cancellationToken)
-        {
-            IEnumerable<Game> games;
-            if (string.IsNullOrWhiteSpace(queryParameter.GameId))
-            {
-                var scheduleParams = new ScheduleQueryParameter
-                {
-                    Week = queryParameter.Week,
-                    Season = queryParameter.Season,
-                    Team = queryParameter.Team
-                };
-
-                games = (await _scheduleService.GetGames(scheduleParams, cancellationToken)).ToList();
-                ;
-                var week = queryParameter.Week ?? GetLatestWeek(games);
-                games = games.Where(x => x.Week == week);
-            }
-            else
-            {
-                var gameIdsBySeason = queryParameter.GetGameIdsBySeason();
-                games = await _scheduleService.GetGamesById(gameIdsBySeason, cancellationToken);
-            }
-
-            return games.ToList();
+            scope.LogEnd(nameof(GetGameScoringSummariesAsync));
         }
 
         private async IAsyncEnumerable<ApiGamePlay> QueryForGameStats(
             PlayByPlayQueryParameter queryParameter,
             [EnumeratorCancellation] CancellationToken cancellationToken)
         {
-            _tracer.CreateChildTrace(nameof(QueryForGameStats));
+            var scope = _tracer.BuildTrace(nameof(QueryForGameStats));
+
+            scope.LogStart(nameof(QueryForGameStats));
 
             var games = await GetGamesFromQueryOptions(queryParameter, cancellationToken);
 
@@ -131,9 +119,27 @@ namespace FourthDown.Api.Services
 
                 yield return new ApiGamePlay(pbp);
             }
+
+            scope.LogEnd(nameof(QueryForGameStats));
         }
 
-        private int GetLatestWeek(IEnumerable<Game> games)
+        private async Task<IList<Game>> GetGamesFromQueryOptions(
+            PlayByPlayQueryParameter queryParameter,
+            CancellationToken cancellationToken)
+        {
+            var scheduleParams = queryParameter.ToScheduleQueryParameters();
+
+            if (string.IsNullOrWhiteSpace(queryParameter.GameId))
+                return (await _scheduleService.GetGames(scheduleParams, cancellationToken)).ToList();
+
+            var allGames = await _scheduleService.GetGames(scheduleParams, cancellationToken);
+
+            allGames.ToDictionary(x => x.GameId, x => x).TryGetValue(queryParameter.GameId, out var game);
+
+            return new List<Game>() {game};
+        }
+
+        private int GetCurrentWeek(IEnumerable<Game> games)
         {
             var Today = DateTime.UtcNow;
             var season = Today.Month > 8 ? Today.Year : Today.Year - 1;
