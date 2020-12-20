@@ -27,11 +27,15 @@ namespace FourthDown.Api.Repositories.Json
             int season,
             CancellationToken cancellationToken)
         {
-            _tracer.CreateChildTrace(nameof(GetGamePlaysAsync));
+            using var scope = _tracer.BuildTrace(nameof(GetGamePlaysAsync));
+
+            scope.LogStart(nameof(GetGamePlaysAsync));
 
             var url = GetGameUrl(gameId, season);
 
-            return await GetGameJson(url, cancellationToken);
+            scope.LogEnd(nameof(GetGamePlaysAsync));
+
+            return await GetGameJson(url, cancellationToken, scope);
         }
 
         private string GetGameUrl(string gameId, int season)
@@ -39,9 +43,9 @@ namespace FourthDown.Api.Repositories.Json
             return $"{RepositoryEndpoints.GamePlayEndpoint}/{season}/{gameId}.json.gz?raw=true";
         }
 
-        private static async Task<GameDetail> GetGameJson(string url, CancellationToken cancellationToken)
+        private static async Task<GameDetail> GetGameJson(string url, CancellationToken cancellationToken, IScope scope)
         {
-            _tracer.CreateChildTrace(nameof(GetGameJson));
+            scope.LogStart(nameof(GetGameJson));
 
             var response = await RequestHelper.GetRequestResponse(url, cancellationToken);
             var stream = await response.Content.ReadAsStreamAsync();
@@ -50,6 +54,8 @@ namespace FourthDown.Api.Repositories.Json
                 return new GameDetail();
 
             var data = await ResponseHelper.ReadCompressedStreamToString(stream);
+
+            scope.LogEnd(nameof(GetGameJson));
 
             return ParseResponseString(url, data);
         }

@@ -23,7 +23,7 @@ namespace FourthDown.Api.Controllers
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ValidationProblemDetailsResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ValidationProblemDetailsResponse), StatusCodes.Status404NotFound)]
-    [ResponseCache(Duration = 600, Location = ResponseCacheLocation.Any, VaryByQueryKeys = new [] {"impactlevel", "pii"})]
+    [ResponseCache(Duration = 600, Location = ResponseCacheLocation.Any, VaryByQueryKeys = new[] {"impactlevel", "pii"})]
     [ApiController]
     public class NflfastrController : ControllerBase
     {
@@ -50,27 +50,27 @@ namespace FourthDown.Api.Controllers
         /// <param name="cancellationToken"></param>
         /// <returns>List of game play by plays</returns>
         [HttpGet("")]
-        [ProducesResponseType(typeof(PlayByPlayResponse[]),StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(PlayByPlayResponse[]), StatusCodes.Status200OK)]
         public async Task<ActionResult<IEnumerable<PlayByPlay>>> GetPlayByPlays(
             [FromQuery] PlayByPlayQueryParameter queryParameter,
             CancellationToken cancellationToken)
         {
             using var scope = _tracer.InitializeTrace(HttpContext, nameof(GetPlayByPlays));
-
-            scope.LogStart(nameof(_playByPlayRepository.GetPlayByPlaysAsync));
-
-            var plays = await _playByPlayRepository.GetPlayByPlaysAsync(queryParameter, cancellationToken);
-
-            scope.LogEnd(nameof(_playByPlayRepository.GetPlayByPlaysAsync));
-
-            if (plays == null || !plays.Any())
-                return NotFound(new ValidationProblemDetails
+            
+            var errors = queryParameter.Validate();
+            if (errors.Count > 0)
+                return BadRequest(new ValidationProblemDetails(errors)
                 {
-                    Title = $"No play by play data for the season {queryParameter.Season} found.",
-                    Status = StatusCodes.Status404NotFound
+                    Title = "There are errors with your request.",
+                    Status = StatusCodes.Status400BadRequest
                 });
 
-            MetricCollector.RegisterMetrics(HttpContext, Request, plays.Count());
+            var plays = (await _playByPlayRepository.GetPlayByPlaysAsync(queryParameter, cancellationToken)).ToList();
+
+            MetricCollector.RegisterMetrics(HttpContext, Request);
+            PrometheusMetrics.RecordsReturned
+                .WithLabels(Request.Method, HttpContext.GetEndpoint().DisplayName)
+                .Observe(plays.Count());
 
             return Ok(plays);
         }

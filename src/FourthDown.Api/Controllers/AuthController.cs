@@ -1,30 +1,27 @@
 using System.Threading.Tasks;
 using FourthDown.Api.Authentication;
+using FourthDown.Api.Extensions;
 using FourthDown.Api.Monitoring;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using OpenTracing;
 
 namespace FourthDown.Api.Controllers
 {
     [Route("api/auth")]
-    [ApiVersion( "1.0" )]
+    [ApiVersion("1.0")]
     [Authorize]
     [ApiController]
     public class AuthController : ControllerBase
     {
         private readonly IAuthClient _authClient;
-        private readonly ILogger<AuthController> _logger;
         private readonly ITracer _tracer;
 
         public AuthController(
             IAuthClient authClient,
-            ILogger<AuthController> logger,
             ITracer tracer)
         {
-            _logger = logger;
             _tracer = tracer;
             _authClient = authClient;
         }
@@ -41,8 +38,8 @@ namespace FourthDown.Api.Controllers
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<ApiKey>> CreateApiKey([FromQuery] string name)
         {
-            using var scope = _tracer.BuildSpan(nameof(CreateApiKey)).StartActive();
-            
+            using var scope = _tracer.InitializeTrace(HttpContext, nameof(CreateApiKey));
+
             PrometheusMetrics.PathCounter.WithLabels(Request.Method, Request.Path).Inc();
 
             var createdKey = await _authClient.CreateApiKey(name);

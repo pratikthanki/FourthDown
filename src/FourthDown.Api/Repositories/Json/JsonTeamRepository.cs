@@ -29,8 +29,7 @@ namespace FourthDown.Api.Repositories.Json
             return await ReadTeamsJson(cancellationToken, scope);
         }
 
-        private async Task<IEnumerable<Team>> ReadTeamsJson(
-            CancellationToken cancellationToken, IScope scope)
+        private async Task<IEnumerable<Team>> ReadTeamsJson(CancellationToken cancellationToken, IScope scope)
         {
             scope.LogStart(nameof(ReadTeamsJson));
 

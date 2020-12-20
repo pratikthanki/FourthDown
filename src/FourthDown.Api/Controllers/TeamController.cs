@@ -50,7 +50,10 @@ namespace FourthDown.Api.Controllers
 
             scope.LogEnd(nameof(_teamRepository.GetTeamsAsync));
 
-            MetricCollector.RegisterMetrics(HttpContext, Request, teams.Count());
+            MetricCollector.RegisterMetrics(HttpContext, Request);
+            PrometheusMetrics.RecordsReturned
+                .WithLabels(Request.Method, HttpContext.GetEndpoint().DisplayName)
+                .Observe(teams.Count());
 
             return Ok(teams);
         }

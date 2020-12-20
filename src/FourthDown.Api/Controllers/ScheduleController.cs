@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -56,14 +55,14 @@ namespace FourthDown.Api.Controllers
         {
             using var scope = _tracer.InitializeTrace(HttpContext, nameof(GetSchedule));
 
-            var errors = queryParameter.ValidateBase();
+            var errors = queryParameter.Validate();
             if (errors.Count > 0)
                 return BadRequest(new ValidationProblemDetails(errors)
                 {
                     Title = "There are errors with your request.",
                     Status = StatusCodes.Status400BadRequest
                 });
-            
+
             scope.LogStart(nameof(_scheduleService.GetGames));
 
             var games = await _scheduleService.GetGames(queryParameter, cancellationToken);
@@ -71,8 +70,11 @@ namespace FourthDown.Api.Controllers
             scope.LogEnd(nameof(_scheduleService.GetGames));
 
             _logger.LogInformation("Successful Games request");
-            
-            MetricCollector.RegisterMetrics(HttpContext, Request, games.Count());
+
+            MetricCollector.RegisterMetrics(HttpContext, Request);
+            PrometheusMetrics.RecordsReturned
+                .WithLabels(Request.Method, HttpContext.GetEndpoint().DisplayName)
+                .Observe(games.ToList().Count);
 
             return Ok(games);
         }
