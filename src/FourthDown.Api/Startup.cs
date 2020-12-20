@@ -99,9 +99,9 @@ namespace FourthDown.Api
                     c.SwaggerDoc("v1", new OpenApiInfo
                     {
                         Version = "v1",
-                        Title = "Fourth Down API",
+                        Title = "FourthDown API",
                         Description =
-                            "The Fourth Down API is organised around the HTTP [REST](https://en.wikipedia.org/wiki/Representational_state_transfer) protocol. " +
+                            "The FourthDown API is organised around the HTTP [REST](https://en.wikipedia.org/wiki/Representational_state_transfer) protocol. " +
                             "Our API has predictable resource-oriented URLs and will returns [JSON-encoded](http://www.json.org/) responses, " +
                             "and uses standard HTTP response codes, authentication, and verbs.\n" +
                             "The API can be used to get NFL schedule and team details, as well as the more sophisticated and " +

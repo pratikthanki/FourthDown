@@ -22,7 +22,6 @@ namespace FourthDown.Api.Controllers
     [Produces("application/json")]
     [ProducesResponseType(typeof(ScheduleResponse[]), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ValidationProblemDetailsResponse), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(ValidationProblemDetailsResponse), StatusCodes.Status404NotFound)]
     [ApiController]
     public class ScheduleController : ControllerBase
     {

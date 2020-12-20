@@ -20,7 +20,6 @@ namespace FourthDown.Api.Controllers
     [Produces("application/json")]
     [ProducesResponseType(typeof(TeamResponse[]), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ValidationProblemDetailsResponse),StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(ValidationProblemDetailsResponse), StatusCodes.Status404NotFound)]
     [ApiController]
     public class TeamController : ControllerBase
     {

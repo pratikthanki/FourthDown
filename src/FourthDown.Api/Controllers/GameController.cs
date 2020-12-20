@@ -1,6 +1,6 @@
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using System.Threading;
+using System.Threading.Tasks;
 using FourthDown.Api.Extensions;
 using FourthDown.Api.Models;
 using FourthDown.Api.Monitoring;
@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using OpenTracing;
+#pragma warning disable 1998
 
 namespace FourthDown.Api.Controllers
 {
@@ -20,7 +21,6 @@ namespace FourthDown.Api.Controllers
     [ApiController]
     [Produces("application/json")]
     [ProducesResponseType(typeof(ValidationProblemDetailsResponse), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(ValidationProblemDetailsResponse), StatusCodes.Status404NotFound)]
     public class GameController : ControllerBase
     {
         private readonly ITracer _tracer;
@@ -40,25 +40,21 @@ namespace FourthDown.Api.Controllers
         /// <param name="cancellationToken"></param>
         /// <returns>List of game play by plays</returns>
         [HttpGet("plays")]
-        [ProducesResponseType(typeof(GamePlays[]),StatusCodes.Status200OK)]
-        public async IAsyncEnumerable<GamePlays> GetPlays(
+        [ProducesResponseType(typeof(GamePlays[]), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetPlays(
             [FromQuery] PlayByPlayQueryParameter queryParameter,
-            [EnumeratorCancellation] CancellationToken cancellationToken)
+            CancellationToken cancellationToken)
         {
             using var scope = _tracer.InitializeTrace(HttpContext, nameof(GetPlays));
+            MetricCollector.RegisterMetrics(HttpContext, Request);
 
-            scope.LogStart(nameof(_pbpService.GetGamePlaysAsync));
+            var errors = queryParameter.Validate();
+            if (errors.Count > 0)
+                return BadRequestErrorValidation(errors);
 
-            int count = 0;
-            await foreach (var play in _pbpService.GetGamePlaysAsync(queryParameter, cancellationToken))
-            {
-                ++count;
-                yield return play;
-            }
+            var plays = _pbpService.GetGamePlaysAsync(queryParameter, cancellationToken);
 
-            scope.LogEnd(nameof(_pbpService.GetGamePlaysAsync));
-
-            MetricCollector.RegisterMetrics(HttpContext, Request, count);
+            return Ok(plays);
         }
 
         /// <summary>
@@ -69,41 +65,21 @@ namespace FourthDown.Api.Controllers
         /// <param name="cancellationToken"></param>
         /// <returns>List of game drives</returns>
         [HttpGet("drives")]
-        [ProducesResponseType(typeof(GameDrives[]),StatusCodes.Status200OK)]
-        public async IAsyncEnumerable<GameDrives> GetDrives(
+        [ProducesResponseType(typeof(GameDrives[]), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetDrives(
             [FromQuery] PlayByPlayQueryParameter queryParameter,
-            [EnumeratorCancellation] CancellationToken cancellationToken)
+            CancellationToken cancellationToken)
         {
-            // var errors = queryParameter.Validate();
-            // if (errors.Count > 0)
-            //     return BadRequest(new ValidationProblemDetails(errors)
-            //     {
-            //         Title = "There are errors with your request.",
-            //         Status = StatusCodes.Status400BadRequest
-            //     });
+            using var scope = _tracer.InitializeTrace(HttpContext, nameof(GetDrives));
+            MetricCollector.RegisterMetrics(HttpContext, Request);
 
-            using var scope = _tracer.InitializeTrace(HttpContext, nameof(GetPlays));
+            var errors = queryParameter.Validate();
+            if (errors.Count > 0)
+                return BadRequestErrorValidation(errors);
 
-            scope.LogStart(nameof(_pbpService.GetGameDrivesAsync));
+            var plays = _pbpService.GetGameDrivesAsync(queryParameter, cancellationToken);
 
-            int count = 0;
-            await foreach (var play in _pbpService.GetGameDrivesAsync(queryParameter, cancellationToken))
-            {
-                ++count;
-                yield return play;
-            }
-
-            scope.LogEnd(nameof(_pbpService.GetGameDrivesAsync));
-
-            MetricCollector.RegisterMetrics(HttpContext, Request, count);
-
-            // if (plays == null || !plays.Any())
-            //     return NotFound(new ValidationProblemDetails(queryParameter.ToKeyValues())
-            //     {
-            //         Title = "No data for the request parameters given.",
-            //         Status = StatusCodes.Status404NotFound
-            //     });
-
+            return Ok(plays);
         }
 
         /// <summary>
@@ -114,25 +90,30 @@ namespace FourthDown.Api.Controllers
         /// <param name="cancellationToken"></param>
         /// <returns>List of game scoring summaries</returns>
         [HttpGet("scoringsummaries")]
-        [ProducesResponseType(typeof(GameScoringSummaries[]),StatusCodes.Status200OK)]
-        public async IAsyncEnumerable<GameScoringSummaries> GetScoringSummaries(
+        [ProducesResponseType(typeof(GameScoringSummaries[]), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetScoringSummaries(
             [FromQuery] PlayByPlayQueryParameter queryParameter,
-            [EnumeratorCancellation] CancellationToken cancellationToken)
+            CancellationToken cancellationToken)
         {
             using var scope = _tracer.InitializeTrace(HttpContext, nameof(GetPlays));
+            MetricCollector.RegisterMetrics(HttpContext, Request);
 
-            scope.LogStart(nameof(_pbpService.GetGameScoringSummariesAsync));
+            var errors = queryParameter.Validate();
+            if (errors.Count > 0)
+                return BadRequestErrorValidation(errors);
 
-            int count = 0;
-            await foreach (var play in _pbpService.GetGameScoringSummariesAsync(queryParameter, cancellationToken))
+            var plays = _pbpService.GetGameScoringSummariesAsync(queryParameter, cancellationToken);
+
+            return Ok(plays);
+        }
+
+        private BadRequestObjectResult BadRequestErrorValidation(IDictionary<string, string[]> errors)
+        {
+            return BadRequest(new ValidationProblemDetails(errors)
             {
-                ++count;
-                yield return play;
-            }
-
-            scope.LogEnd(nameof(_pbpService.GetGameScoringSummariesAsync));
-
-            MetricCollector.RegisterMetrics(HttpContext, Request, count);
+                Title = "There are errors with your request.",
+                Status = StatusCodes.Status400BadRequest
+            });
         }
     }
 }
