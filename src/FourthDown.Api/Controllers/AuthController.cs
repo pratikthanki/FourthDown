@@ -1,9 +1,7 @@
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using FourthDown.Api.Authentication;
 using FourthDown.Api.Extensions;
-using FourthDown.Api.Models;
 using FourthDown.Api.Monitoring;
 using FourthDown.Api.Parameters;
 using Microsoft.AspNetCore.Authorization;
@@ -34,6 +32,7 @@ namespace FourthDown.Api.Controllers
         /// Create an API Key with time-based expiry.
         /// </summary>
         /// <param queryParameter="queryParameter">Name/alias for the created API Key</param>
+        /// <param name="queryParameter">Name parameter to alias created apiKey</param>
         /// <returns>List of game play by plays</returns>
         [HttpPost]
         [AllowAnonymous]

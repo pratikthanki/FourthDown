@@ -25,20 +25,15 @@ namespace FourthDown.Api.Repositories.Json
         public async Task<IEnumerable<Team>> GetTeamsAsync(CancellationToken cancellationToken)
         {
             using var scope = _tracer.BuildSpan(nameof(GetTeamsAsync)).StartActive(true);
-            
-            return await ReadTeamsJson(cancellationToken, scope);
-        }
 
-        private async Task<IEnumerable<Team>> ReadTeamsJson(CancellationToken cancellationToken, IScope scope)
-        {
-            scope.LogStart(nameof(ReadTeamsJson));
+            scope.LogStart(nameof(GetTeamsAsync));
 
             const string file = "teams.json";
             var filePath = Path.Join(_webHostEnvironment.WebRootPath, "data", file);
 
             await using var SourceStream = File.Open(filePath, FileMode.Open);
 
-            scope.LogEnd(nameof(ReadTeamsJson));
+            scope.LogEnd(nameof(GetTeamsAsync));
 
             return await JsonSerializer.DeserializeAsync<IEnumerable<Team>>(
                 SourceStream,
