@@ -64,7 +64,7 @@ namespace FourthDown.Api.Controllers
                     Status = StatusCodes.Status400BadRequest
                 });
 
-            var plays = (await _playByPlayRepository.GetPlayByPlaysAsync(queryParameter, cancellationToken)).ToList();
+            var plays = await _playByPlayRepository.GetPlayByPlaysAsync(queryParameter, cancellationToken);
 
             MetricCollector.RegisterMetrics(HttpContext, Request);
             PrometheusMetrics.RecordsReturned

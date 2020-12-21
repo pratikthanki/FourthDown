@@ -1,7 +1,11 @@
+using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using FourthDown.Api.Authentication;
 using FourthDown.Api.Extensions;
+using FourthDown.Api.Models;
 using FourthDown.Api.Monitoring;
+using FourthDown.Api.Parameters;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -29,20 +33,24 @@ namespace FourthDown.Api.Controllers
         /// <summary>
         /// Create an API Key with time-based expiry.
         /// </summary>
-        /// <param name="name">Name/alias for the created API Key</param>
+        /// <param queryParameter="queryParameter">Name/alias for the created API Key</param>
         /// <returns>List of game play by plays</returns>
         [HttpPost]
         [AllowAnonymous]
         [Produces("application/json")]
         [ProducesResponseType(typeof(ApiKey), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<ApiKey>> CreateApiKey([FromQuery] string name)
+        public async Task<ActionResult<ApiKey>> CreateApiKey([FromQuery] ApiKeyQueryParameter queryParameter)
         {
             using var scope = _tracer.InitializeTrace(HttpContext, nameof(CreateApiKey));
 
             PrometheusMetrics.PathCounter.WithLabels(Request.Method, Request.Path).Inc();
 
-            var createdKey = await _authClient.CreateApiKey(name);
+            var errors = queryParameter.Validate();
+            if (errors.Count > 0)
+                return BadRequestErrorValidation(errors);
+
+            var createdKey = await _authClient.CreateApiKey(queryParameter.Name);
 
             if (createdKey == null)
                 return BadRequest(new ValidationProblemDetails()
@@ -52,6 +60,15 @@ namespace FourthDown.Api.Controllers
                 });
 
             return Ok(createdKey);
+        }
+
+        private BadRequestObjectResult BadRequestErrorValidation(IDictionary<string, string[]> errors)
+        {
+            return BadRequest(new ValidationProblemDetails(errors)
+            {
+                Title = "There are errors with your request.",
+                Status = StatusCodes.Status400BadRequest
+            });
         }
     }
 }
