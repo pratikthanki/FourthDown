@@ -22,7 +22,7 @@ namespace FourthDown.Api.Models
     {
     }
 
-    public class HomeTeam
+    public class GameTeam
     {
         public IReadOnlyList<string> Abbreviation { get; set; }
         public IReadOnlyList<string> NickName { get; set; }
@@ -30,12 +30,6 @@ namespace FourthDown.Api.Models
 
     public class Period
     {
-    }
-
-    public class PossessionTeam
-    {
-        public IList<string> Abbreviation { get; set; }
-        public IList<string> NickName { get; set; }
     }
 
     public class ScoringSummary
@@ -49,12 +43,6 @@ namespace FourthDown.Api.Models
 
     public class VisitorPointsOvertime
     {
-    }
-
-    public class VisitorTeam
-    {
-        public IReadOnlyList<string> Abbreviation { get; set; }
-        public IReadOnlyList<string> NickName { get; set; }
     }
 
     public class CurrentFahrenheit
@@ -168,7 +156,7 @@ namespace FourthDown.Api.Models
         public string StPlayType { get; set; }
     }
 
-    public class GameDetail : Game
+    public class GameDetail
     {
         [JsonIgnore] public IList<string> Id { get; set; }
         [JsonIgnore] public IList<string> Attendance { get; set; }
@@ -180,15 +168,15 @@ namespace FourthDown.Api.Models
         [JsonIgnore] public Period Period { get; set; }
         [JsonIgnore] public IList<string> Phase { get; set; }
         [JsonIgnore] public IList<bool> PlayReview { get; set; }
-        [JsonIgnore] public PossessionTeam PossessionTeam { get; set; }
+        [JsonIgnore] public GameTeam PossessionTeam { get; set; }
         [JsonIgnore] public IList<bool> Redzone { get; set; }
-        [JsonIgnore] public new IList<string> Stadium { get; set; }
+        [JsonIgnore] public IList<string> Stadium { get; set; }
         [JsonIgnore] public IReadOnlyList<string> StartTime { get; set; }
         [JsonIgnore] public VisitorPointsOvertime VisitorPointsOvertime { get; set; }
         [JsonIgnore] public Weather Weather { get; set; }
         [JsonIgnore] public YardLine YardLine { get; set; }
         [JsonIgnore] public IList<int> YardsToGo { get; set; }
-        
+
         public Game Game { get; set; }
         public IReadOnlyList<int> HomePointsQ1 { get; set; }
         public IReadOnlyList<int> HomePointsQ2 { get; set; }
@@ -196,7 +184,7 @@ namespace FourthDown.Api.Models
         public IReadOnlyList<int> HomePointsQ4 { get; set; }
         public IReadOnlyList<int> HomePointsOvertimeTotal { get; set; }
         public IReadOnlyList<int> HomePointsTotal { get; set; }
-        public new HomeTeam HomeTeam { get; set; }
+        [JsonPropertyName("HomeTeam")] public GameTeam HomeGameTeam { get; set; }
         public IReadOnlyList<int> HomeTimeoutsUsed { get; set; }
         public IReadOnlyList<int> HomeTimeoutsRemaining { get; set; }
         public IReadOnlyList<int> VisitorPointsQ1 { get; set; }
@@ -205,7 +193,7 @@ namespace FourthDown.Api.Models
         public IReadOnlyList<int> VisitorPointsQ4 { get; set; }
         public IReadOnlyList<int> VisitorPointsOvertimeTotal { get; set; }
         public IReadOnlyList<int> VisitorPointsTotal { get; set; }
-        public VisitorTeam VisitorTeam { get; set; }
+        [JsonPropertyName("VisitorTeam")] public GameTeam VisitorGameTeam { get; set; }
         public IReadOnlyList<int> VisitorTimeoutsUsed { get; set; }
         public IReadOnlyList<int> VisitorTimeoutsRemaining { get; set; }
         public IList<Drive> Drives { get; set; }

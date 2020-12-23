@@ -17,8 +17,8 @@ namespace FourthDown.Api.Parameters
             var Today = DateTime.UtcNow;
             var currentSeason = Today.Month > 8 ? Today.Year : Today.Year - 1;
 
-            if (Season > currentSeason || Season < 1999)
-                errors["season"] = new[] {$"Season must be between 1999 and {currentSeason}"};
+            if (Season > currentSeason || Season < 2001)
+                errors["season"] = new[] {$"Season must be between 2001 and {currentSeason}"};
 
             if (Week < 1 || Week > 21)
                 errors["week"] = new[]
