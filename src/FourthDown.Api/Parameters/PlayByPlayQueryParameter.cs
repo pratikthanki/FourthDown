@@ -13,10 +13,10 @@ namespace FourthDown.Api.Parameters
     public class PlayByPlayQueryParameter : QueryParameterBase
     {
         /// <summary>
-        /// Single or comma-separated list of GameId's.
+        /// Single Id for specific game to retrieve.
         /// </summary>
         /// <remarks>
-        /// GameId should be in the format `Season_Week_VisitorAbr_HomeTAbr`.
+        /// GameId should be in the format `Season_Week_VisitorAbr_HomeAbr`.
         /// For example, `2020_17_DAL_NYG`
         /// </remarks>
         public string GameId { get; set; }

@@ -7,6 +7,7 @@ using FourthDown.Api.Extensions;
 using FourthDown.Api.Models;
 using FourthDown.Api.Parameters;
 using FourthDown.Api.Utilities;
+using Microsoft.Extensions.Logging;
 using OpenTracing;
 
 namespace FourthDown.Api.Repositories.Csv
@@ -14,10 +15,14 @@ namespace FourthDown.Api.Repositories.Csv
     public class CsvPlayByPlayRepository : IPlayByPlayRepository
     {
         private readonly ITracer _tracer;
+        private static ILogger<CsvPlayByPlayRepository> _logger;
 
-        public CsvPlayByPlayRepository(ITracer tracer)
+        public CsvPlayByPlayRepository(
+            ITracer tracer,
+            ILogger<CsvPlayByPlayRepository> logger)
         {
             _tracer = tracer;
+            _logger = logger;
         }
 
         public async Task<IEnumerable<PlayByPlay>> GetPlayByPlaysAsync(
@@ -32,7 +37,7 @@ namespace FourthDown.Api.Repositories.Csv
 
             var path = $"{RepositoryEndpoints.PlayByPlayEndpoint}/play_by_play_{season}.csv.gz?raw=true";
 
-            var response = await RequestHelper.GetRequestResponse(path, cancellationToken);
+            var response = await RequestHelper.GetRequestResponse(path, cancellationToken, _logger);
             var stream = await response.Content.ReadAsStreamAsync();
 
             if (!response.IsSuccessStatusCode)

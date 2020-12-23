@@ -31,7 +31,7 @@ namespace FourthDown.Api.Repositories.Json
             var url = GetGameUrl(game.GameId, game.Season);
 
             scope.LogEnd(nameof(GetGamePlaysAsync));
-            
+
             var gameDetail = await GetGameJson(url, cancellationToken, scope);
             gameDetail.Game = game;
 
@@ -46,11 +46,11 @@ namespace FourthDown.Api.Repositories.Json
             return $"{RepositoryEndpoints.GamePlayEndpoint}/{folder}/{season}/{gameId}.json.gz?raw=true";
         }
 
-        private static async Task<GameDetail> GetGameJson(string url, CancellationToken cancellationToken, IScope scope)
+        private async Task<GameDetail> GetGameJson(string url, CancellationToken cancellationToken, IScope scope)
         {
             scope.LogStart(nameof(GetGameJson));
 
-            var response = await RequestHelper.GetRequestResponse(url, cancellationToken);
+            var response = await RequestHelper.GetRequestResponse(url, cancellationToken, _logger);
             var stream = await response.Content.ReadAsStreamAsync();
 
             if (!response.IsSuccessStatusCode)
@@ -59,8 +59,6 @@ namespace FourthDown.Api.Repositories.Json
             var data = await ResponseHelper.ReadCompressedStreamToString(stream);
 
             scope.LogEnd(nameof(GetGameJson));
-
-            _logger.LogInformation($"Fetching data for url: {url}");
 
             return ParseResponseString(url, data);
         }

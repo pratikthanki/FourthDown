@@ -13,7 +13,7 @@ namespace FourthDown.Api.HealthChecks
         {
             async Task<bool> GetStatusCode(string s)
             {
-                var response = await RequestHelper.GetRequestResponse(s, cancellationToken);
+                var response = await RequestHelper.GetRequestResponse<bool>(s, cancellationToken);
                 return response.IsSuccessStatusCode;
             }
 

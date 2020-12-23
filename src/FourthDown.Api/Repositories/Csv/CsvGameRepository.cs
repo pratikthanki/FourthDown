@@ -4,14 +4,29 @@ using System.Threading;
 using System.Threading.Tasks;
 using FourthDown.Api.Models;
 using FourthDown.Api.Utilities;
+using Microsoft.Extensions.Logging;
+using OpenTracing;
 
 namespace FourthDown.Api.Repositories.Csv
 {
     public class CsvGameRepository : IGameRepository
     {
+        private static ITracer _tracer;
+        private static ILogger<CsvGameRepository> _logger;
+
+        public CsvGameRepository(
+            ITracer tracer,
+            ILogger<CsvGameRepository> logger)
+        {
+            _tracer = tracer;
+            _logger = logger;
+        }
+
         public async Task<Dictionary<int, IEnumerable<Game>>> GetGamesAsync(CancellationToken cancellationToken)
         {
-            var response = await RequestHelper.GetRequestResponse(RepositoryEndpoints.GamesEndpoint, cancellationToken);
+            var response = await RequestHelper.GetRequestResponse
+                (RepositoryEndpoints.GamesEndpoint, cancellationToken, _logger);
+
             var responseBody = await response.Content.ReadAsStringAsync();
 
             return response.IsSuccessStatusCode
