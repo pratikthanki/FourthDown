@@ -6,7 +6,7 @@ namespace FourthDown.Api.Utilities
             "https://github.com/leesharpe/nfldata/blob/master/data/games.csv?raw=true";
 
         public static readonly string GamePlayEndpoint =
-            "https://github.com/pratikthanki/nflfastR-raw/blob/upstream/raw";
+            "https://github.com/pratikthanki/nflfastR-raw/blob/upstream";
 
         public static readonly string PlayByPlayEndpoint =
             "https://github.com/pratikthanki/nflfastR-data/blob/master/data";

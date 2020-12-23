@@ -18,7 +18,7 @@ namespace FourthDown.Api.Parameters
         public int? Week { get; set; }
 
         /// <summary>
-        /// Valid seasons from 1999 to the current season.
+        /// Valid seasons from 2001 to the current season.
         /// </summary>
         /// <remarks>
         /// Defaults to the current season if not set.

@@ -31,8 +31,8 @@ namespace FourthDown.Api.Parameters
             if (Week == null && string.IsNullOrWhiteSpace(Team))
                 errors["requiredField"] = new[] {$"Week or team must be provided."};
 
-            if (Season > currentSeason || Season < 1999)
-                errors["season"] = new[] {$"Season must be between 1999 and {currentSeason}"};
+            if (Season > currentSeason || Season < 2001)
+                errors["season"] = new[] {$"Season must be between 2001 and {currentSeason}"};
 
             if (Week < 1 || Week > 21)
                 errors["week"] = new[]

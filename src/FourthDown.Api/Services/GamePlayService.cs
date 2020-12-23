@@ -103,7 +103,7 @@ namespace FourthDown.Api.Services
                 yield return null;
 
             var requests = games
-                .Select(game => _gamePlayRepository.GetGamePlaysAsync(game.GameId, game.Season, cancellationToken))
+                .Select(game => _gamePlayRepository.GetGamePlaysAsync(game, cancellationToken))
                 .ToList();
 
             //Wait for all the requests to finish
@@ -114,8 +114,7 @@ namespace FourthDown.Api.Services
 
             foreach (var pbp in responses)
             {
-                if (pbp.Id == null || !pbp.Id.Any())
-                    continue;
+                if (pbp.Game == null) continue;
 
                 yield return new ApiGamePlay(pbp);
             }
