@@ -22,25 +22,28 @@ namespace FourthDown.Api.Repositories.Json
             _logger = logger;
         }
 
-        public async Task<GameDetail> GetGamePlaysAsync(
-            string gameId,
-            int season,
-            CancellationToken cancellationToken)
+        public async Task<GameDetail> GetGamePlaysAsync(Game game, CancellationToken cancellationToken)
         {
             using var scope = _tracer.BuildTrace(nameof(GetGamePlaysAsync));
 
             scope.LogStart(nameof(GetGamePlaysAsync));
 
-            var url = GetGameUrl(gameId, season);
+            var url = GetGameUrl(game.GameId, game.Season);
 
             scope.LogEnd(nameof(GetGamePlaysAsync));
+            
+            var gameDetail = await GetGameJson(url, cancellationToken, scope);
+            gameDetail.Game = game;
 
-            return await GetGameJson(url, cancellationToken, scope);
+            return gameDetail;
         }
 
         public static string GetGameUrl(string gameId, int season)
         {
-            return $"{RepositoryEndpoints.GamePlayEndpoint}/{season}/{gameId}.json.gz?raw=true";
+            // Games between 2001-2010 (inc) are in the raw_old folder
+            var folder = season < 2011 ? "raw_old" : "raw";
+
+            return $"{RepositoryEndpoints.GamePlayEndpoint}/{folder}/{season}/{gameId}.json.gz?raw=true";
         }
 
         private static async Task<GameDetail> GetGameJson(string url, CancellationToken cancellationToken, IScope scope)
@@ -56,6 +59,8 @@ namespace FourthDown.Api.Repositories.Json
             var data = await ResponseHelper.ReadCompressedStreamToString(stream);
 
             scope.LogEnd(nameof(GetGameJson));
+
+            _logger.LogInformation($"Fetching data for url: {url}");
 
             return ParseResponseString(url, data);
         }

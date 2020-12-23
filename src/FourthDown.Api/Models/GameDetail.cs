@@ -12,7 +12,7 @@ namespace FourthDown.Api.Models
     {
         public Viewer Viewer { get; set; }
     }
-    
+
     internal class Viewer
     {
         public GameDetail GameDetail { get; set; }
@@ -24,8 +24,8 @@ namespace FourthDown.Api.Models
 
     public class HomeTeam
     {
-        public IList<string> Abbreviation { get; set; }
-        public IList<string> NickName { get; set; }
+        public IReadOnlyList<string> Abbreviation { get; set; }
+        public IReadOnlyList<string> NickName { get; set; }
     }
 
     public class Period
@@ -53,8 +53,8 @@ namespace FourthDown.Api.Models
 
     public class VisitorTeam
     {
-        public IList<string> Abbreviation { get; set; }
-        public IList<string> NickName { get; set; }
+        public IReadOnlyList<string> Abbreviation { get; set; }
+        public IReadOnlyList<string> NickName { get; set; }
     }
 
     public class CurrentFahrenheit
@@ -168,46 +168,48 @@ namespace FourthDown.Api.Models
         public string StPlayType { get; set; }
     }
 
-    public class GameDetail
+    public class GameDetail : Game
     {
-        public IList<string> Id { get; set; }
-        public IList<string> Attendance { get; set; }
-        public IList<int> Distance { get; set; }
-        public IList<int> Down { get; set; }
-        public IList<string> GameClock { get; set; }
-        public IList<bool> GoalToGo { get; set; }
-        public HomePointsOvertime HomePointsOvertime { get; set; }
-        public IList<int> HomePointsTotal { get; set; }
-        public IList<int> HomePointsQ1 { get; set; }
-        public IList<int> HomePointsQ2 { get; set; }
-        public IList<int> HomePointsQ3 { get; set; }
-        public IList<int> HomePointsQ4 { get; set; }
-        public HomeTeam HomeTeam { get; set; }
-        public IList<int> HomeTimeoutsUsed { get; set; }
-        public IList<int> HomeTimeoutsRemaining { get; set; }
-        public Period Period { get; set; }
-        public IList<string> Phase { get; set; }
-        public IList<bool> PlayReview { get; set; }
-        public PossessionTeam PossessionTeam { get; set; }
-        public IList<bool> Redzone { get; set; }
-        public IList<ScoringSummary> ScoringSummaries { get; set; }
-        public IList<string> Stadium { get; set; }
-        public IList<string> StartTime { get; set; }
-        public VisitorPointsOvertime VisitorPointsOvertime { get; set; }
-        public IList<int> VisitorPointsOvertimeTotal { get; set; }
-        public IList<int> VisitorPointsQ1 { get; set; }
-        public IList<int> VisitorPointsQ2 { get; set; }
-        public IList<int> VisitorPointsQ3 { get; set; }
-        public IList<int> VisitorPointsQ4 { get; set; }
-        public IList<int> VisitorPointsTotal { get; set; }
+        [JsonIgnore] public IList<string> Id { get; set; }
+        [JsonIgnore] public IList<string> Attendance { get; set; }
+        [JsonIgnore] public IList<int> Distance { get; set; }
+        [JsonIgnore] public IList<int> Down { get; set; }
+        [JsonIgnore] public IList<string> GameClock { get; set; }
+        [JsonIgnore] public IList<bool> GoalToGo { get; set; }
+        [JsonIgnore] public HomePointsOvertime HomePointsOvertime { get; set; }
+        [JsonIgnore] public Period Period { get; set; }
+        [JsonIgnore] public IList<string> Phase { get; set; }
+        [JsonIgnore] public IList<bool> PlayReview { get; set; }
+        [JsonIgnore] public PossessionTeam PossessionTeam { get; set; }
+        [JsonIgnore] public IList<bool> Redzone { get; set; }
+        [JsonIgnore] public new IList<string> Stadium { get; set; }
+        [JsonIgnore] public IReadOnlyList<string> StartTime { get; set; }
+        [JsonIgnore] public VisitorPointsOvertime VisitorPointsOvertime { get; set; }
+        [JsonIgnore] public Weather Weather { get; set; }
+        [JsonIgnore] public YardLine YardLine { get; set; }
+        [JsonIgnore] public IList<int> YardsToGo { get; set; }
+        
+        public Game Game { get; set; }
+        public IReadOnlyList<int> HomePointsQ1 { get; set; }
+        public IReadOnlyList<int> HomePointsQ2 { get; set; }
+        public IReadOnlyList<int> HomePointsQ3 { get; set; }
+        public IReadOnlyList<int> HomePointsQ4 { get; set; }
+        public IReadOnlyList<int> HomePointsOvertimeTotal { get; set; }
+        public IReadOnlyList<int> HomePointsTotal { get; set; }
+        public new HomeTeam HomeTeam { get; set; }
+        public IReadOnlyList<int> HomeTimeoutsUsed { get; set; }
+        public IReadOnlyList<int> HomeTimeoutsRemaining { get; set; }
+        public IReadOnlyList<int> VisitorPointsQ1 { get; set; }
+        public IReadOnlyList<int> VisitorPointsQ2 { get; set; }
+        public IReadOnlyList<int> VisitorPointsQ3 { get; set; }
+        public IReadOnlyList<int> VisitorPointsQ4 { get; set; }
+        public IReadOnlyList<int> VisitorPointsOvertimeTotal { get; set; }
+        public IReadOnlyList<int> VisitorPointsTotal { get; set; }
         public VisitorTeam VisitorTeam { get; set; }
-        public IList<int> VisitorTimeoutsUsed { get; set; }
-        public IList<int> VisitorTimeoutsRemaining { get; set; }
-        public IList<int> HomePointsOvertimeTotal { get; set; }
-        public Weather Weather { get; set; }
-        public YardLine YardLine { get; set; }
-        public IList<int> YardsToGo { get; set; }
+        public IReadOnlyList<int> VisitorTimeoutsUsed { get; set; }
+        public IReadOnlyList<int> VisitorTimeoutsRemaining { get; set; }
         public IList<Drive> Drives { get; set; }
         public IList<Play> Plays { get; set; }
+        public IList<ScoringSummary> ScoringSummaries { get; set; }
     }
 }

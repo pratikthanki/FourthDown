@@ -37,5 +37,18 @@ namespace FourthDown.Api.Tests
             
             Assert.AreEqual(expected, actual);
         }
+        
+        [Test]
+        public void GamePlayRepositoryEndpointPre2011()
+        {
+            const int season = 2002;
+            const string gameId = "2002_01_ABC_XYZ";
+            var expected =
+                $"https://github.com/pratikthanki/nflfastR-raw/blob/upstream/raw_old/{season}/{gameId}.json.gz?raw=true";
+
+            var actual = JsonGamePlayRepository.GetGameUrl(gameId, season);
+            
+            Assert.AreEqual(expected, actual);
+        }
     }
 }
