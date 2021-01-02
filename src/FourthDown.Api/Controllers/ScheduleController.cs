@@ -56,11 +56,7 @@ namespace FourthDown.Api.Controllers
 
             var errors = queryParameter.Validate();
             if (errors.Count > 0)
-                return BadRequest(new ValidationProblemDetails(errors)
-                {
-                    Title = "There are errors with your request.",
-                    Status = StatusCodes.Status400BadRequest
-                });
+                return BadRequestError(errors);
 
             scope.LogStart(nameof(_scheduleService.GetGames));
 
@@ -76,6 +72,50 @@ namespace FourthDown.Api.Controllers
                 .Observe(games.ToList().Count);
 
             return Ok(games);
+        }
+
+        /// <summary>
+        ///     List of results between two teams. Season phase and an offset.
+        /// </summary>
+        /// <param name="queryParameter">Combination of Season, Week and Team</param>
+        /// <param name="cancellationToken"></param>
+        /// <returns>List of game scoring summaries</returns>
+        [HttpGet("results")]
+        [ProducesResponseType(typeof(GameScoringSummaries[]), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetResults(
+            [FromQuery] GameResultQueryParameter queryParameter,
+            CancellationToken cancellationToken)
+        {
+            using var scope = _tracer.InitializeTrace(HttpContext, nameof(GetResults));
+            MetricCollector.RegisterMetrics(HttpContext, Request);
+
+            var errors = queryParameter.Validate();
+            if (errors.Count > 0)
+                return BadRequestError(errors);
+
+            scope.LogStart(nameof(_scheduleService.GetGames));
+
+            var games = await _scheduleService.GetGamesBetween(queryParameter, cancellationToken);
+
+            scope.LogEnd(nameof(_scheduleService.GetGames));
+
+            _logger.LogInformation("Successful Games request");
+
+            MetricCollector.RegisterMetrics(HttpContext, Request);
+            PrometheusMetrics.RecordsReturned
+                .WithLabels(Request.Method, HttpContext.GetEndpoint().DisplayName)
+                .Observe(games.ToList().Count);
+
+            return Ok(games);
+        }
+
+        private BadRequestObjectResult BadRequestError(IDictionary<string, string[]> errors)
+        {
+            return BadRequest(new ValidationProblemDetails(errors)
+            {
+                Title = "There are errors with your request.",
+                Status = StatusCodes.Status400BadRequest
+            });
         }
     }
 }

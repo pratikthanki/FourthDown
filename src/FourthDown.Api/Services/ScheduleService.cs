@@ -39,7 +39,35 @@ namespace FourthDown.Api.Services
             return games;
         }
 
-        public async Task<Dictionary<int, IEnumerable<Game>>> GetAllGames(CancellationToken cancellationToken)
+        public async Task<IEnumerable<Game>> GetGamesBetween(
+            GameResultQueryParameter queryParameter, 
+            CancellationToken cancellationToken)
+        {
+            var team = queryParameter.Team;
+            var opposition = queryParameter.Opposition;
+            var offset = queryParameter.GameOffset;
+            var gameType = queryParameter.GameType;
+            
+            var gamesPerSeason = await GetAllGames(cancellationToken);
+
+            var games = gamesPerSeason.SelectMany(x => x.Value.Where(g => g.HomeTeam == team || g.AwayTeam == team));
+
+            if (gameType != GameTypeFilter.All)
+            {
+                games = gameType == GameTypeFilter.Reg
+                    ? games.Where(x => x.GameType == GameType.REG)
+                    : games.Where(x => x.GameType != GameType.REG);
+            }
+
+            if (!string.IsNullOrWhiteSpace(opposition))
+                games = games.Where(x => x.HomeTeam == opposition || x.AwayTeam == opposition);
+
+            games = games.OrderByDescending(x => x.Gameday);
+
+            return games.Take(offset);
+        }
+
+        private async Task<Dictionary<int, IEnumerable<Game>>> GetAllGames(CancellationToken cancellationToken)
         {
             return await _gameRepository.GetGamesAsync(cancellationToken);
         }

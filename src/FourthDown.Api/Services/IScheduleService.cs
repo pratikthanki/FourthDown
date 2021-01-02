@@ -11,5 +11,9 @@ namespace FourthDown.Api.Services
         Task<IEnumerable<Game>> GetGames(
             ScheduleQueryParameter queryParameter,
             CancellationToken cancellationToken);
+        
+        Task<IEnumerable<Game>> GetGamesBetween(
+            GameResultQueryParameter queryParameter,
+            CancellationToken cancellationToken);
     }
 }
