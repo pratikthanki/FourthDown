@@ -110,10 +110,10 @@ namespace FourthDown.Api.Services
             await Task.WhenAll(requests);
 
             //Get the responses
-            var responses = requests.Select(task => task.Result);
-
-            foreach (var pbp in responses)
+            foreach (var request in requests)
             {
+                var pbp = await request;
+
                 if (pbp.Game == null) continue;
 
                 yield return new ApiGamePlay(pbp);
