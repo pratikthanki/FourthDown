@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using System.Text.Json.Serialization;
 using FourthDown.Api.Authentication;
 using FourthDown.Api.Configuration;
 using FourthDown.Api.HealthChecks;
@@ -25,6 +26,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Interfaces;
 using Microsoft.OpenApi.Models;
+using Newtonsoft.Json.Converters;
 using OpenTracing;
 using OpenTracing.Util;
 using Prometheus;
@@ -82,7 +84,13 @@ namespace FourthDown.Api
                 c.BaseAddress = new Uri("https://hooks.slack.com");
             });
 
-            services.AddControllers();
+            services
+                .AddControllers()
+                .AddJsonOptions(opts =>
+                {
+                    opts.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+                });
+
             services.AddOpenTracing();
             services.AddResponseCaching();
             services.AddApplicationInsightsTelemetry();

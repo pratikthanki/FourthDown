@@ -20,7 +20,6 @@ namespace FourthDown.Api.Controllers
     [ApiVersion("1.0")]
     [Authorize]
     [Produces("application/json")]
-    [ProducesResponseType(typeof(ScheduleResponse[]), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ValidationProblemDetailsResponse), StatusCodes.Status400BadRequest)]
     [ApiController]
     public class ScheduleController : ControllerBase
@@ -48,6 +47,7 @@ namespace FourthDown.Api.Controllers
         /// <param name="cancellationToken"></param>
         /// <returns>List of games</returns>
         [HttpGet("")]
+        [ProducesResponseType(typeof(ScheduleResponse[]), StatusCodes.Status200OK)]
         public async Task<ActionResult<IEnumerable<Game>>> GetSchedule(
             [FromQuery] ScheduleQueryParameter queryParameter,
             CancellationToken cancellationToken)
@@ -81,7 +81,7 @@ namespace FourthDown.Api.Controllers
         /// <param name="cancellationToken"></param>
         /// <returns>List of game scoring summaries</returns>
         [HttpGet("results")]
-        [ProducesResponseType(typeof(GameScoringSummaries[]), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ScheduleResponse[]), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetResults(
             [FromQuery] GameResultQueryParameter queryParameter,
             CancellationToken cancellationToken)

@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 using FourthDown.Api.Models;
+using Newtonsoft.Json.Converters;
 
 namespace FourthDown.Api.Schemas
 {
@@ -35,7 +37,8 @@ namespace FourthDown.Api.Schemas
         public int Season { get; set; }
 
         /// <example>REG</example>
-        public string GameType { get; set; }
+        [JsonConverter(typeof(StringEnumConverter))]
+        public GameType GameType { get; set; }
 
         /// <example>1</example>
         public int Week { get; set; }
