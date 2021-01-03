@@ -15,6 +15,9 @@ namespace FourthDown.Api.Parameters
         /// <remarks>
         /// Note: only completed games for the current week are shown.
         /// </remarks>
+        /// <example>
+        /// `10`
+        /// </example>
         public int? Week { get; set; }
 
         /// <summary>
@@ -23,6 +26,9 @@ namespace FourthDown.Api.Parameters
         /// <remarks>
         /// Defaults to the current season if not set.
         /// </remarks>
+        /// <example>
+        /// `2018`
+        /// </example>
         public int? Season { get; set; }
 
         /// <summary>
@@ -31,6 +37,9 @@ namespace FourthDown.Api.Parameters
         /// <remarks>
         /// Returns data for all teams if not set.
         /// </remarks>
+        /// <example>
+        /// `DAL`
+        /// </example>
         public string Team { get; set; }
     }
 }
