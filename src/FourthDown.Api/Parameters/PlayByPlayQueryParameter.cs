@@ -17,8 +17,10 @@ namespace FourthDown.Api.Parameters
         /// </summary>
         /// <remarks>
         /// GameId should be in the format `Season_Week_VisitorAbr_HomeAbr`.
-        /// For example, `2020_17_DAL_NYG`
         /// </remarks>
+        /// <example>
+        /// `2020_17_DAL_NYG`
+        /// </example>
         public string GameId { get; set; }
 
         public Dictionary<string, string[]> Validate()
