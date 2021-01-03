@@ -3,7 +3,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using FourthDown.Api.Extensions;
 using FourthDown.Api.Models;
-using FourthDown.Api.Monitoring;
 using FourthDown.Api.Parameters;
 using FourthDown.Api.Schemas;
 using FourthDown.Api.Services;
@@ -22,13 +21,11 @@ namespace FourthDown.Api.Controllers
     public class GameController : ControllerBase
     {
         private readonly ITracer _tracer;
-        private readonly ISlackClient _slackClient;
         private readonly IGamePlayService _pbpService;
 
-        public GameController(ITracer tracer, ISlackClient slackClient, IGamePlayService pbpService)
+        public GameController(ITracer tracer, IGamePlayService pbpService)
         {
             _tracer = tracer;
-            _slackClient = slackClient;
             _pbpService = pbpService;
         }
 
@@ -52,7 +49,6 @@ namespace FourthDown.Api.Controllers
             var plays = _pbpService.GetGamePlaysAsync(queryParameter, cancellationToken);
 
             _tracer.ActiveSpan.SetTags(HttpContext);
-            await _slackClient.PostMessage(HttpContext);
 
             return Ok(plays);
         }
@@ -77,7 +73,6 @@ namespace FourthDown.Api.Controllers
             var plays = _pbpService.GetGameDrivesAsync(queryParameter, cancellationToken);
 
             _tracer.ActiveSpan.SetTags(HttpContext);
-            await _slackClient.PostMessage(HttpContext);
 
             return Ok(plays);
         }
@@ -102,7 +97,6 @@ namespace FourthDown.Api.Controllers
             var plays = _pbpService.GetGameScoringSummariesAsync(queryParameter, cancellationToken);
 
             _tracer.ActiveSpan.SetTags(HttpContext);
-            await _slackClient.PostMessage(HttpContext);
 
             return Ok(plays);
         }

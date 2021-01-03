@@ -5,7 +5,6 @@ using System.Reflection;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 using FourthDown.Api.HealthChecks;
-using FourthDown.Api.Monitoring;
 using FourthDown.Api.Repositories;
 using FourthDown.Api.Repositories.Csv;
 using FourthDown.Api.Repositories.Json;
@@ -75,15 +74,7 @@ namespace FourthDown.Api
 
                     return tracer;
                 });
-
-            services
-                .Configure<MonitoringOptions>(Configuration);
-
-            services.AddHttpClient<ISlackClient, SlackClient>(c =>
-            {
-                c.BaseAddress = new Uri("https://hooks.slack.com");
-            });
-
+            
             services
                 .AddControllers()
                 .AddJsonOptions(opts => { opts.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()); });

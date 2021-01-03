@@ -2,7 +2,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using FourthDown.Api.Utilities;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
-using Microsoft.Extensions.Logging;
 
 namespace FourthDown.Api.HealthChecks
 {
