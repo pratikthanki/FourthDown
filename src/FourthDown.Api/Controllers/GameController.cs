@@ -7,7 +7,6 @@ using FourthDown.Api.Monitoring;
 using FourthDown.Api.Parameters;
 using FourthDown.Api.Schemas;
 using FourthDown.Api.Services;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using OpenTracing;
@@ -17,18 +16,19 @@ namespace FourthDown.Api.Controllers
 {
     [Route("api/game")]
     [ApiVersion("1.0")]
-    [Authorize]
     [ApiController]
     [Produces("application/json")]
     [ProducesResponseType(typeof(ValidationProblemDetailsResponse), StatusCodes.Status400BadRequest)]
     public class GameController : ControllerBase
     {
         private readonly ITracer _tracer;
+        private readonly ISlackClient _slackClient;
         private readonly IGamePlayService _pbpService;
 
-        public GameController(ITracer tracer, IGamePlayService pbpService)
+        public GameController(ITracer tracer, ISlackClient slackClient, IGamePlayService pbpService)
         {
             _tracer = tracer;
+            _slackClient = slackClient;
             _pbpService = pbpService;
         }
 
@@ -52,7 +52,7 @@ namespace FourthDown.Api.Controllers
             var plays = _pbpService.GetGamePlaysAsync(queryParameter, cancellationToken);
 
             _tracer.ActiveSpan.SetTags(HttpContext);
-            MetricCollector.RegisterMetrics(HttpContext, Request);
+            await _slackClient.PostMessage(HttpContext);
 
             return Ok(plays);
         }
@@ -77,7 +77,7 @@ namespace FourthDown.Api.Controllers
             var plays = _pbpService.GetGameDrivesAsync(queryParameter, cancellationToken);
 
             _tracer.ActiveSpan.SetTags(HttpContext);
-            MetricCollector.RegisterMetrics(HttpContext, Request);
+            await _slackClient.PostMessage(HttpContext);
 
             return Ok(plays);
         }
@@ -102,7 +102,7 @@ namespace FourthDown.Api.Controllers
             var plays = _pbpService.GetGameScoringSummariesAsync(queryParameter, cancellationToken);
 
             _tracer.ActiveSpan.SetTags(HttpContext);
-            MetricCollector.RegisterMetrics(HttpContext, Request);
+            await _slackClient.PostMessage(HttpContext);
 
             return Ok(plays);
         }

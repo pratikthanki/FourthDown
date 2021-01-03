@@ -1,14 +1,11 @@
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using FourthDown.Api.Extensions;
 using FourthDown.Api.Models;
-using FourthDown.Api.Monitoring;
 using FourthDown.Api.Parameters;
 using FourthDown.Api.Schemas;
 using FourthDown.Api.Services;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -18,7 +15,6 @@ namespace FourthDown.Api.Controllers
 {
     [Route("api/schedule")]
     [ApiVersion("1.0")]
-    [Authorize]
     [Produces("application/json")]
     [ProducesResponseType(typeof(ValidationProblemDetailsResponse), StatusCodes.Status400BadRequest)]
     [ApiController]
@@ -61,11 +57,6 @@ namespace FourthDown.Api.Controllers
             _logger.LogInformation("Successful Games request");
             _tracer.ActiveSpan.SetTags(HttpContext);
 
-            MetricCollector.RegisterMetrics(HttpContext, Request);
-            PrometheusMetrics.RecordsReturned
-                .WithLabels(Request.Method, HttpContext.GetEndpoint().DisplayName)
-                .Observe(games.ToList().Count);
-
             return Ok(games);
         }
 
@@ -90,11 +81,6 @@ namespace FourthDown.Api.Controllers
             _logger.LogInformation("Successful Games request");
             _tracer.ActiveSpan.SetTags(HttpContext);
             
-            MetricCollector.RegisterMetrics(HttpContext, Request);
-            PrometheusMetrics.RecordsReturned
-                .WithLabels(Request.Method, HttpContext.GetEndpoint().DisplayName)
-                .Observe(games.ToList().Count);
-
             return Ok(games);
         }
 

@@ -1,14 +1,11 @@
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using FourthDown.Api.Extensions;
 using FourthDown.Api.Models;
-using FourthDown.Api.Monitoring;
 using FourthDown.Api.Parameters;
 using FourthDown.Api.Repositories;
 using FourthDown.Api.Schemas;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -18,7 +15,6 @@ namespace FourthDown.Api.Controllers
 {
     [Route("api/nflfastr")]
     [ApiVersion("1.0")]
-    [Authorize]
     [Produces("application/json")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ValidationProblemDetailsResponse), StatusCodes.Status400BadRequest)]
@@ -51,7 +47,7 @@ namespace FourthDown.Api.Controllers
         [HttpGet("")]
         [ProducesResponseType(typeof(PlayByPlayResponse[]), StatusCodes.Status200OK)]
         public async Task<ActionResult<IEnumerable<PlayByPlay>>> GetPlayByPlays(
-            [FromQuery] PlayByPlayQueryParameter queryParameter,
+            [FromQuery] NflfastrQueryParameter queryParameter,
             CancellationToken cancellationToken)
         {
             var errors = queryParameter.Validate();
@@ -62,13 +58,10 @@ namespace FourthDown.Api.Controllers
                     Status = StatusCodes.Status400BadRequest
                 });
 
-            var plays = await _playByPlayRepository.GetPlayByPlaysAsync(queryParameter, cancellationToken);
+            var queryOptions = new PlayByPlayQueryParameter() {Season = queryParameter.Season};
+            var plays = await _playByPlayRepository.GetPlayByPlaysAsync(queryOptions, cancellationToken);
 
             _tracer.ActiveSpan.SetTags(HttpContext);
-            MetricCollector.RegisterMetrics(HttpContext, Request);
-            PrometheusMetrics.RecordsReturned
-                .WithLabels(Request.Method, HttpContext.GetEndpoint().DisplayName)
-                .Observe(plays.Count());
 
             return Ok(plays);
         }

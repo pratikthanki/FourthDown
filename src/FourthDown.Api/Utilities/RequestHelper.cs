@@ -9,10 +9,9 @@ namespace FourthDown.Api.Utilities
 {
     public static class RequestHelper
     {
-        public static async Task<HttpResponseMessage> GetRequestResponse<T>(
+        public static async Task<HttpResponseMessage> GetRequestResponse(
             string url,
-            CancellationToken cancellationToken,
-            ILogger<T> logger = default)
+            CancellationToken cancellationToken)
         {
             var timeout = TimeSpan.FromSeconds(10);
             var httpClientHandler = new HttpClientHandler
@@ -23,8 +22,6 @@ namespace FourthDown.Api.Utilities
             var httpClient = new HttpClient(httpClientHandler) {Timeout = timeout};
 
             var response = await httpClient.GetAsync(url, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
-
-            logger.LogInformation($"Fetching data. Url: {url}; Status: {response.StatusCode}");
 
             return response;
         }

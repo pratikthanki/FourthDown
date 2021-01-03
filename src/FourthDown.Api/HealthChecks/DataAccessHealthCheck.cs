@@ -2,6 +2,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using FourthDown.Api.Utilities;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Microsoft.Extensions.Logging;
 
 namespace FourthDown.Api.HealthChecks
 {
@@ -13,7 +14,7 @@ namespace FourthDown.Api.HealthChecks
         {
             async Task<bool> GetStatusCode(string s)
             {
-                var response = await RequestHelper.GetRequestResponse<bool>(s, cancellationToken);
+                var response = await RequestHelper.GetRequestResponse(s, cancellationToken);
                 return response.IsSuccessStatusCode;
             }
 

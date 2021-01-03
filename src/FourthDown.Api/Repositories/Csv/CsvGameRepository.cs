@@ -25,8 +25,10 @@ namespace FourthDown.Api.Repositories.Csv
 
         public async Task<Dictionary<int, IEnumerable<Game>>> GetGamesAsync(CancellationToken cancellationToken)
         {
-            var response = await RequestHelper.GetRequestResponse
-                (RepositoryEndpoints.GamesEndpoint, cancellationToken, _logger);
+            var url = RepositoryEndpoints.GamesEndpoint;
+            var response = await RequestHelper.GetRequestResponse(url, cancellationToken);
+            
+            _logger.LogInformation($"Fetching data. Url: {url}; Status: {response.StatusCode}");
 
             var responseBody = await response.Content.ReadAsStringAsync();
 

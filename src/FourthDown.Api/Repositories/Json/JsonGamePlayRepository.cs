@@ -50,7 +50,10 @@ namespace FourthDown.Api.Repositories.Json
         {
             scope.LogStart(nameof(GetGameJson));
 
-            var response = await RequestHelper.GetRequestResponse(url, cancellationToken, _logger);
+            var response = await RequestHelper.GetRequestResponse(url, cancellationToken);
+
+            _logger.LogInformation($"Fetching data. Url: {url}; Status: {response.StatusCode}");
+
             var stream = await response.Content.ReadAsStreamAsync();
 
             if (!response.IsSuccessStatusCode)

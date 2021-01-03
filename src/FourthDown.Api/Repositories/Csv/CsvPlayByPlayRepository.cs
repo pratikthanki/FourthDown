@@ -37,7 +37,9 @@ namespace FourthDown.Api.Repositories.Csv
 
             var path = $"{RepositoryEndpoints.PlayByPlayEndpoint}/play_by_play_{season}.csv.gz?raw=true";
 
-            var response = await RequestHelper.GetRequestResponse(path, cancellationToken, _logger);
+            var response = await RequestHelper.GetRequestResponse(path, cancellationToken);
+            _logger.LogInformation($"Fetching data. Url: {path}; Status: {response.StatusCode}");
+
             var stream = await response.Content.ReadAsStreamAsync();
 
             if (!response.IsSuccessStatusCode)

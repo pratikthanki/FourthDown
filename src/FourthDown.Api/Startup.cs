@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Text.Json.Serialization;
-using FourthDown.Api.Authentication;
-using FourthDown.Api.Configuration;
+using System.Text.RegularExpressions;
 using FourthDown.Api.HealthChecks;
+using FourthDown.Api.Monitoring;
 using FourthDown.Api.Repositories;
 using FourthDown.Api.Repositories.Csv;
 using FourthDown.Api.Repositories.Json;
@@ -26,10 +26,11 @@ using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Interfaces;
 using Microsoft.OpenApi.Models;
-using Newtonsoft.Json.Converters;
 using OpenTracing;
 using OpenTracing.Util;
 using Prometheus;
+using Prometheus.Client.HealthChecks;
+using Prometheus.Client.HttpRequestDurations;
 
 namespace FourthDown.Api
 {
@@ -45,16 +46,12 @@ namespace FourthDown.Api
         public void ConfigureServices(IServiceCollection services)
         {
             services
-                .Configure<AuthenticationOptions>(Configuration);
-
-            services
                 .AddSingleton<IGamePlayService, GamePlayService>()
                 .AddSingleton<IScheduleService, ScheduleService>()
                 .AddSingleton<ITeamRepository, JsonTeamRepository>()
                 .AddSingleton<IGameRepository, CsvGameRepository>()
                 .AddSingleton<IGamePlayRepository, JsonGamePlayRepository>()
                 .AddSingleton<IPlayByPlayRepository, CsvPlayByPlayRepository>()
-                .AddSingleton<IAuthClient, AuthClient>()
                 .AddSingleton<ITracer>(serviceProvider =>
                 {
                     var serviceName = serviceProvider.GetRequiredService<IWebHostEnvironment>().ApplicationName;
@@ -79,6 +76,9 @@ namespace FourthDown.Api
                     return tracer;
                 });
 
+            services
+                .Configure<MonitoringOptions>(Configuration);
+
             services.AddHttpClient<ISlackClient, SlackClient>(c =>
             {
                 c.BaseAddress = new Uri("https://hooks.slack.com");
@@ -86,14 +86,10 @@ namespace FourthDown.Api
 
             services
                 .AddControllers()
-                .AddJsonOptions(opts =>
-                {
-                    opts.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-                });
+                .AddJsonOptions(opts => { opts.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()); });
 
             services.AddOpenTracing();
             services.AddResponseCaching();
-            services.AddApplicationInsightsTelemetry();
 
             services.AddLogging(config =>
             {
@@ -144,12 +140,6 @@ namespace FourthDown.Api
                         }
                     });
 
-                    c.AddSecurityDefinition("apiKey",
-                        new OpenApiSecurityScheme
-                        {
-                            Name = "X-API-KEY", In = ParameterLocation.Header, Type = SecuritySchemeType.ApiKey
-                        });
-
                     var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
                     var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
                     c.IncludeXmlComments(xmlPath);
@@ -157,19 +147,11 @@ namespace FourthDown.Api
 
             services
                 .AddHealthChecks()
+                .WriteToPrometheus()
                 .AddCheck<DataAccessHealthCheck>(
                     "Health check for access to data repository",
                     HealthStatus.Degraded,
                     new[] {"data"});
-
-            services
-                .AddAuthentication(options =>
-                {
-                    options.DefaultAuthenticateScheme = ApiKeyAuthenticationOptions.DefaultScheme;
-                    options.DefaultChallengeScheme = ApiKeyAuthenticationOptions.DefaultScheme;
-                })
-                .AddScheme<ApiKeyAuthenticationOptions, ApiKeyAuthenticationHandler>(
-                    ApiKeyAuthenticationOptions.DefaultScheme, options => { });
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -189,6 +171,37 @@ namespace FourthDown.Api
             app.UseResponseCaching();
             app.UseHttpMetrics();
 
+            app.UsePrometheusRequestDurations(q =>
+            {
+                q.IncludePath = true;
+                q.IncludeMethod = true;
+                q.IgnoreRoutesConcrete = new[]
+                {
+                    "/favicon.ico",
+                    "/robots.txt",
+                    "/"
+                };
+                q.IgnoreRoutesStartWith = new[]
+                {
+                    "/swagger"
+                };
+                q.CustomNormalizePath = new Dictionary<Regex, string>
+                {
+                    {new Regex(@"\/[0-9]{1,}(?![a-z])"), "/id"}
+                };
+
+                // Just for example. Not for Production
+                q.CustomLabels = new Dictionary<string, Func<string>>
+                {
+                    {
+                        "application_name", () => env.ApplicationName
+                    },
+                    {
+                        "date", () => DateTime.UtcNow.ToString("yyyy-MM-dd")
+                    }
+                };
+            });
+
             app.UseAuthentication();
             app.UseAuthorization();
             app.UseDefaultFiles();
@@ -207,8 +220,6 @@ namespace FourthDown.Api
                         [HealthStatus.Unhealthy] = StatusCodes.Status503ServiceUnavailable
                     }
                 });
-
-                endpoints.MapGet("/hello", async context => { await context.Response.WriteAsync("Hello World!"); });
 
                 endpoints.MapMetrics();
             });

@@ -1,13 +1,9 @@
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using FourthDown.Api.Extensions;
 using FourthDown.Api.Models;
-using FourthDown.Api.Monitoring;
 using FourthDown.Api.Repositories;
 using FourthDown.Api.Schemas;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using OpenTracing;
@@ -16,7 +12,6 @@ namespace FourthDown.Api.Controllers
 {
     [Route("api/teams")]
     [ApiVersion("1.0")]
-    [Authorize]
     [Produces("application/json")]
     [ProducesResponseType(typeof(TeamResponse[]), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ValidationProblemDetailsResponse),StatusCodes.Status400BadRequest)]
@@ -43,11 +38,6 @@ namespace FourthDown.Api.Controllers
         {
             var teams = await _teamRepository.GetTeamsAsync(cancellationToken);
             
-            MetricCollector.RegisterMetrics(HttpContext, Request);
-            PrometheusMetrics.RecordsReturned
-                .WithLabels(Request.Method, HttpContext.GetEndpoint().DisplayName)
-                .Observe(teams.Count());
-
             return Ok(teams);
         }
     }
