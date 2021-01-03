@@ -45,14 +45,14 @@ namespace FourthDown.Api.Controllers
             [FromQuery] PlayByPlayQueryParameter queryParameter,
             CancellationToken cancellationToken)
         {
-            using var scope = _tracer.InitializeTrace(HttpContext, nameof(GetPlays));
-            MetricCollector.RegisterMetrics(HttpContext, Request);
-
             var errors = queryParameter.Validate();
             if (errors.Count > 0)
                 return BadRequestErrorValidation(errors);
 
             var plays = _pbpService.GetGamePlaysAsync(queryParameter, cancellationToken);
+
+            _tracer.ActiveSpan.SetTags(HttpContext);
+            MetricCollector.RegisterMetrics(HttpContext, Request);
 
             return Ok(plays);
         }
@@ -70,14 +70,14 @@ namespace FourthDown.Api.Controllers
             [FromQuery] PlayByPlayQueryParameter queryParameter,
             CancellationToken cancellationToken)
         {
-            using var scope = _tracer.InitializeTrace(HttpContext, nameof(GetDrives));
-            MetricCollector.RegisterMetrics(HttpContext, Request);
-
             var errors = queryParameter.Validate();
             if (errors.Count > 0)
                 return BadRequestErrorValidation(errors);
 
             var plays = _pbpService.GetGameDrivesAsync(queryParameter, cancellationToken);
+
+            _tracer.ActiveSpan.SetTags(HttpContext);
+            MetricCollector.RegisterMetrics(HttpContext, Request);
 
             return Ok(plays);
         }
@@ -95,14 +95,14 @@ namespace FourthDown.Api.Controllers
             [FromQuery] PlayByPlayQueryParameter queryParameter,
             CancellationToken cancellationToken)
         {
-            using var scope = _tracer.InitializeTrace(HttpContext, nameof(GetPlays));
-            MetricCollector.RegisterMetrics(HttpContext, Request);
-
             var errors = queryParameter.Validate();
             if (errors.Count > 0)
                 return BadRequestErrorValidation(errors);
 
             var plays = _pbpService.GetGameScoringSummariesAsync(queryParameter, cancellationToken);
+
+            _tracer.ActiveSpan.SetTags(HttpContext);
+            MetricCollector.RegisterMetrics(HttpContext, Request);
 
             return Ok(plays);
         }

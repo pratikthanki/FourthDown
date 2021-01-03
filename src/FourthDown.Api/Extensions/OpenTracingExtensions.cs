@@ -8,14 +8,16 @@ namespace FourthDown.Api.Extensions
 {
     public static class OpenTracingExtensions
     {
-        public static IScope InitializeTrace(this ITracer tracer, HttpContext httpContext, string actionName) =>
+        public static IScope InitializeTrace(this ITracer tracer, string actionName) =>
             tracer.BuildSpan(actionName)
-                .WithTag(Tags.SpanKind, Tags.SpanKindClient)
-                .WithTag(Tags.HttpMethod, HttpMethod.Get.ToString())
-                .WithTag(Tags.HttpUrl, httpContext.Request.GetDisplayUrl())
-                .WithTag(Tags.PeerHostIpv4, httpContext.Connection.RemoteIpAddress.MapToIPv4().ToString())
-                .WithTag(Tags.PeerHostIpv6, httpContext.Connection.RemoteIpAddress.MapToIPv6().ToString())
                 .StartActive(true);
+
+        public static void SetTags(this ISpan span, HttpContext httpContext) =>
+            span.SetTag(Tags.SpanKind, Tags.SpanKindClient)
+                .SetTag(Tags.HttpMethod, HttpMethod.Get.ToString())
+                .SetTag(Tags.HttpUrl, httpContext.Request.GetDisplayUrl())
+                .SetTag(Tags.PeerHostIpv4, httpContext.Connection.RemoteIpAddress.MapToIPv4().ToString())
+                .SetTag(Tags.PeerHostIpv6, httpContext.Connection.RemoteIpAddress.MapToIPv6().ToString());
 
         public static IScope BuildTrace(this ITracer tracer, string actionName) =>
             tracer.BuildSpan(actionName).StartActive(true);

@@ -41,14 +41,8 @@ namespace FourthDown.Api.Controllers
         [HttpGet("")]
         public async Task<ActionResult<IEnumerable<Team>>> GetTeams(CancellationToken cancellationToken)
         {
-            using var scope = _tracer.InitializeTrace(HttpContext, nameof(GetTeams));
-
-            scope.LogStart(nameof(_teamRepository.GetTeamsAsync));
-
             var teams = await _teamRepository.GetTeamsAsync(cancellationToken);
-
-            scope.LogEnd(nameof(_teamRepository.GetTeamsAsync));
-
+            
             MetricCollector.RegisterMetrics(HttpContext, Request);
             PrometheusMetrics.RecordsReturned
                 .WithLabels(Request.Method, HttpContext.GetEndpoint().DisplayName)

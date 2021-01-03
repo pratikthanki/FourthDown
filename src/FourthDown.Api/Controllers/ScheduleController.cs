@@ -52,19 +52,14 @@ namespace FourthDown.Api.Controllers
             [FromQuery] ScheduleQueryParameter queryParameter,
             CancellationToken cancellationToken)
         {
-            using var scope = _tracer.InitializeTrace(HttpContext, nameof(GetSchedule));
-
             var errors = queryParameter.Validate();
             if (errors.Count > 0)
                 return BadRequestError(errors);
-
-            scope.LogStart(nameof(_scheduleService.GetGames));
-
+            
             var games = await _scheduleService.GetGames(queryParameter, cancellationToken);
-
-            scope.LogEnd(nameof(_scheduleService.GetGames));
-
+            
             _logger.LogInformation("Successful Games request");
+            _tracer.ActiveSpan.SetTags(HttpContext);
 
             MetricCollector.RegisterMetrics(HttpContext, Request);
             PrometheusMetrics.RecordsReturned
@@ -86,21 +81,15 @@ namespace FourthDown.Api.Controllers
             [FromQuery] GameResultQueryParameter queryParameter,
             CancellationToken cancellationToken)
         {
-            using var scope = _tracer.InitializeTrace(HttpContext, nameof(GetResults));
-            MetricCollector.RegisterMetrics(HttpContext, Request);
-
             var errors = queryParameter.Validate();
             if (errors.Count > 0)
                 return BadRequestError(errors);
-
-            scope.LogStart(nameof(_scheduleService.GetGames));
-
+            
             var games = await _scheduleService.GetGamesBetween(queryParameter, cancellationToken);
-
-            scope.LogEnd(nameof(_scheduleService.GetGames));
-
+            
             _logger.LogInformation("Successful Games request");
-
+            _tracer.ActiveSpan.SetTags(HttpContext);
+            
             MetricCollector.RegisterMetrics(HttpContext, Request);
             PrometheusMetrics.RecordsReturned
                 .WithLabels(Request.Method, HttpContext.GetEndpoint().DisplayName)

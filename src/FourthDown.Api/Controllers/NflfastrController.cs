@@ -54,8 +54,6 @@ namespace FourthDown.Api.Controllers
             [FromQuery] PlayByPlayQueryParameter queryParameter,
             CancellationToken cancellationToken)
         {
-            using var scope = _tracer.InitializeTrace(HttpContext, nameof(GetPlayByPlays));
-            
             var errors = queryParameter.Validate();
             if (errors.Count > 0)
                 return BadRequest(new ValidationProblemDetails(errors)
@@ -66,6 +64,7 @@ namespace FourthDown.Api.Controllers
 
             var plays = await _playByPlayRepository.GetPlayByPlaysAsync(queryParameter, cancellationToken);
 
+            _tracer.ActiveSpan.SetTags(HttpContext);
             MetricCollector.RegisterMetrics(HttpContext, Request);
             PrometheusMetrics.RecordsReturned
                 .WithLabels(Request.Method, HttpContext.GetEndpoint().DisplayName)

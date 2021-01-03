@@ -41,7 +41,7 @@ namespace FourthDown.Api.Controllers
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<ApiKey>> CreateApiKey([FromQuery] ApiKeyQueryParameter queryParameter)
         {
-            using var scope = _tracer.InitializeTrace(HttpContext, nameof(CreateApiKey));
+            using var scope = _tracer.InitializeTrace(nameof(CreateApiKey));
 
             PrometheusMetrics.PathCounter.WithLabels(Request.Method, Request.Path).Inc();
 
@@ -57,6 +57,8 @@ namespace FourthDown.Api.Controllers
                     Title = "Unable to create a new apiKey at this moment. Please try again.",
                     Status = StatusCodes.Status400BadRequest
                 });
+
+            _tracer.ActiveSpan.SetTags(HttpContext);
 
             return Ok(createdKey);
         }

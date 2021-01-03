@@ -3,19 +3,26 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using FourthDown.Api.Extensions;
 using FourthDown.Api.Models;
 using FourthDown.Api.Parameters;
 using FourthDown.Api.Repositories;
+using Microsoft.AspNetCore.Http;
+using OpenTracing;
 
 namespace FourthDown.Api.Services
 {
     public class ScheduleService : IScheduleService
     {
+        private readonly ITracer _tracer;
         private readonly IGameRepository _gameRepository;
         private readonly DateTime Today = DateTime.UtcNow;
 
-        public ScheduleService(IGameRepository gameRepository)
+        public ScheduleService(
+            ITracer tracer,
+            IGameRepository gameRepository)
         {
+            _tracer = tracer;
             _gameRepository = gameRepository;
         }
 
@@ -23,6 +30,10 @@ namespace FourthDown.Api.Services
             ScheduleQueryParameter queryParameter,
             CancellationToken cancellationToken)
         {
+            using var scope = _tracer.InitializeTrace(nameof(GetGames));
+            
+            scope.LogStart(nameof(GetGames));
+
             var gamesPerSeason = await GetAllGames(cancellationToken);
 
             var currentSeason = Today.Month > 8 ? Today.Year : Today.Year - 1;
@@ -35,6 +46,8 @@ namespace FourthDown.Api.Services
 
             if (queryParameter.Week != null)
                 games = games.Where(x => x.Week == queryParameter.Week);
+            
+            scope.LogEnd(nameof(GetGames));
 
             return games;
         }
