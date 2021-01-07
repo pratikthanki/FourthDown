@@ -113,10 +113,8 @@ namespace FourthDown.Api.Repositories.Csv
                 Play.HalfSecondsRemaining = StringParser.ToInt(x[14]);
                 Play.GameSecondsRemaining = StringParser.ToInt(x[15]);
                 Play.Drive = StringParser.ToNullableInt(x[18]);
-                Play.Sp = StringParser.ToInt(x[19]);
                 Play.Qtr = StringParser.ToInt(x[20]);
                 Play.Down = StringParser.ToNullableInt(x[21]);
-                Play.GoalToGo = StringParser.ToInt(x[22]);
                 Play.Time = StringParser.ToString(x[23]);
                 Play.YardLine = StringParser.ToString(x[24]);
                 Play.YdsToGo = StringParser.ToInt(x[25]);
