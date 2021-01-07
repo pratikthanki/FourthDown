@@ -46,6 +46,7 @@ namespace FourthDown.Api
         {
             services
                 .AddSingleton<IGamePlayService, GamePlayService>()
+                .AddSingleton<INflfastrService, NflfastrService>()
                 .AddSingleton<IScheduleService, ScheduleService>()
                 .AddSingleton<ITeamRepository, JsonTeamRepository>()
                 .AddSingleton<IGameRepository, CsvGameRepository>()
