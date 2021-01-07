@@ -3,15 +3,11 @@ namespace FourthDown.Api.Models
     public class PlayByPlay
     {
         public int PlayId { get; set; }
+        public int Week { get; set; }
         public string GameId { get; set; }
         public string HomeTeam { get; set; }
         public string AwayTeam { get; set; }
         public string SeasonType { get; set; }
-        public int Week { get; set; }
-        public string PosTeam { get; set; }
-        public string PosTeamType { get; set; }
-        public string DefTeam { get; set; }
-        public string SideOfField { get; set; }
         public int? YardLine100 { get; set; }
         public int QuarterSecondsRemaining { get; set; }
         public int HalfSecondsRemaining { get; set; }
@@ -19,26 +15,11 @@ namespace FourthDown.Api.Models
         public int? Drive { get; set; }
         public int Qtr { get; set; }
         public int? Down { get; set; }
-        public string Time { get; set; }
-        public string YardLine { get; set; }
-        public int YdsToGo { get; set; }
-        public int? YardsNet { get; set; }
         public string Desc { get; set; }
         public string PlayType { get; set; }
+        public int YdsToGo { get; set; }
+        public int? YardsNet { get; set; }
         public int? YardsGained { get; set; }
-        public int Shotgun { get; set; }
-        public int NoHuddle { get; set; }
-        public int? QbDropBack { get; set; }
-        public int QbKneel { get; set; }
-        public int QbSpike { get; set; }
-        public int QbScramble { get; set; }
-        public string PassLength { get; set; }
-        public string PassLocation { get; set; }
-        public int HomeTimeoutsRemaining { get; set; }
-        public int AwayTimeoutsRemaining { get; set; }
-        public int? Timeout { get; set; }
-        public string TimeoutTeam { get; set; }
-        public string TdTeam { get; set; }
         public int? AirYards { get; set; }
         public int? YardsAfterCatch { get; set; }
         public int TotalHomeScore { get; set; }
@@ -47,19 +28,6 @@ namespace FourthDown.Api.Models
         public int? PosTeamScorePost { get; set; }
         public int? DefTeamScorePost { get; set; }
         public int? ScoreDifferentialPost { get; set; }
-
-        public double NoScoreProb { get; set; }
-        public double OppFgProb { get; set; }
-        public double OppSafetyProb { get; set; }
-        public double OppTdProb { get; set; }
-        public double FgProb { get; set; }
-        public double SafetyProb { get; set; }
-        public double TdProb { get; set; }
-        public double ExtraPointProb { get; set; }
-        public double TwoPointConversionProb { get; set; }
-
-        public double? HomeWpPost { get; set; }
-        public double? AwayWpPost { get; set; }
         public double? Ep { get; set; }
         public double? Epa { get; set; }
         public double TotalHomeEpa { get; set; }
@@ -96,7 +64,6 @@ namespace FourthDown.Api.Models
         public double TotalAwayRawAirWpa { get; set; }
         public double TotalHomeRawYacWpa { get; set; }
         public double TotalAwayRawYacWpa { get; set; }
-
         public string SeriesResult { get; set; }
         public string PlayTypeNfl { get; set; }
         public int FixedDrive { get; set; }
@@ -108,26 +75,28 @@ namespace FourthDown.Api.Models
         public int? DriveInside20 { get; set; }
         public int? DriveEndedWithScore { get; set; }
         public int? DriveYardsPenalized { get; set; }
-
         public string DriveStartTransition { get; set; }
         public string DriveEndTransition { get; set; }
         public string DriveStartYardLine { get; set; }
         public string DriveEndYardLine { get; set; }
         public int? StartDrivePlayId { get; set; }
         public int? EndDrivePlayId { get; set; }
-
         public bool? IsSuccess { get; set; }
         public bool IsPass { get; set; }
         public bool IsRush { get; set; }
         public bool? IsFirstDown { get; set; }
         public bool IsAbortedPlay { get; set; }
         public bool Play { get; set; }
-
+        public int Shotgun { get; set; }
+        public int NoHuddle { get; set; }
+        public int? QbDropBack { get; set; }
+        public int QbKneel { get; set; }
+        public int QbSpike { get; set; }
+        public int QbScramble { get; set; }
         public string PasserName { get; set; }
         public string RusherName { get; set; }
         public string ReceiverName { get; set; }
         public string Name { get; set; }
-
         public double? CompletionProbability { get; set; }
         public double? CompletionProbabilityOverExpected { get; set; }
         public double? QbEpa { get; set; }
