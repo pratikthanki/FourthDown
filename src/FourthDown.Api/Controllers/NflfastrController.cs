@@ -4,8 +4,8 @@ using System.Threading.Tasks;
 using FourthDown.Api.Extensions;
 using FourthDown.Api.Models;
 using FourthDown.Api.Parameters;
-using FourthDown.Api.Repositories;
 using FourthDown.Api.Schemas;
+using FourthDown.Api.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -24,14 +24,14 @@ namespace FourthDown.Api.Controllers
     {
         private readonly ILogger<NflfastrController> _logger;
         private readonly ITracer _tracer;
-        private readonly IPlayByPlayRepository _playByPlayRepository;
+        private readonly INflfastrService _nflfastrService;
 
         public NflfastrController(
-            IPlayByPlayRepository playByPlayRepository,
+            INflfastrService nflfastrService,
             ILogger<NflfastrController> logger,
             ITracer tracer)
         {
-            _playByPlayRepository = playByPlayRepository;
+            _nflfastrService = nflfastrService;
             _logger = logger;
             _tracer = tracer;
         }
@@ -59,7 +59,7 @@ namespace FourthDown.Api.Controllers
                 });
 
             var queryOptions = new PlayByPlayQueryParameter() {Season = queryParameter.Season};
-            var plays = await _playByPlayRepository.GetPlayByPlaysAsync(queryOptions, cancellationToken);
+            var plays = await _nflfastrService.GetAllPlaysAsync(queryOptions, cancellationToken);
 
             _tracer.ActiveSpan.SetTags(HttpContext);
 
