@@ -7,17 +7,11 @@ namespace FourthDown.Api.Tests
 {
     public class StartupTests
     {
-        private static void BuildWith(Dictionary<string, string> appConfig)
+        private static void Build()
         {
             var factory = new WebApplicationFactory<Startup>();
             factory.WithWebHostBuilder(builder =>
             {
-                builder
-                    .ConfigureAppConfiguration((_, config) =>
-                    {
-                        config.Sources.Clear();
-                        config.AddInMemoryCollection(appConfig);
-                    });
             }).CreateClient();
         }
 
@@ -25,13 +19,7 @@ namespace FourthDown.Api.Tests
          TestCase(null)]
         public void AppDoesNotThrowWhenSampleAppOptionNotSet(string option)
         {
-            Assert.DoesNotThrow(() =>
-            {
-                BuildWith(new Dictionary<string, string>
-                {
-                    ["UseSampleAuth"] = option
-                });
-            });
+            Assert.DoesNotThrow(Build);
         }
     }
 }

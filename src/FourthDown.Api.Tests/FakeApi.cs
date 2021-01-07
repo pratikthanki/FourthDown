@@ -88,7 +88,6 @@ namespace FourthDown.Api.Tests
 
         protected async Task<(HttpStatusCode, string)> SendRequest(
             string endpoint,
-            string apiKey,
             Dictionary<string, string> parameters)
         {
             var parameterString = parameters == null
@@ -102,7 +101,6 @@ namespace FourthDown.Api.Tests
             };
 
             request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            request.Headers.Add("X-API-KEY", apiKey);
 
             var response = await Client.SendAsync(request);
             var responseString = await response.Content.ReadAsStringAsync();
