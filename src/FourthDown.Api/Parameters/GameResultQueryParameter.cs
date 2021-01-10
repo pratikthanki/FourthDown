@@ -1,5 +1,5 @@
+using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 
 namespace FourthDown.Api.Parameters
 {
@@ -43,29 +43,29 @@ namespace FourthDown.Api.Parameters
         /// - All
         /// ```
         /// </summary>
-        /// <remarks>
-        /// If not set, defaults to `All`.
-        /// </remarks>
         /// <example>
         /// Post
         /// </example>
-        public GameTypeFilter? GameType { get; set; }
+        public string GameType { get; set; }
 
         public Dictionary<string, string[]> Validate()
         {
             var errors = new Dictionary<string, string[]>();
 
-            if (GameOffset == 0 || GameOffset > 20)
-                errors["gameOffset"] = new[] {"GameOffset should be between 1 and 20."};
+            if (GameOffset < 1)
+                errors["gameOffset"] = new[] {"GameOffset should be greater than 1."};
             
             if (string.IsNullOrWhiteSpace(Team))
                 errors["team"] = new[] {"Team must be provided."};
             
-            if (GameType == null)
-                errors["team"] = new[] {"GameType should be one of; Reg, Post, All."};
+            if (!Enum.TryParse(GameType, out GameTypeFilter _))
+                errors["team"] = new[] {"GameType should be one of; 'Reg', 'Post' or 'All'."};
 
             return errors;
         }
+
+        public GameTypeFilter ToGameTypeFilter() => Enum.Parse<GameTypeFilter>(GameType);
+
     }
 
     public enum GameTypeFilter

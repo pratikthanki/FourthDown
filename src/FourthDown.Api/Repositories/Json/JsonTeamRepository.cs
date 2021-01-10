@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
@@ -35,10 +36,15 @@ namespace FourthDown.Api.Repositories.Json
 
             scope.LogEnd(nameof(GetTeamsAsync));
 
-            return await JsonSerializer.DeserializeAsync<IEnumerable<Team>>(
+            var teams = await JsonSerializer.DeserializeAsync<IEnumerable<Team>>(
                 SourceStream,
                 StringParser.JsonSerializerOptions,
                 cancellationToken);
+
+            return teams
+                .OrderBy(x => x.Conference)
+                .ThenBy(x => x.DivisionIndex)
+                .ThenBy(x => x.City);
         }
     }
 }

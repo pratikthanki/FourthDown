@@ -59,7 +59,7 @@ namespace FourthDown.Api.Services
             var team = queryParameter.Team;
             var opposition = queryParameter.Opposition;
             var offset = queryParameter.GameOffset;
-            var gameType = queryParameter.GameType;
+            var gameType = queryParameter.ToGameTypeFilter();
             
             var gamesPerSeason = await GetAllGames(cancellationToken);
 

@@ -25,7 +25,7 @@
     "name": "Bills",
     "abr": "BUF",
     "conf": "AFC",
-    "div": "EAST"
+    "div": "East"
   },
   {
     "city": "Carolina",
@@ -218,7 +218,7 @@
   },
   {
     "city": "Washington",
-    "name": "Washington",
+    "name": "Football Team",
     "abr": "WAS",
     "conf": "NFC",
     "div": "East"
