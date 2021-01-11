@@ -45,8 +45,8 @@ namespace FourthDown.Api.Controllers
         /// <param name="cancellationToken"></param>
         /// <returns>List of game play by plays</returns>
         [HttpGet("")]
-        [ProducesResponseType(typeof(PlayByPlayResponse[]), StatusCodes.Status200OK)]
-        public async Task<ActionResult<IEnumerable<PlayByPlay>>> GetPlayByPlays(
+        [ProducesResponseType(typeof(TeamPlayByPlay[]), StatusCodes.Status200OK)]
+        public async Task<ActionResult<IEnumerable<TeamPlayByPlay>>> GetPlayByPlays(
             [FromQuery] NflfastrQueryParameter queryParameter,
             CancellationToken cancellationToken)
         {
@@ -58,8 +58,7 @@ namespace FourthDown.Api.Controllers
                     Status = StatusCodes.Status400BadRequest
                 });
 
-            var queryOptions = new PlayByPlayQueryParameter() {Season = queryParameter.Season};
-            var plays = await _nflfastrService.GetAllPlaysAsync(queryOptions, cancellationToken);
+            var plays = await _nflfastrService.GetSummarisedStats(queryParameter, cancellationToken);
 
             _tracer.ActiveSpan.SetTags(HttpContext);
 
