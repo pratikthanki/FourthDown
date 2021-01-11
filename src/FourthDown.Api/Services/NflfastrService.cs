@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using FourthDown.Api.Controllers;
@@ -26,11 +28,23 @@ namespace FourthDown.Api.Services
             _tracer = tracer;
         }
 
-        public async Task<IEnumerable<PlayByPlay>> GetAllPlaysAsync(
-            PlayByPlayQueryParameter queryParameter,
+        public async Task<IEnumerable<TeamPlayByPlay>> GetSummarisedStats(
+            NflfastrQueryParameter queryParameter,
             CancellationToken cancellationToken)
         {
-            return await _playByPlayRepository.GetPlayByPlaysAsync(queryParameter, cancellationToken);
+            var plays = await _playByPlayRepository.GetPlayByPlaysAsync(
+                queryParameter.Season, queryParameter.Team, cancellationToken);
+
+            var playsByKey = plays
+                .GroupBy(x => x.ToPlayKey())
+                .ToDictionary(k => k.Key, x =>
+                {
+                    return new TeamPlayByPlay(x.Key, x.ToList());
+                });
+
+            var teamPlays = playsByKey.Select(x => x.Value).ToList();
+
+            return teamPlays;
         }
     }
 }

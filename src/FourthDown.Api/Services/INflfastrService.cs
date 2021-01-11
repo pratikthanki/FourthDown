@@ -8,8 +8,8 @@ namespace FourthDown.Api.Services
 {
     public interface INflfastrService
     {
-        Task<IEnumerable<PlayByPlay>> GetAllPlaysAsync(
-            PlayByPlayQueryParameter queryOptions,
+        Task<IEnumerable<TeamPlayByPlay>> GetSummarisedStats(
+            NflfastrQueryParameter queryParameter,
             CancellationToken cancellationToken);
     }
 }
