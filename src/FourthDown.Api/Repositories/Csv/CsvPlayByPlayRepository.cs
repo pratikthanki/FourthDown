@@ -40,14 +40,20 @@ namespace FourthDown.Api.Repositories.Csv
             if (!response.IsSuccessStatusCode)
                 return Enumerable.Empty<NflfastrPlayByPlay>();
 
-            var stream = await response.Content.ReadAsStreamAsync();
-            var responseString = await ResponseHelper.ReadCompressedStreamToString(stream);
+            var stream = await response.Content.ReadAsByteArrayAsync();
+
+            _logger.LogInformation($"{nameof(GetPlayByPlaysAsync)}: before ReadCompressedStreamToString");
+
+            var responseStringTask = ResponseHelper.ReadCompressedStreamToString(stream);
+
+            _logger.LogInformation($"{nameof(GetPlayByPlaysAsync)}: after ReadCompressedStreamToString");
 
             var results = new List<NflfastrPlayByPlay>();
 
             _logger.LogInformation($"Started method {nameof(ProcessPlayByPlayResponse)}");
 
-            foreach (var play in ProcessPlayByPlayResponse(responseString, scope))
+            await foreach (var play in ProcessPlayByPlayResponse(responseStringTask, scope)
+                .WithCancellation(cancellationToken))
             {
                 if (string.IsNullOrWhiteSpace(team))
                 {
@@ -71,10 +77,13 @@ namespace FourthDown.Api.Repositories.Csv
             return results;
         }
 
-        private static IEnumerable<NflfastrPlayByPlay> ProcessPlayByPlayResponse(string responseBody, IScope scope)
+        private static async IAsyncEnumerable<NflfastrPlayByPlay> ProcessPlayByPlayResponse(Task<string> dataTask,
+            IScope scope)
         {
             scope.LogStart(nameof(ProcessPlayByPlayResponse));
-            
+
+            var responseBody = await dataTask;
+
             _logger.LogInformation($"{nameof(ProcessPlayByPlayResponse)}: before csv response");
 
             var csvResponse = responseBody
@@ -89,26 +98,23 @@ namespace FourthDown.Api.Repositories.Csv
             var groupedPlays = csvResponse
                 .GroupBy(x => x[28])
                 .ToDictionary(x => x.Key, x => x.ToList());
-            
+
             _logger.LogInformation($"{nameof(ProcessPlayByPlayResponse)}: after grouped plays");
 
-            foreach (var row in groupedPlays["pass"])
+            var keysToReturn = new List<string>() {"pass", "run"};
+            foreach (var key in keysToReturn)
             {
-                var Play = new NflfastrPlayByPlay(row);
-                if (Play.IsPass || Play.IsRush || Play.Down != null)
-                    yield return Play;
-            }
-            
-            _logger.LogInformation($"{nameof(ProcessPlayByPlayResponse)}: after pass foreach");
+                _logger.LogInformation($"{nameof(ProcessPlayByPlayResponse)}: after {key} foreach");
 
-            foreach (var row in groupedPlays["run"])
-            {
-                var Play = new NflfastrPlayByPlay(row);
-                if (Play.IsPass || Play.IsRush || Play.Down != null)
-                    yield return Play;
+                foreach (var row in groupedPlays[key])
+                {
+                    var Play = new NflfastrPlayByPlay(row);
+                    if (Play.IsPass || Play.IsRush || Play.Down != null)
+                        yield return Play;
+                }
+
+                _logger.LogInformation($"{nameof(ProcessPlayByPlayResponse)}: after {key} foreach");
             }
-            
-            _logger.LogInformation($"{nameof(ProcessPlayByPlayResponse)}: after run foreach");
 
             scope.LogEnd(nameof(ProcessPlayByPlayResponse));
         }
