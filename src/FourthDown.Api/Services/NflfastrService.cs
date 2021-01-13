@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -32,19 +31,20 @@ namespace FourthDown.Api.Services
             NflfastrQueryParameter queryParameter,
             CancellationToken cancellationToken)
         {
+            _logger.LogInformation($"Started method {nameof(GetSummarisedStats)}");
+
             var plays = await _playByPlayRepository.GetPlayByPlaysAsync(
-                queryParameter.Season, queryParameter.Team, cancellationToken);
+                queryParameter.Season, 
+                queryParameter.Team, 
+                cancellationToken).ToArrayAsync(cancellationToken);
 
             var playsByKey = plays
                 .GroupBy(x => x.ToPlayKey())
-                .ToDictionary(k => k.Key, x =>
-                {
-                    return new TeamPlayByPlay(x.Key, x.ToList());
-                });
+                .ToDictionary(k => k.Key, x => new TeamPlayByPlay(x.Key, x.ToList()));
+            
+            _logger.LogInformation($"Finished method {nameof(GetSummarisedStats)}");
 
-            var teamPlays = playsByKey.Select(x => x.Value).ToList();
-
-            return teamPlays;
+            return playsByKey.Select(x => x.Value);
         }
     }
 }

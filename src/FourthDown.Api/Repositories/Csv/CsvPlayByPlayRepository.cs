@@ -1,5 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using FourthDown.Api.Extensions;
@@ -7,6 +9,7 @@ using FourthDown.Api.Models;
 using FourthDown.Api.Utilities;
 using Microsoft.Extensions.Logging;
 using OpenTracing;
+#pragma warning disable 1998
 
 namespace FourthDown.Api.Repositories.Csv
 {
@@ -23,10 +26,10 @@ namespace FourthDown.Api.Repositories.Csv
             _logger = logger;
         }
 
-        public async Task<IEnumerable<NflfastrPlayByPlay>> GetPlayByPlaysAsync(
+        public async IAsyncEnumerable<NflfastrPlayByPlay> GetPlayByPlaysAsync(
             int? season,
             string team,
-            CancellationToken cancellationToken)
+            [EnumeratorCancellation] CancellationToken cancellationToken)
         {
             using var scope = _tracer.BuildTrace(nameof(GetPlayByPlaysAsync));
 
@@ -38,85 +41,85 @@ namespace FourthDown.Api.Repositories.Csv
             _logger.LogInformation($"Fetching data. Url: {path}; Status: {response.StatusCode}");
 
             if (!response.IsSuccessStatusCode)
-                return Enumerable.Empty<NflfastrPlayByPlay>();
-
-            var stream = await response.Content.ReadAsByteArrayAsync();
+                yield return new NflfastrPlayByPlay();
 
             _logger.LogInformation($"{nameof(GetPlayByPlaysAsync)}: before ReadCompressedStreamToString");
 
-            var responseStringTask = ResponseHelper.ReadCompressedStreamToString(stream);
+            var responseString = await ResponseHelper.ReadCompressedStreamToString(response);
 
             _logger.LogInformation($"{nameof(GetPlayByPlaysAsync)}: after ReadCompressedStreamToString");
 
-            var results = new List<NflfastrPlayByPlay>();
-
-            _logger.LogInformation($"Started method {nameof(ProcessPlayByPlayResponse)}");
-
-            await foreach (var play in ProcessPlayByPlayResponse(responseStringTask, scope)
+            await foreach (var play in ProcessPlayByPlayResponse(responseString, team, scope)
                 .WithCancellation(cancellationToken))
             {
-                if (string.IsNullOrWhiteSpace(team))
-                {
-                    results.Add(play);
-                }
-                else
-                {
-                    if (play.AwayTeam == team || play.HomeTeam == team)
-                    {
-                        results.Add(play);
-                    }
-                }
+                yield return play;
             }
-
-            _logger.LogInformation($"Finished method {nameof(ProcessPlayByPlayResponse)}");
-
-            scope.LogEnd(nameof(GetPlayByPlaysAsync));
-
-            scope.Span.SetTag("Total rows", results.Count);
-
-            return results;
         }
 
-        private static async IAsyncEnumerable<NflfastrPlayByPlay> ProcessPlayByPlayResponse(Task<string> dataTask,
+        private static async IAsyncEnumerable<NflfastrPlayByPlay> ProcessPlayByPlayResponse(
+            string data,
+            string team,
             IScope scope)
         {
+            _logger.LogInformation($"Started method {nameof(ProcessPlayByPlayResponse)}");
             scope.LogStart(nameof(ProcessPlayByPlayResponse));
 
-            var responseBody = await dataTask;
-
-            _logger.LogInformation($"{nameof(ProcessPlayByPlayResponse)}: before csv response");
-
-            var csvResponse = responseBody
+            var csvResponse = data
                 .Split("\n")
                 .Skip(1) // Skip header row
-                .Select(x => StringParser.SplitCsvLine(x)) // Parse lines and delimit by column and ignore quotes
-                .Where(x => !x.All(cell => cell == "")) // Account for empty lines
+                // .Where(x => x.Any(cell => cell != "")) // Account for empty lines
                 .ToList();
 
-            _logger.LogInformation($"{nameof(ProcessPlayByPlayResponse)}: after csv response");
+            // Last element is an empty line
+            csvResponse.RemoveAt(csvResponse.Count - 1);
 
-            var groupedPlays = csvResponse
-                .GroupBy(x => x[28])
-                .ToDictionary(x => x.Key, x => x.ToList());
+            _logger.LogInformation($"{nameof(ProcessPlayByPlayResponse)}: after csvResponse");
 
-            _logger.LogInformation($"{nameof(ProcessPlayByPlayResponse)}: after grouped plays");
-
-            var keysToReturn = new List<string>() {"pass", "run"};
-            foreach (var key in keysToReturn)
+            foreach (var line in csvResponse)
             {
-                _logger.LogInformation($"{nameof(ProcessPlayByPlayResponse)}: after {key} foreach");
+                var play = SplitCsvLine(line, team);
 
-                foreach (var row in groupedPlays[key])
-                {
-                    var Play = new NflfastrPlayByPlay(row);
-                    if (Play.IsPass || Play.IsRush || Play.Down != null)
-                        yield return Play;
-                }
+                if (play == null) continue;
 
-                _logger.LogInformation($"{nameof(ProcessPlayByPlayResponse)}: after {key} foreach");
+                if ((play.IsPass || play.IsRush) && play.Down != null) yield return play;
             }
 
             scope.LogEnd(nameof(ProcessPlayByPlayResponse));
+            _logger.LogInformation($"Finished method {nameof(ProcessPlayByPlayResponse)}");
+        }
+
+        private static NflfastrPlayByPlay SplitCsvLine(string line, string team)
+        {
+            var result = new List<string>();
+            var currentStr = new StringBuilder("");
+            var inQuotes = false;
+
+            foreach (var T in line)
+            {
+                switch (T)
+                {
+                    case '\"':
+                        inQuotes = !inQuotes;
+                        break;
+                    case ',' when !inQuotes:
+                        result.Add(currentStr.ToString());
+                        currentStr.Clear();
+                        break;
+                    case ',':
+                        currentStr.Append(T);
+                        break;
+                    default:
+                        currentStr.Append(T);
+                        break;
+                }
+            }
+
+            result.Add(currentStr.ToString());
+            var final = new NflfastrPlayByPlay(result.ToArray());
+
+            if (string.IsNullOrWhiteSpace(team)) return final;
+
+            return final.PosTeam == team ? final : null;
         }
     }
 }

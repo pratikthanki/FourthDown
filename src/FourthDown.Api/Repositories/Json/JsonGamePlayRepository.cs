@@ -54,12 +54,10 @@ namespace FourthDown.Api.Repositories.Json
 
             _logger.LogInformation($"Fetching data. Url: {url}; Status: {response.StatusCode}");
 
-            var stream = await response.Content.ReadAsByteArrayAsync();
-
             if (!response.IsSuccessStatusCode)
                 return new GameDetail();
 
-            var data = ResponseHelper.ReadCompressedStreamToString(stream);
+            var data = ResponseHelper.ReadCompressedStreamToString(response);
 
             scope.LogEnd(nameof(GetGameJson));
 

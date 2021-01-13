@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using FourthDown.Api.Utilities;
 
 namespace FourthDown.Api.Models
@@ -118,6 +117,10 @@ namespace FourthDown.Api.Models
             ExpectedYardsAfterCatchFirstDown = StringParser.ToNullableDouble(x[339]);
             
             #endregion
+        }
+
+        public NflfastrPlayByPlay()
+        {
         }
 
         #region NflfastrPlayByPlayProperties fields

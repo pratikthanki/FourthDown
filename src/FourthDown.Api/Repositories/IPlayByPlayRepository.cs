@@ -8,7 +8,7 @@ namespace FourthDown.Api.Repositories
 {
     public interface IPlayByPlayRepository
     {
-        Task<IEnumerable<NflfastrPlayByPlay>> GetPlayByPlaysAsync(
+        IAsyncEnumerable<NflfastrPlayByPlay> GetPlayByPlaysAsync(
             int? season,
             string team,
             CancellationToken cancellationToken);
