@@ -81,9 +81,7 @@ namespace FourthDown.Api.Tests
                 .Setup(pbp => pbp.GetPlayByPlaysAsync(
                     It.IsAny<int?>(),
                     It.IsAny<string>(),
-                    It.IsAny<CancellationToken>()))
-                .Returns(() => Task<IEnumerable<NflfastrPlayByPlay>>.Factory.StartNew(() => new List<NflfastrPlayByPlay>()));
-
+                    It.IsAny<CancellationToken>()));
         }
 
         protected async Task<(HttpStatusCode, string)> SendRequest(

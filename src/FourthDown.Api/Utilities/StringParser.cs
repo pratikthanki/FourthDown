@@ -105,38 +105,5 @@ namespace FourthDown.Api.Utilities
         {
             return GetAbsolutePath($@"../../../Data/{file}");
         }
-        
-        public static string[] SplitCsvLine(string line)
-        {
-            var result = new List<string>();
-            var currentStr = new StringBuilder("");
-            var inQuotes = false;
-
-            foreach (var T in line)
-                if (T == '\"')
-                {
-                    inQuotes = !inQuotes;
-                }
-                else if (T == ',')
-                {
-                    if (!inQuotes)
-                    {
-                        result.Add(currentStr.ToString());
-                        currentStr.Clear();
-                    }
-                    else
-                    {
-                        currentStr.Append(T);
-                    }
-                }
-                else
-                {
-                    currentStr.Append(T);
-                }
-
-            result.Add(currentStr.ToString());
-
-            return result.ToArray();
-        }
     }
 }
