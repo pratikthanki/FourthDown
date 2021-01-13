@@ -1,7 +1,9 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+using System.Text;
 using System.Text.Json;
 
 namespace FourthDown.Api.Utilities
@@ -79,7 +81,7 @@ namespace FourthDown.Api.Utilities
 
         public static string ToString(string str)
         {
-            return IsNa(str) ? "" : str;
+            return IsNa(str) ? "NA" : str;
         }
 
         private static bool IsNa(string value)

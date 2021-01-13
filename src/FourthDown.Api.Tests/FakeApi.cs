@@ -7,7 +7,6 @@ using System.Net.Http.Headers;
 using System.Threading;
 using System.Threading.Tasks;
 using FourthDown.Api.Models;
-using FourthDown.Api.Parameters;
 using FourthDown.Api.Repositories;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
@@ -80,10 +79,9 @@ namespace FourthDown.Api.Tests
 
             _mockPlayByPlayRepository
                 .Setup(pbp => pbp.GetPlayByPlaysAsync(
-                    It.IsAny<PlayByPlayQueryParameter>(),
-                    It.IsAny<CancellationToken>()))
-                .Returns(() => Task<IEnumerable<PlayByPlay>>.Factory.StartNew(() => new List<PlayByPlay>()));
-
+                    It.IsAny<int?>(),
+                    It.IsAny<string>(),
+                    It.IsAny<CancellationToken>()));
         }
 
         protected async Task<(HttpStatusCode, string)> SendRequest(

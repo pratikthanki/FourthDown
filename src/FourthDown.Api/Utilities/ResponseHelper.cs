@@ -1,24 +1,21 @@
 using System.IO;
-using System.Text;
+using System.IO.Compression;
+using System.Net.Http;
 using System.Threading.Tasks;
-using ICSharpCode.SharpZipLib.Core;
-using ICSharpCode.SharpZipLib.GZip;
 
 namespace FourthDown.Api.Utilities
 {
-    public class ResponseHelper
+    public static class ResponseHelper
     {
-        public static async Task<string> ReadCompressedStreamToString(Stream stream)
+        public static async Task<string> ReadCompressedStreamToString(HttpResponseMessage response)
         {
-            await using var inStream = new GZipInputStream(stream);
-            await using var MemoryStream = new MemoryStream();
+            var inputBytes = await response.Content.ReadAsByteArrayAsync();
 
-            var buffer = new byte[4096];
-            StreamUtils.Copy(inStream, MemoryStream, buffer);
+            await using var inputStream = new MemoryStream(inputBytes);
+            await using var gZipStream = new GZipStream(inputStream, CompressionMode.Decompress);
+            using var streamReader = new StreamReader(gZipStream);
 
-            var data = Encoding.UTF8.GetString(MemoryStream.ToArray());
-
-            return data;
+            return await streamReader.ReadToEndAsync();
         }
     }
 }

@@ -54,21 +54,20 @@ namespace FourthDown.Api.Repositories.Json
 
             _logger.LogInformation($"Fetching data. Url: {url}; Status: {response.StatusCode}");
 
-            var stream = await response.Content.ReadAsStreamAsync();
-
             if (!response.IsSuccessStatusCode)
                 return new GameDetail();
 
-            var data = await ResponseHelper.ReadCompressedStreamToString(stream);
+            var data = ResponseHelper.ReadCompressedStreamToString(response);
 
             scope.LogEnd(nameof(GetGameJson));
 
-            return ParseResponseString(url, data);
+            return await ParseResponseString(url, data);
         }
 
-        private static GameDetail ParseResponseString(string url, string data)
+        private static async Task<GameDetail> ParseResponseString(string url, Task<string> dataTask)
         {
             GameRaw gameRaw = null;
+            var data = await dataTask;
             try
             {
                 gameRaw = JsonSerializer.Deserialize<GameRaw>(data, StringParser.JsonSerializerOptions);

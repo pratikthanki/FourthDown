@@ -9,6 +9,6 @@ namespace FourthDown.Api.Utilities
             "https://github.com/pratikthanki/nflfastR-raw/blob/upstream";
 
         public static readonly string PlayByPlayEndpoint =
-            "https://github.com/pratikthanki/nflfastR-data/blob/master/data";
+            "https://github.com/pratikthanki/nflfastR-data/blob/upstream/data";
     }
 }

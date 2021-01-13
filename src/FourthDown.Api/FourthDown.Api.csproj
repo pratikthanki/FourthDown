@@ -12,7 +12,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="ICSharpCode.SharpZipLib.dll" Version="0.85.4.369" />
       <PackageReference Include="Jaeger" Version="0.4.2" />
       <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.16.0" />
       <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning" Version="4.2.0" />
@@ -25,7 +24,7 @@
       <PackageReference Include="Serilog" Version="2.10.0" />
       <PackageReference Include="Serilog.AspNetCore" Version="3.4.0" />
       <PackageReference Include="Swashbuckle.AspNetCore" Version="5.6.3" />
-      <PackageReference Include="Swashbuckle.AspNetCore.ReDoc" Version="5.6.3" />
+      <PackageReference Include="System.Linq.Async" Version="5.0.0" />
     </ItemGroup>
 
     <ItemGroup>
