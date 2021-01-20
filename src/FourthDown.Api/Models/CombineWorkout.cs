@@ -4,9 +4,11 @@ namespace FourthDown.Api.Models
 {
     public class CombineWorkout
     {
+        [JsonIgnore]
         [JsonPropertyName("Id")] 
         public int Id { get; set; }
 
+        [JsonIgnore]
         [JsonPropertyName("ShieldId")] 
         public string ShieldId { get; set; }
 
@@ -22,28 +24,28 @@ namespace FourthDown.Api.Models
         [JsonPropertyName("Position")] 
         public string Position { get; set; }
 
-        [JsonPropertyName("season")] 
+        [JsonPropertyName("Season")] 
         public int Season { get; set; }
 
         [JsonPropertyName("FORTY_YARD_DASH")] 
-        public double FortyYardDash { get; set; }
+        public double? FortyYardDash { get; set; }
 
         [JsonPropertyName("BENCH_PRESS")] 
         public double? BenchPress { get; set; }
 
         [JsonPropertyName("VERTICAL_JUMP")] 
-        public double VerticalJump { get; set; }
+        public double? VerticalJump { get; set; }
 
         [JsonPropertyName("BROAD_JUMP")] 
-        public double BroadJump { get; set; }
+        public double? BroadJump { get; set; }
 
         [JsonPropertyName("THREE_CONE_DRILL")] 
         public double? ThreeConeDrill { get; set; }
 
         [JsonPropertyName("TWENTY_YARD_SHUTTLE")] 
-        public object TwentyYardShuttle { get; set; }
+        public double? TwentyYardShuttle { get; set; }
 
         [JsonPropertyName("SIXTY_YARD_SHUTTLE")] 
-        public object SixtyYardShuttle { get; set; }
+        public double? SixtyYardShuttle { get; set; }
     }
 }
