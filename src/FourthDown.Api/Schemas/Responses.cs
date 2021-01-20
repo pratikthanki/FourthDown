@@ -223,6 +223,51 @@ namespace FourthDown.Api.Schemas
         public IList<ScoringSummary> ScoringSummaries { get; set; }
     }
 
+    public class CombineWorkoutResponse
+    {
+        /// <example>2563967</example>
+        public int Id { get; set; }
+
+        /// <example>32194c41-4d13-8457-fcbe-d37fdbd87233</example>
+        public string ShieldId { get; set; }
+
+        /// <example>Joe</example>
+        public string FirstName { get; set; }
+
+        /// <example>Bloggs</example>
+        public string LastName { get; set; }
+
+        /// <example>Michigan</example>
+        public string College { get; set; }
+
+        /// <example>S</example>
+        public string Position { get; set; }
+
+        /// <example>2020</example>
+        public int Season { get; set; }
+
+        /// <example>4.5</example>
+        public double FortyYardDash { get; set; }
+
+        /// <example>11.0</example>
+        public double? BenchPress { get; set; }
+
+        /// <example>34.5</example>
+        public double VerticalJump { get; set; }
+
+        /// <example>120.0</example>
+        public double BroadJump { get; set; }
+
+        /// <example>7.45</example>
+        public double? ThreeConeDrill { get; set; }
+
+        /// <example>4.5</example>
+        public object TwentyYardShuttle { get; set; }
+
+        /// <example></example>
+        public object SixtyYardShuttle { get; set; }
+    }
+
     public class PlayByPlayResponse
     {
         public int PlayId { get; set; }
