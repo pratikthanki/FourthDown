@@ -1,7 +1,7 @@
 import styled from "@emotion/styled";
 import { observer } from "mobx-react";
 
-import store from "../src/store";
+import teamStore from "../src/stores/teamStore"
 
 const Input = styled.input`
   width: 100%;
@@ -13,8 +13,8 @@ const PokemonFilter = () => {
   return (
     <Input
       type="text"
-      value={store.filter}
-      onChange={(evt) => store.setFilter(evt.target.value)}
+      value={teamStore.filter}
+      onChange={(evt) => teamStore.setFilter(evt.target.value)}
     />
   );
 };

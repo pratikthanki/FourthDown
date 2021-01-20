@@ -1,4 +1,6 @@
 import { makeObservable, observable, computed } from "mobx"
+import useSWR from 'swr'
+import fetch from "node-fetch"
 
 class Store {
   pokemon = [];
@@ -33,12 +35,21 @@ class Store {
   }
 }
 
-const store = new Store();
+const teamStore = new Store();
 
-if (typeof window != "undefined") {
-  fetch("/pokemon.json")
-    .then((resp) => resp.json())
-    .then((pokemon) => store.setPokemon(pokemon));
-}
+const base_url = "http://localhost:5000/"
+const endpoint = "api/teams"
 
-export default store;
+const url = `${base_url}${endpoint}`
+
+console.log(url)
+
+fetch(url)
+  .then((resp) => resp.json())
+  .catch((error) => {
+    assert.isNotOk(error, 'Promise error');
+    done();
+  })
+  .then((pokemon) => store.setPokemon(pokemon));
+
+export default teamStore;

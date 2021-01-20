@@ -1,17 +1,18 @@
 import { observer } from "mobx-react";
 
 import store from "../src/store";
+import teamStore from "../src/stores/teamStore"
 
 const PokemonInfo = () => {
-  return store.selectedPokemon ? (
+  return teamStore.selectedPokemon ? (
     <div>
-      <h2>{store.selectedPokemon.name.english}</h2>
+      <h2>{teamStore.selectedPokemon.name.english}</h2>
       <table>
         <tbody>
-          {Object.keys(store.selectedPokemon.base).map((key) => (
+          {Object.keys(teamStore.selectedPokemon.base).map((key) => (
             <tr key={key}>
               <td>{key}</td>
-              <td>{store.selectedPokemon.base[key]}</td>
+              <td>{teamStore.selectedPokemon.base[key]}</td>
             </tr>
           ))}
         </tbody>

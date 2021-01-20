@@ -4,6 +4,7 @@ import { Button } from "@material-ui/core";
 import { observer } from "mobx-react";
 
 import PokemonType from "../src/pokemonType";
+import TeamType from "../src/types/teamType";
 
 const PokemonRow = ({ pokemon, onClick }) => (
   <>
@@ -28,7 +29,7 @@ const PokemonRow = ({ pokemon, onClick }) => (
 );
 
 PokemonRow.propTypes = {
-  pokemon: PropTypes.arrayOf(PokemonType),
+  pokemon: PropTypes.arrayOf(TeamType),
 };
 
 export default observer(PokemonRow);
