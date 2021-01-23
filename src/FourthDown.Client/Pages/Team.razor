@@ -1,0 +1,42 @@
+﻿@page "/teams"
+
+@using FourthDown.Client.Services
+@inject IDataService DataService
+
+<h1>Schedule</h1>
+
+<p>This is the schedule.</p>
+
+@if (results == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Team</th>
+                <th>Division</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var team in results)
+            {
+                <tr>
+                    <td>@team.TeamNameLabel</td>
+                    <td>@team.Label</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private IEnumerable<Api.Models.Team> results;
+
+    protected override async Task OnInitializedAsync()
+    {
+        results = await DataService.GetTeams();
+    }
+}
