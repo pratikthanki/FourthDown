@@ -1,6 +1,4 @@
-using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.Extensions.Configuration;
 using NUnit.Framework;
 
 namespace FourthDown.Api.Tests

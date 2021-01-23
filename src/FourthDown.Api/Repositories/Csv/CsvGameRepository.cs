@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -54,7 +53,7 @@ namespace FourthDown.Api.Repositories.Csv
                 {
                     GameId = fields[0],
                     Season = StringParser.ToInt(fields[1]),
-                    GameType = Enum.Parse<GameType>(fields[2]),
+                    GameType = fields[2],
                     Week = StringParser.ToInt(fields[3]),
                     Gameday = StringParser.ToDateTime(fields[4], "yyyy-MM-dd"),
                     Weekday = fields[5],

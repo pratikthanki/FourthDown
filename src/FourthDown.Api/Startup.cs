@@ -52,6 +52,7 @@ namespace FourthDown.Api
                 .AddSingleton<IGameRepository, CsvGameRepository>()
                 .AddSingleton<IGamePlayRepository, JsonGamePlayRepository>()
                 .AddSingleton<IPlayByPlayRepository, CsvPlayByPlayRepository>()
+                .AddSingleton<ICombineRepository, JsonCombineRepository>()
                 .AddSingleton<ITracer>(serviceProvider =>
                 {
                     var serviceName = serviceProvider.GetRequiredService<IWebHostEnvironment>().ApplicationName;

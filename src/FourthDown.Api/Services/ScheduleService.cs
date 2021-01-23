@@ -7,7 +7,6 @@ using FourthDown.Api.Extensions;
 using FourthDown.Api.Models;
 using FourthDown.Api.Parameters;
 using FourthDown.Api.Repositories;
-using Microsoft.AspNetCore.Http;
 using OpenTracing;
 
 namespace FourthDown.Api.Services

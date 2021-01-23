@@ -8,11 +8,14 @@ namespace FourthDown.Api.Models
         public string City { get; set; }
         public string Name { get; set; }
 
-        [JsonPropertyName("abr")] public string Abbreviation { get; set; }
+        [JsonPropertyName("abr")] 
+        public string Abbreviation { get; set; }
 
-        [JsonPropertyName("conf")] public string Conference { get; set; }
+        [JsonPropertyName("conf")] 
+        public string Conference { get; set; }
 
-        [JsonPropertyName("div")] public string Division { get; set; }
+        [JsonPropertyName("div")] 
+        public string Division { get; set; }
 
         public string Label => $"{Conference} {Division}";
         public string TeamNameLabel => $"{City} {Name}";

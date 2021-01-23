@@ -1,14 +1,11 @@
-using System.Runtime.Serialization;
-
 namespace FourthDown.Api.Models
 {
-    public enum GameType
+    public static class GameType
     {
-        [EnumMember(Value = "REG")] REG, // Regular
-        [EnumMember(Value = "WC")] WC, // Wild Card
-        [EnumMember(Value = "DIV")] DIV, // Divisional
-        [EnumMember(Value = "CON")] CON, // Conference
-        [EnumMember(Value = "SB")] SB, // Super Bowl
-        [EnumMember(Value = "All")] All
+        public static string REG = "REG";
+        public static string WC = "WC";
+        public static string DIV = "DIV";
+        public static string CON = "CON";
+        public static string SB = "SB";
     }
 }

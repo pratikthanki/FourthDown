@@ -6,7 +6,7 @@ namespace FourthDown.Api.Models
     {
         public string GameId { get; set; }
         public int Season { get; set; }
-        public GameType GameType { get; set; }
+        public string GameType { get; set; }
         public int Week { get; set; }
         public DateTime Gameday { get; set; }
         public string Weekday { get; set; }
