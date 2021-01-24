@@ -39,7 +39,9 @@ namespace FourthDown.Client.Services
             var currentSeason = Today.Month > 8 ? Today.Year : Today.Year - 1;
 
             var data = (await GetData<Game>(scheduleEndpoint)).ToList();
-            var currentWeek = data.Where(game => game.Gameday >= Today).Min().Week;
+            var currentWeek = data
+                .Where(game => game.Gameday >= Today.Date)
+                .Select(game => game.Week).Min();
 
             return data.Where(game => game.Week == currentWeek);
         }
@@ -52,10 +54,11 @@ namespace FourthDown.Client.Services
 
             if (!response.IsSuccessStatusCode)
                 return Enumerable.Empty<T>();
-            
-            var data = await response.Content.ReadAsStringAsync();
 
-            return JsonSerializer.Deserialize<IEnumerable<T>>(data, StringParser.JsonSerializerOptions);
+            var data = await response.Content.ReadAsStringAsync();
+            var results = JsonSerializer.Deserialize<IEnumerable<T>>(data, StringParser.JsonSerializerOptions);
+
+            return results;
         }
     }
 }
