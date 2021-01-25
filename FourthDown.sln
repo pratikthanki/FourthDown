@@ -5,8 +5,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FourthDown.Api", "src\Fourt
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FourthDown.Api.Tests", "src\FourthDown.Api.Tests\FourthDown.Api.Tests.csproj", "{E897B2F3-1427-441B-98E2-0AE2980C2197}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FourthDown.Client", "src\FourthDown.Client\FourthDown.Client.csproj", "{E2720A3C-103A-484B-987B-DA5D1026D5C1}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,9 +19,5 @@ Global
 		{E897B2F3-1427-441B-98E2-0AE2980C2197}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E897B2F3-1427-441B-98E2-0AE2980C2197}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E897B2F3-1427-441B-98E2-0AE2980C2197}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E2720A3C-103A-484B-987B-DA5D1026D5C1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E2720A3C-103A-484B-987B-DA5D1026D5C1}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E2720A3C-103A-484B-987B-DA5D1026D5C1}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E2720A3C-103A-484B-987B-DA5D1026D5C1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
