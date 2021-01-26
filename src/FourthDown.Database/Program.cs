@@ -1,9 +1,9 @@
-﻿using FourthDown.Collector.Configuration;
+﻿using FourthDown.Database.Configuration;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace FourthDown.Collector
+namespace FourthDown.Database
 {
     class Program
     {

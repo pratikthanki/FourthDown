@@ -4,12 +4,12 @@ using System.IO;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
-using FourthDown.Collector.Configuration;
+using FourthDown.Database.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace FourthDown.Collector
+namespace FourthDown.Database
 {
     public class DeploymentService : IHostedService
     {

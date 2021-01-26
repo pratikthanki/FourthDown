@@ -1,6 +1,6 @@
 using Microsoft.Data.SqlClient;
 
-namespace FourthDown.Collector.Configuration
+namespace FourthDown.Database.Configuration
 {
     public class DatabaseOptions
     {

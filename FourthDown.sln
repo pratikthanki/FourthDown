@@ -5,7 +5,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FourthDown.Api", "src\Fourt
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FourthDown.Api.Tests", "src\FourthDown.Api.Tests\FourthDown.Api.Tests.csproj", "{E897B2F3-1427-441B-98E2-0AE2980C2197}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FourthDown.Collector", "src\FourthDown.Collector\FourthDown.Collector.csproj", "{4D5703D5-38B0-40F9-AD8E-A154E9C517EB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FourthDown.Database", "src\FourthDown.Database\FourthDown.Database.csproj", "{4D5703D5-38B0-40F9-AD8E-A154E9C517EB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
