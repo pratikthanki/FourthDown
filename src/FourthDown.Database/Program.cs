@@ -1,5 +1,4 @@
-﻿using FourthDown.Database.Configuration;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -22,9 +21,10 @@ namespace FourthDown.Database
                 })
                 .ConfigureServices((hostContext, services) =>
                 {
-                    services.AddHostedService<DeploymentService>();
                     services
-                        .AddSingleton(hostContext.Configuration.GetSection("targetDatabase").Get<DatabaseOptions>());
+                        .AddHostedService<DeploymentService>()
+                        .AddTransient<IDatabaseClient, DatabaseClient>()
+                        .Configure<DatabaseOptions>(hostContext.Configuration.GetSection("targetDatabase"));
                 })
                 .UseConsoleLifetime();
         }

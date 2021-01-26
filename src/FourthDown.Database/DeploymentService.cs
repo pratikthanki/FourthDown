@@ -1,31 +1,28 @@
 using System;
-using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
-using FourthDown.Database.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 
 namespace FourthDown.Database
 {
     public class DeploymentService : IHostedService
     {
         private readonly ILogger<DeploymentService> _logger;
+        private readonly IDatabaseClient _databaseClient;
         private readonly CancellationTokenSource _cancellationTokenSource;
-        private readonly DatabaseOptions _databaseOptions;
 
         private Task _task;
 
         public DeploymentService(
-            ILogger<DeploymentService> logger, 
-            IOptions<DatabaseOptions> databaseOptions,
+            ILogger<DeploymentService> logger,
+            IDatabaseClient databaseClient,
             IHostApplicationLifetime appLifetime)
         {
             _logger = logger;
-            _databaseOptions = databaseOptions.Value;
+            _databaseClient = databaseClient;
             _cancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(appLifetime.ApplicationStopping);
 
             Environment.ExitCode = 0;
@@ -66,12 +63,22 @@ namespace FourthDown.Database
 
         private async Task RunDeployment()
         {
-            var path = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), @"../../../Scripts");
-            var files = Directory.GetFiles(path);
-            
-            foreach(var file in files)
+            var assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+
+            if (assemblyPath == null)
+                throw new Exception($"{nameof(assemblyPath)} not set");
+
+            var path = Path.Combine(assemblyPath, @"../../../Scripts");
+            var deploymentScripts = Directory.GetFiles(path);
+
+            var preDeploymentCheck = await _databaseClient.PreDeploymentCheckSuccessful(_cancellationTokenSource.Token);
+
+            if (!preDeploymentCheck)
+                LogException("PreDeploymentCheck failed");
+
+            foreach (var script in deploymentScripts)
             {
-                _logger.LogInformation($"Migration script found: {file}");
+                _logger.LogInformation($"Migration script found: {script}");
             }
 
             try
@@ -80,29 +87,20 @@ namespace FourthDown.Database
             }
             catch (Exception exception)
             {
-                _logger.LogCritical(exception.ToString());
-                _cancellationTokenSource.Cancel();
-
-                Environment.ExitCode = 1;
+                LogException(exception.ToString());
             }
 
             _cancellationTokenSource.Cancel();
 
             Environment.ExitCode = 0;
         }
-        
-        private static string GetAbsolutePath()
+
+        private void LogException(string exception)
         {
-            const string relativePath = @"../../../../Scripts";
-            var _dataRoot = new FileInfo(typeof(Program).Assembly.Location);
+            _logger.LogCritical(exception);
+            _cancellationTokenSource.Cancel();
 
-            Debug.Assert(_dataRoot.Directory != null);
-
-            var assemblyFolderPath = _dataRoot.Directory.FullName;
-
-            var fullPath = Path.Combine(assemblyFolderPath, relativePath);
-
-            return fullPath;
+            Environment.ExitCode = 1;
         }
     }
 }
