@@ -1,8 +1,9 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using FourthDown.Collector.Options;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace FourthDown.Database
+namespace FourthDown.Collector
 {
     class Program
     {
@@ -22,9 +23,9 @@ namespace FourthDown.Database
                 .ConfigureServices((hostContext, services) =>
                 {
                     services
-                        .AddHostedService<DeploymentService>()
-                        .AddTransient<IDatabaseClient, DatabaseClient>()
-                        .Configure<DatabaseOptions>(hostContext.Configuration.GetSection("TargetDatabase"));
+                        .AddHostedService<CollectorService>()
+                        .Configure<CollectorOptions>(hostContext.Configuration)
+                        .Configure<DatabaseOptions>(hostContext.Configuration.GetSection("Database"));
                 })
                 .UseConsoleLifetime();
         }
