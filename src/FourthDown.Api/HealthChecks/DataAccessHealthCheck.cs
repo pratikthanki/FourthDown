@@ -1,6 +1,6 @@
 using System.Threading;
 using System.Threading.Tasks;
-using FourthDown.Api.Utilities;
+using FourthDown.Shared.Utilities;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 
 namespace FourthDown.Api.HealthChecks

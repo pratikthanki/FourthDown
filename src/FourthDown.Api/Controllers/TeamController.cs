@@ -1,9 +1,10 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using FourthDown.Api.Models;
-using FourthDown.Api.Repositories;
+using FourthDown.Shared.Models;
+using FourthDown.Shared.Repositories;
 using FourthDown.Api.Schemas;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using OpenTracing;
@@ -19,14 +20,17 @@ namespace FourthDown.Api.Controllers
     public class TeamController : ControllerBase
     {
         private readonly ITeamRepository _teamRepository;
+        private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly ITracer _tracer;
 
         public TeamController(
             ITracer tracer,
-            ITeamRepository teamRepository)
+            ITeamRepository teamRepository, 
+            IWebHostEnvironment webHostEnvironment)
         {
             _tracer = tracer;
             _teamRepository = teamRepository;
+            _webHostEnvironment = webHostEnvironment;
         }
 
         /// <summary>
@@ -36,7 +40,9 @@ namespace FourthDown.Api.Controllers
         [HttpGet("")]
         public async Task<ActionResult<IEnumerable<Team>>> GetTeams(CancellationToken cancellationToken)
         {
-            var teams = await _teamRepository.GetTeamsAsync(cancellationToken);
+            var webRootPath = _webHostEnvironment.WebRootPath;
+
+            var teams = await _teamRepository.GetTeamsAsync(webRootPath, cancellationToken);
             
             return Ok(teams);
         }

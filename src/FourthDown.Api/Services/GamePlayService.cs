@@ -4,10 +4,10 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
-using FourthDown.Api.Extensions;
-using FourthDown.Api.Models;
+using FourthDown.Shared.Extensions;
+using FourthDown.Shared.Models;
 using FourthDown.Api.Parameters;
-using FourthDown.Api.Repositories;
+using FourthDown.Shared.Repositories;
 using OpenTracing;
 
 namespace FourthDown.Api.Services

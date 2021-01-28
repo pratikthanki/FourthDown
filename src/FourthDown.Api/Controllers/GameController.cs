@@ -1,12 +1,13 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using FourthDown.Api.Extensions;
-using FourthDown.Api.Models;
+using FourthDown.Shared.Extensions;
+using FourthDown.Shared.Models;
 using FourthDown.Api.Parameters;
 using FourthDown.Api.Schemas;
 using FourthDown.Api.Services;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using OpenTracing;
 #pragma warning disable 1998
@@ -48,7 +49,9 @@ namespace FourthDown.Api.Controllers
 
             var plays = _pbpService.GetGamePlaysAsync(queryParameter, cancellationToken);
 
-            _tracer.ActiveSpan.SetTags(HttpContext);
+            _tracer.ActiveSpan.SetTags(
+                HttpContext.Request.GetDisplayUrl(),
+                HttpContext.Connection.RemoteIpAddress.MapToIPv6().ToString());
 
             return Ok(plays);
         }
@@ -72,7 +75,9 @@ namespace FourthDown.Api.Controllers
 
             var plays = _pbpService.GetGameDrivesAsync(queryParameter, cancellationToken);
 
-            _tracer.ActiveSpan.SetTags(HttpContext);
+            _tracer.ActiveSpan.SetTags(
+                HttpContext.Request.GetDisplayUrl(),
+                HttpContext.Connection.RemoteIpAddress.MapToIPv6().ToString());
 
             return Ok(plays);
         }
@@ -96,7 +101,9 @@ namespace FourthDown.Api.Controllers
 
             var plays = _pbpService.GetGameScoringSummariesAsync(queryParameter, cancellationToken);
 
-            _tracer.ActiveSpan.SetTags(HttpContext);
+            _tracer.ActiveSpan.SetTags(
+                HttpContext.Request.GetDisplayUrl(),
+                HttpContext.Connection.RemoteIpAddress.MapToIPv6().ToString());
 
             return Ok(plays);
         }

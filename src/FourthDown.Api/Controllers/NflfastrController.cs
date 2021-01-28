@@ -1,12 +1,13 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using FourthDown.Api.Extensions;
-using FourthDown.Api.Models;
+using FourthDown.Shared.Extensions;
+using FourthDown.Shared.Models;
 using FourthDown.Api.Parameters;
 using FourthDown.Api.Schemas;
 using FourthDown.Api.Services;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using OpenTracing;
@@ -60,7 +61,9 @@ namespace FourthDown.Api.Controllers
 
             var plays = await _nflfastrService.GetSummarisedStats(queryParameter, cancellationToken);
 
-            _tracer.ActiveSpan.SetTags(HttpContext);
+            _tracer.ActiveSpan.SetTags(
+                HttpContext.Request.GetDisplayUrl(),
+                HttpContext.Connection.RemoteIpAddress.MapToIPv6().ToString());
 
             return Ok(plays);
         }
