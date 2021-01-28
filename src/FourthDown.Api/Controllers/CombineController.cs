@@ -2,9 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using FourthDown.Api.Models;
-using FourthDown.Api.Repositories;
+using FourthDown.Shared.Models;
+using FourthDown.Shared.Repositories;
 using FourthDown.Api.Schemas;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using OpenTracing;
@@ -19,15 +20,18 @@ namespace FourthDown.Api.Controllers
     [ApiController]
     public class CombineController : ControllerBase
     {
+        private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly ICombineRepository _combineRepository;
         private readonly ITracer _tracer;
 
         public CombineController(
             ITracer tracer,
+            IWebHostEnvironment webHostEnvironment,
             ICombineRepository combineRepository)
         {
             _tracer = tracer;
             _combineRepository = combineRepository;
+            _webHostEnvironment = webHostEnvironment;
         }
 
         /// <summary>
@@ -49,7 +53,13 @@ namespace FourthDown.Api.Controllers
                     Status = StatusCodes.Status400BadRequest
                 });
 
-            var teams = await _combineRepository.GetCombineSummaryAsync(season, cancellationToken);
+            var webRootPath = _webHostEnvironment.WebRootPath;
+
+            var teams = await _combineRepository.GetCombineSummaryAsync(
+                webRootPath,
+                season,
+                cancellationToken);
+
             return Ok(teams);
         }
 
