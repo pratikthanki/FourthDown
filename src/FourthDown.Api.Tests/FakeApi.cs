@@ -6,8 +6,8 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading;
 using System.Threading.Tasks;
-using FourthDown.Api.Models;
-using FourthDown.Api.Repositories;
+using FourthDown.Shared.Models;
+using FourthDown.Shared.Repositories;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Configuration;
@@ -68,6 +68,7 @@ namespace FourthDown.Api.Tests
 
             _mockTeamRepository
                 .Setup(t => t.GetTeamsAsync(
+                    It.IsAny<string>(),
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new List<Team> {new Team()});
 

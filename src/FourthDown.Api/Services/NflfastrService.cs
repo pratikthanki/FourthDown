@@ -3,9 +3,9 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using FourthDown.Api.Controllers;
-using FourthDown.Api.Models;
+using FourthDown.Shared.Models;
 using FourthDown.Api.Parameters;
-using FourthDown.Api.Repositories;
+using FourthDown.Shared.Repositories;
 using Microsoft.Extensions.Logging;
 using OpenTracing;
 
