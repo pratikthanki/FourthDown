@@ -163,36 +163,15 @@ namespace FourthDown.Api
             app.UseRouting();
             app.UseResponseCaching();
             app.UseHttpMetrics();
+            app.UseMetricServer();
 
             app.UsePrometheusRequestDurations(q =>
             {
                 q.IncludePath = true;
                 q.IncludeMethod = true;
-                q.IgnoreRoutesConcrete = new[]
-                {
-                    "/favicon.ico",
-                    "/robots.txt",
-                    "/"
-                };
-                q.IgnoreRoutesStartWith = new[]
-                {
-                    "/swagger"
-                };
-                q.CustomNormalizePath = new Dictionary<Regex, string>
-                {
-                    {new Regex(@"\/[0-9]{1,}(?![a-z])"), "/id"}
-                };
-
-                // Just for example. Not for Production
-                q.CustomLabels = new Dictionary<string, Func<string>>
-                {
-                    {
-                        "application_name", () => env.ApplicationName
-                    },
-                    {
-                        "date", () => DateTime.UtcNow.ToString("yyyy-MM-dd")
-                    }
-                };
+                q.IgnoreRoutesConcrete = new[] {"/favicon.ico", "/robots.txt", "/"};
+                q.IgnoreRoutesStartWith = new[] {"/swagger", "/health", "/metrics"};
+                q.CustomNormalizePath = new Dictionary<Regex, string> {{new Regex(@"\/[0-9]{1,}(?![a-z])"), "/id"}};
             });
 
             app.UseAuthentication();

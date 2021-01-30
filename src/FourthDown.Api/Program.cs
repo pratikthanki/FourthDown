@@ -4,6 +4,7 @@ using System.Reflection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
+using Prometheus.DotNetRuntime;
 using Serilog;
 
 namespace FourthDown.Api
@@ -14,6 +15,8 @@ namespace FourthDown.Api
         {
             Activity.DefaultIdFormat = ActivityIdFormat.W3C;
             Activity.ForceDefaultIdFormat = true;
+            
+            using var collector = DotNetRuntimeStatsBuilder.Default().StartCollecting();
 
             CreateHostBuilder(args).Build().Run();
         }
@@ -24,6 +27,7 @@ namespace FourthDown.Api
                 .ConfigureAppConfiguration((hostingContext, configuration) =>
                 {
                     configuration.Sources.Clear();
+                    configuration.AddEnvironmentVariables();
 
                     configuration
                         .SetBasePath(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location))
