@@ -23,7 +23,13 @@ namespace FourthDown.Api.Schemas
         public string Conference { get; set; }
 
         /// <example>Dallas</example>
-        public string East { get; set; }
+        public string Division { get; set; }
+
+        /// <example>NFC East</example>
+        public string Label { get; set; }
+
+        /// <example>Dallas Cowboys</example>
+        public string TeamNameLabel { get; set; }
     }
 
     public class ScheduleResponse
