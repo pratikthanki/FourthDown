@@ -405,3 +405,4 @@ ASALocalRun/
 .localhistory/
 secrets/
 src/FourthDown.Client/nextjs-example/
+src/FourthDown.Client/web-app/.next/
