@@ -66,6 +66,13 @@ View stats at the following:
 - Prometheus: <http://localhost:9090>
 - Grafana: <http://localhost:3000>
 
+## Projects 
+- `FourthDown.Api`: client-facing project (deployed on Azure)
+- `FourthDown.Client`: nextJS web app
+- `FourthDown.Collector`: project for writing records to the database
+- `FourthDown.Database`: manage database migrations
+- `FourthDown.Shared`: library of shared models and helper methods
+
 ## Thanks
 
 Shoutout to the guys of the R package [nflfastR](https://github.com/mrcaseb/nflfastR) 
