@@ -3,7 +3,7 @@ apiVersion: 1
 
 # list of datasources that should be deleted from the database
 deleteDatasources:
-  - name: Prometheus
+  - name: prometheus
     orgId: 1
   - name: Jaeger
     orgId: 2
@@ -11,7 +11,7 @@ deleteDatasources:
 # list of datasources to insert/update depending
 # what's available in the database
 datasources:
-- name: Prometheus
+- name: prometheus
   type: prometheus
   access: proxy
   orgId: 1
