@@ -1,13 +1,12 @@
-import React, { Component } from 'react';
+import React, { useEffect, useState } from 'react';
 import Layout from "../components/Layout";
-import Dropdown from "../components/Dropdown"
-import DataTable, { createTheme } from 'react-data-table-component';
+import Dropdown from "../components/SeasonPicker"
+import DataTable from 'react-data-table-component';
 import Card from "@material-ui/core/Card";
 import SortIcon from "@material-ui/icons/ArrowDownward";
+import { getCombineSeason } from '../services/combineService';
+import { useAppState } from '../hooks/useAppState';
 
-const axios = require('axios');
-const options = [1, 2, 3]
-const tableHeader = "Combine Workouts 2020"
 const columns = [
   {
     name: "Name",
@@ -63,36 +62,42 @@ const columns = [
   }
 ];
 
-class CombineView extends Component {
-  static async getInitialProps() {
-    const res = await axios.get(`https://fourthdown.azurewebsites.net/api/combine?season=2020`);
-    return { data: res.data }
-  }
+const CombineView = () => {
+  const { season } = useAppState();
+  const [combineData, setCombineData] = useState([]);
 
-  render() {
-    return (
-      <Layout>
-        <Dropdown></Dropdown>
+  useEffect(() => {
+    // Not using async/await directly because useEffect does not support it. 
+    const fetchCombine = async () => {
+      const newCombineData = await getCombineSeason(season);
+      setCombineData(newCombineData);
+    };
 
-        <div style={{ width: '95%', padding: '20px' }}>
-          <Card>
-            <DataTable
-              title={tableHeader}
-              columns={columns}
-              data={this.props.data}
-              defaultSortField="LastName"
-              sortIcon={<SortIcon />}
-              striped="True"
-              highlightOnHover="True"
-              dense="True"
-              fixedHeader="True"
-              overflowY="True"
-            />
-          </Card>
-        </div>
-      </Layout>
-    );
-  }
-}
+    fetchCombine();
+  }, [season]);
+
+  return (
+    <Layout>
+      <Dropdown></Dropdown>
+
+      <div style={{ width: '95%', padding: '20px' }}>
+        <Card>
+          <DataTable
+            title={`Combine Workouts ${season}`}
+            columns={columns}
+            data={combineData}
+            defaultSortField="LastName"
+            sortIcon={<SortIcon />}
+            striped="True"
+            highlightOnHover="True"
+            dense="True"
+            fixedHeader="True"
+            overflowY="True"
+          />
+        </Card>
+      </div>
+    </Layout>
+  );
+};
 
 export default CombineView;
