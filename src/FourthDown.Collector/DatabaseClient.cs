@@ -7,7 +7,6 @@ using FourthDown.Database;
 using FourthDown.Shared.Models;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Options;
-using Z.Dapper.Plus;
 
 namespace FourthDown.Collector
 {
