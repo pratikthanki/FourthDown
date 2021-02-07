@@ -84,6 +84,8 @@ namespace FourthDown.Api
             services.AddOpenTracing();
             services.AddResponseCaching();
 
+            services.AddCors();
+
             services.AddLogging(config =>
             {
                 config.AddDebug();
@@ -158,6 +160,8 @@ namespace FourthDown.Api
                 app.UseExceptionHandler("/Error");
                 app.UseHsts();
             }
+
+            app.UseCors(builder => builder.WithOrigins("http://localhost:3000"));
 
             app.UseSwagger();
             app.UseRouting();
