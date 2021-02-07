@@ -10,11 +10,12 @@ namespace FourthDown.Collector.Options
 
         public string Password { get; set; }
 
-        public string ConnectionString =>
-            $"Server={Server};Database={Database};User Id={UserId};Password='{Password}'";
+        public string ConnectionString => ConnectionStringBuilder(Database);
 
-        public string MasterConnectionString =>
-            $"Server={Server};Database=master;User Id={UserId};Password='{Password}'";
+        public string MasterConnectionString => ConnectionStringBuilder("master");
+
+        private string ConnectionStringBuilder(string db) =>
+            $"Server={Server};Database={db};User Id={UserId};Password='{Password}'";
 
         public override string ToString() => ConnectionString;
     }

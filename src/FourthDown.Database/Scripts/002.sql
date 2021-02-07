@@ -86,3 +86,125 @@ IF(OBJECT_ID('dbo.Schedule') IS NULL)
 GO
 
 
+IF(OBJECT_ID('dbo.GameTeams') IS NULL)
+    BEGIN
+        PRINT N'Creating table dbo.GameTeams';
+        CREATE TABLE [dbo].[GameTeams]
+        (
+            [GameId]                VARCHAR(255)        NULL,
+            [TeamAbbreviation]      VARCHAR(255)        NULL,
+            [TeamNickName]          VARCHAR(255)        NULL,
+            [PointsQ1]              INT                 NULL,
+            [PointsQ2]              INT                 NULL,
+            [PointsQ3]              INT                 NULL,
+            [PointsQ4]              INT                 NULL,
+            [PointsOvertimeTotal]   INT                 NULL,
+            [PointsTotal]           INT                 NULL,
+            [TimeoutsUsed]          INT                 NULL,
+            [TimeoutsRemaining]     INT                 NULL,
+            [IsHome]                BIT                 NULL
+        )
+    END 
+GO
+
+
+IF(OBJECT_ID('dbo.GameDrives') IS NULL)
+    BEGIN
+        PRINT N'Creating table dbo.GameDrives';
+        CREATE TABLE [dbo].[GameDrives]
+        (
+            [GameId]                                    VARCHAR(255)        NULL,
+            [QuarterStart]                              INT                 NULL,
+            [EndTransition]                             VARCHAR(255)        NULL,
+            [EndYardLine]                               VARCHAR(255)        NULL,
+            [EndedWithScore]                            BIT                 NULL,
+            [FirstDowns]                                INT                 NULL,
+            [GameClockEnd]                              VARCHAR(255)        NULL,
+            [GameClockStart]                            VARCHAR(255)        NULL,
+            [HowEndedDescription]                       VARCHAR(255)        NULL,
+            [HowStartedDescription]                     VARCHAR(255)        NULL,
+            [Inside20]                                  BIT                 NULL,
+            [OrderSequence]                             BIGINT              NULL,
+            [PlayCount]                                 INT                 NULL,
+            [PlayIdEnded]                               INT                 NULL,
+            [PlayIdStarted]                             INT                 NULL,
+            [PlaySeqEnded]                              INT                 NULL,
+            [PlaySeqStarted]                            INT                 NULL,
+            [QuarterEnd]                                INT                 NULL,
+            [StartTransition]                           VARCHAR(255)        NULL,
+            [StartYardLine]                             VARCHAR(255)        NULL,
+            [TimeOfPossession]                          VARCHAR(255)        NULL,
+            [Yards]                                     INT                 NULL,
+            [YardsPenalized]                            INT                 NULL,
+            [PossessionTeamAbbreviation]                VARCHAR(255)        NULL,
+            [PossessionTeamNickName]                    VARCHAR(255)        NULL,
+            [PossessionTeamFranchiseCurrentLogoUrl]     VARCHAR(255)        NULL,
+
+        )
+    END 
+GO
+
+
+IF(OBJECT_ID('dbo.GameScoringSummaries') IS NULL)
+    BEGIN
+        PRINT N'Creating table dbo.GameScoringSummaries';
+        CREATE TABLE [dbo].[GameScoringSummaries]
+        (
+            [GameId]                VARCHAR(255)        NULL,
+            [PlayId]                INT                 NULL,
+            [PlayDescription]       VARCHAR(255)        NULL,
+            [PatPlayId]             INT                 NULL,
+            [HomeScore]             INT                 NULL,
+            [VisitorScore]          INT                 NULL,
+        )
+    END 
+GO
+
+
+IF(OBJECT_ID('dbo.GamePlays') IS NULL)
+    BEGIN
+        PRINT N'Creating table dbo.GamePlays';
+        CREATE TABLE [dbo].[GamePlays]
+        (
+            [GameId]                                    VARCHAR(255)        NULL,
+            [ClockTime]                                 VARCHAR(255)        NULL,
+            [Down]                                      INT                 NULL,
+            [EndClockTime]                              VARCHAR(255)        NULL,
+            [EndYardLine]                               VARCHAR(255)        NULL,
+            [FirstDown]                                 BIT                 NULL,
+            [GoalToGo]                                  BIT                 NULL,
+            [NextPlayIsGoalToGo]                        BIT                 NULL,
+            [NextPlayType]                              VARCHAR(255)        NULL,
+            [OrderSequence]                             BIGINT              NULL,
+            [PenaltyOnPlay]                             BIT                 NULL,
+            [PlayClock]                                 VARCHAR(255)        NULL,
+            [PlayDeleted]                               BIT                 NULL,
+            [PlayDescription]                           VARCHAR(255)        NULL,
+            [PlayDescriptionWithJerseyNumbers]          VARCHAR(255)        NULL,
+            [PlayId]                                    INT                 NULL,
+            [PlayType]                                  VARCHAR(255)        NULL,
+            [PrePlayByPlay]                             VARCHAR(255)        NULL,
+            [Quarter]                                   INT                 NULL,
+            [ScoringPlay]                               BIT                 NULL,
+            [ShortDescription]                          VARCHAR(255)        NULL,
+            [SpecialTeamsPlay]                          BIT                 NULL,
+            [TimeOfDay]                                 VARCHAR(255)        NULL,
+            [YardLine]                                  VARCHAR(255)        NULL,
+            [Yards]                                     INT                 NULL,
+            [YardsToGo]                                 INT                 NULL,
+            [DriveNetYards]                             INT                 NULL,
+            [DrivePlayCount]                            INT                 NULL,
+            [DriveSequenceNumber]                       INT                 NULL,
+            [DriveTimeOfPossession]                     VARCHAR(255)        NULL,
+            [PossessionTeamAbbreviation]                VARCHAR(255)        NULL,
+            [PossessionTeamNickName]                    VARCHAR(255)        NULL,
+            [PossessionTeamFranchiseCurrentLogoUrl]     VARCHAR(255)        NULL,
+            [IsBigPlay]                                 BIT                 NULL,
+            [ScoringPlayType]                           VARCHAR(255)        NULL,
+            [ScoringTeamId]                             VARCHAR(255)        NULL,
+            [ScoringTeamAbbreviation]                   VARCHAR(255)        NULL,
+            [ScoringTeamNickName]                       VARCHAR(255)        NULL,
+            [StPlayType]                                VARCHAR(255)        NULL
+        )
+    END 
+GO
