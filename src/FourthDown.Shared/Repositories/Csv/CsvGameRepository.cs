@@ -26,17 +26,22 @@ namespace FourthDown.Shared.Repositories.Csv
         {
             var url = RepositoryEndpoints.GamesEndpoint;
             var response = await RequestHelper.GetRequestResponse(url, cancellationToken);
-            
+
             _logger.LogInformation($"Fetching data. Url: {url}; Status: {response.StatusCode}");
 
             var responseBody = await response.Content.ReadAsStringAsync();
 
-            return response.IsSuccessStatusCode
-                ? ProcessGamesResponse(responseBody)
-                : new Dictionary<int, IEnumerable<Game>>();
+            if (!response.IsSuccessStatusCode)
+                return new Dictionary<int, IEnumerable<Game>>();
+
+            var games = ProcessGamesResponse(responseBody);
+
+            return games
+                .GroupBy(x => x.Season)
+                .ToDictionary(x => x.Key, x => x.AsEnumerable());
         }
 
-        private static Dictionary<int, IEnumerable<Game>> ProcessGamesResponse(string responseBody)
+        private static IEnumerable<Game> ProcessGamesResponse(string responseBody)
         {
             var csvResponse = responseBody
                 .Split("\n")
@@ -92,9 +97,7 @@ namespace FourthDown.Shared.Repositories.Csv
                 games.Add(game);
             }
 
-            return games
-                .GroupBy(x => x.Season)
-                .ToDictionary(x => x.Key, x => x.AsEnumerable());
+            return games;
         }
     }
 }

@@ -24,7 +24,6 @@ namespace FourthDown.Collector
                 {
                     services
                         .AddHostedService<CollectorService>()
-                        .Configure<CollectorOptions>(hostContext.Configuration)
                         .Configure<DatabaseOptions>(hostContext.Configuration.GetSection("Database"));
                 })
                 .UseConsoleLifetime();
