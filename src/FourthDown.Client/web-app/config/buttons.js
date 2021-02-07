@@ -1,19 +1,18 @@
-// config/buttons.js
-
 import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faCompass,
   faMapMarkerAlt,
-  faUser,
-  faShoppingCart
+  faFootballBall,
+  faRunning,
+  faInfo
 } from "@fortawesome/free-solid-svg-icons";
 
 const navButtons = [
   {
     label: "Combine",
     path: "/combine",
-    icon: <FontAwesomeIcon icon={faCompass} />
+    icon: <FontAwesomeIcon icon={faRunning} />
   },
   {
     label: "Play by Play",
@@ -23,12 +22,17 @@ const navButtons = [
   {
     label: "Games",
     path: "/games",
-    icon: <FontAwesomeIcon icon={faShoppingCart} />
+    icon: <FontAwesomeIcon icon={faFootballBall} />
   },
   {
     label: "Results",
     path: "/results",
-    icon: <FontAwesomeIcon icon={faUser} />
+    icon: <FontAwesomeIcon icon={faCompass} />
+  },
+  {
+    label: "About",
+    path: "/about",
+    icon: <FontAwesomeIcon icon={faInfo} />
   }
 ];
 
