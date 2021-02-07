@@ -1,5 +1,7 @@
 // components/NavButton.scss
 
+@import "../theme/theme";
+
 .NavButton {
   display: flex;
   flex-direction: column;
@@ -17,5 +19,9 @@
   .Label {
     font-size: 12px;
     text-transform: capitalize;
+  }
+
+  &.active {
+    color: $highlight;
   }
 }
