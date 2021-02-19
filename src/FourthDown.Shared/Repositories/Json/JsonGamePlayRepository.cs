@@ -40,10 +40,7 @@ namespace FourthDown.Shared.Repositories.Json
 
         public static string GetGameUrl(string gameId, int season)
         {
-            // Games between 2001-2010 (inc) are in the raw_old folder
-            var folder = season < 2011 ? "raw_old" : "raw";
-
-            return $"{RepositoryEndpoints.GamePlayEndpoint}/{folder}/{season}/{gameId}.json.gz?raw=true";
+            return $"{RepositoryEndpoints.GamePlayEndpoint}/{season}/{gameId}.json.gz?raw=true";
         }
 
         private async Task<GameDetail> GetGameJson(string url, CancellationToken cancellationToken, IScope scope)
