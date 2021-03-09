@@ -64,6 +64,7 @@ namespace FourthDown.Api.Controllers
         /// <param name="cancellationToken"></param>
         /// <returns>List of game drives</returns>
         [HttpGet("drives")]
+        [ResponseCache(Duration = (60 * 60 * 12), VaryByQueryKeys = new[] {"*"})]
         [ProducesResponseType(typeof(GameDrives[]), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetDrives(
             [FromQuery] PlayByPlayQueryParameter queryParameter,
@@ -90,6 +91,7 @@ namespace FourthDown.Api.Controllers
         /// <param name="cancellationToken"></param>
         /// <returns>List of game scoring summaries</returns>
         [HttpGet("scoringsummaries")]
+        [ResponseCache(Duration = (60 * 60 * 12), VaryByQueryKeys = new[] {"*"})]
         [ProducesResponseType(typeof(GameScoringSummaries[]), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetScoringSummaries(
             [FromQuery] PlayByPlayQueryParameter queryParameter,

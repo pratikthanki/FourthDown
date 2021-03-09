@@ -46,6 +46,7 @@ namespace FourthDown.Api.Controllers
         /// <param name="cancellationToken"></param>
         /// <returns>List of game play by plays</returns>
         [HttpGet("")]
+        [ResponseCache(Duration = (60 * 60 * 12), VaryByQueryKeys = new[] {"*"})]
         [ProducesResponseType(typeof(TeamPlayByPlay[]), StatusCodes.Status200OK)]
         public async Task<ActionResult<IEnumerable<TeamPlayByPlay>>> GetPlayByPlays(
             [FromQuery] NflfastrQueryParameter queryParameter,
