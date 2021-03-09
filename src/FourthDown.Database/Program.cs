@@ -23,7 +23,6 @@ namespace FourthDown.Database
                 {
                     services
                         .AddHostedService<DeploymentService>()
-                        .AddTransient<IDatabaseClient, DatabaseClient>()
                         .Configure<DatabaseOptions>(hostContext.Configuration.GetSection("TargetDatabase"));
                 })
                 .UseConsoleLifetime();

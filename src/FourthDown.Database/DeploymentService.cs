@@ -1,28 +1,29 @@
 using System;
-using System.IO;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using DbUp;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace FourthDown.Database
 {
     public class DeploymentService : IHostedService
     {
         private readonly ILogger<DeploymentService> _logger;
-        private readonly IDatabaseClient _databaseClient;
         private readonly CancellationTokenSource _cancellationTokenSource;
+        private readonly DatabaseOptions _databaseOptions;
 
         private Task _task;
 
         public DeploymentService(
             ILogger<DeploymentService> logger,
-            IDatabaseClient databaseClient,
+            IOptions<DatabaseOptions> databaseOptions,
             IHostApplicationLifetime appLifetime)
         {
             _logger = logger;
-            _databaseClient = databaseClient;
+            _databaseOptions = databaseOptions.Value;
             _cancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(appLifetime.ApplicationStopping);
 
             Environment.ExitCode = 0;
@@ -42,9 +43,11 @@ namespace FourthDown.Database
                 throw new InvalidOperationException();
 
             if (!_cancellationTokenSource.IsCancellationRequested)
+            {
                 _task = Task.Run(RunDeployment, cancellationToken);
+            }
 
-            _logger.LogInformation($"Starting {nameof(DeploymentService)}..");
+            _logger.LogInformation($"Started {nameof(DeploymentService)}..");
 
             return Task.CompletedTask;
         }
@@ -61,46 +64,39 @@ namespace FourthDown.Database
             _logger.LogInformation($"Stopped {nameof(DeploymentService)}..");
         }
 
-        private async Task RunDeployment()
+        private void RunDeployment()
         {
-            var assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            var upgradeBuilder = DeployChanges.To
+                .SqlDatabase(_databaseOptions.ConnectionString)
+                .WithScriptsEmbeddedInAssembly(Assembly.GetExecutingAssembly())
+                .LogToConsole()
+                .Build();
 
-            if (assemblyPath == null)
-                throw new Exception($"{nameof(assemblyPath)} not set");
+            var scriptsToExecute = upgradeBuilder.GetScriptsToExecute();
 
-            var path = Path.Combine(assemblyPath, @"../../../Scripts");
-            var deploymentScripts = Directory.GetFiles(path);
-
-            var preDeploymentCheck = await _databaseClient.PreDeploymentCheckSuccessful(_cancellationTokenSource.Token);
-
-            if (!preDeploymentCheck)
-                LogException("PreDeploymentCheck failed");
-
-            foreach (var script in deploymentScripts)
+            _logger.LogInformation("Scripts to execute: ");
+            foreach (var sqlScript in scriptsToExecute)
             {
-                _logger.LogInformation($"Migration script found: {script}");
+                _logger.LogInformation(sqlScript.Name);
+                
             }
 
-            try
-            {
-                // do something
-            }
-            catch (Exception exception)
-            {
-                LogException(exception.ToString());
-            }
+            // var result = upgradeBuilder.PerformUpgrade();
+            //
+            // if (!result.Successful)
+            // {
+            //     _logger.LogCritical(result.Error.Message);
+            //     _cancellationTokenSource.Cancel();
+            //     Environment.ExitCode = 1;
+            // }
+
+            Console.ForegroundColor = ConsoleColor.Green;
+            _logger.LogInformation("Database successfully upgraded!");
+            Console.ResetColor();
 
             _cancellationTokenSource.Cancel();
 
             Environment.ExitCode = 0;
-        }
-
-        private void LogException(string exception)
-        {
-            _logger.LogCritical(exception);
-            _cancellationTokenSource.Cancel();
-
-            Environment.ExitCode = 1;
         }
     }
 }
