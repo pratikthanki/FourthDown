@@ -17,7 +17,7 @@ namespace FourthDown.Api.HealthChecks
                 return response.IsSuccessStatusCode;
             }
 
-            var jsonDataUrl = $"{RepositoryEndpoints.GamePlayEndpoint}/raw/2020/2020_01_DAL_LA.json.gz?raw=true";
+            var jsonDataUrl = $"{RepositoryEndpoints.GamePlayEndpoint}/2020/2020_01_DAL_LA.json.gz?raw=true";
             var csvDataUrl = $"{RepositoryEndpoints.PlayByPlayEndpoint}/play_by_play_2020.csv.gz?raw=true";
             var gamesDataUrl = RepositoryEndpoints.GamesEndpoint;
 
@@ -25,10 +25,16 @@ namespace FourthDown.Api.HealthChecks
             var csvDataResponse = await GetStatusCode(csvDataUrl);
             var gamesDataResponse = await GetStatusCode(gamesDataUrl);
 
+            var state = "";
+
             if (jsonDataResponse && csvDataResponse && gamesDataResponse)
                 return await Task.FromResult(HealthCheckResult.Healthy("A healthy result."));
 
-            return await Task.FromResult(HealthCheckResult.Unhealthy("An unhealthy result."));
+            if (!jsonDataResponse) state += $"{nameof(jsonDataResponse)}\n";
+            if (!csvDataResponse) state += $"{nameof(csvDataResponse)}\n";
+            if (!gamesDataResponse) state += $"{nameof(gamesDataResponse)}\n";
+
+            return await Task.FromResult(HealthCheckResult.Unhealthy($"An unhealthy result: {state}"));
         }
     }
 }
