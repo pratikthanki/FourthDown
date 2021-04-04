@@ -10,4 +10,8 @@
       <PackageReference Include="OpenTracing" Version="0.12.1" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Repositories\Sql" />
+    </ItemGroup>
+
 </Project>

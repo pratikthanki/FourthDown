@@ -19,7 +19,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\FourthDown.Database\FourthDown.Database.csproj" />
       <ProjectReference Include="..\FourthDown.Shared\FourthDown.Shared.csproj" />
     </ItemGroup>
 

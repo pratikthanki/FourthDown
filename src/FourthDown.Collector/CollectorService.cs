@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection.Metadata.Ecma335;
-using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using FourthDown.Shared.Models;
@@ -15,7 +13,6 @@ namespace FourthDown.Collector
     public class CollectorService : IHostedService
     {
         private readonly ILogger<CollectorService> _logger;
-        private readonly IDatabaseClient<GameDetail> _databaseClient;
         private readonly IGameRepository _gameRepository;
         private readonly IGamePlayRepository _gamePlayRepository;
 
@@ -27,12 +24,10 @@ namespace FourthDown.Collector
         public CollectorService(
             ILogger<CollectorService> logger,
             IHostApplicationLifetime appLifetime,
-            IDatabaseClient<GameDetail> databaseClient,
             IGameRepository gameRepository,
             IGamePlayRepository gamePlayRepository)
         {
             _logger = logger;
-            _databaseClient = databaseClient;
             _gameRepository = gameRepository;
             _gamePlayRepository = gamePlayRepository;
 
@@ -84,10 +79,14 @@ namespace FourthDown.Collector
              * 4. Insert to database 
              */
 
-            var gameIdsWritten = await _databaseClient.GetGameIds(_cancellationToken);
-            var allGames = await _gameRepository.GetGamesAsync(_cancellationToken);
+            var gameIdsWritten = new List<string>() {""};
+            var gamesPerSeason = await _gameRepository.GetGamesAsync(_cancellationToken);
 
-            var gamesToWrite = allGames.SelectMany(x => x.Value).Where(x => !gameIdsWritten.Contains(x.GameId));
+            var allGames = gamesPerSeason
+                .GroupBy(x => x.Season).ToDictionary(x => x.Key, x => x.AsEnumerable());
+
+            var gamesToWrite = allGames
+                .SelectMany(x => x.Value).Where(x => !gameIdsWritten.Contains(x.GameId));
 
             var gameDetailsTask = GetGamePlays(gamesToWrite, _cancellationToken);
             var gameDetails = await gameDetailsTask;
@@ -112,17 +111,17 @@ namespace FourthDown.Collector
             IEnumerable<Game> games, 
             CancellationToken cancellationToken)
         {
-            var requests = games
+            var requestTasks = games
                 .Select(game => _gamePlayRepository.GetGamePlaysAsync(game, cancellationToken))
                 .ToList();
 
             //Wait for all the requests to finish
-            await Task.WhenAll(requests);
+            await Task.WhenAll(requestTasks);
 
             var gameDetails = new List<GameDetail>();
 
             //Get the responses
-            foreach (var request in requests)
+            foreach (var request in requestTasks)
             {
                 var gameDetail = await request;
 
