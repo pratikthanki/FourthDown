@@ -44,6 +44,7 @@ namespace FourthDown.Api.Controllers
         /// <param name="cancellationToken"></param>
         /// <returns>List of games</returns>
         [HttpGet("")]
+        [ResponseCache(Duration = (60 * 60 * 12), VaryByQueryKeys = new[] {"*"})]
         [ProducesResponseType(typeof(ScheduleResponse[]), StatusCodes.Status200OK)]
         public async Task<ActionResult<IEnumerable<Game>>> GetSchedule(
             [FromQuery] ScheduleQueryParameter queryParameter,

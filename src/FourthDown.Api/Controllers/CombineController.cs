@@ -41,6 +41,7 @@ namespace FourthDown.Api.Controllers
         /// <param name="season"></param>
         /// <param name="cancellationToken"></param>
         [HttpGet("")]
+        [ResponseCache(Duration = (60 * 60 * 12), VaryByQueryKeys = new[] {"*"})]
         public async Task<ActionResult<IEnumerable<CombineWorkout>>> Get(
             [FromQuery] int season,
             CancellationToken cancellationToken)
