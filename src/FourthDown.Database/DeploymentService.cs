@@ -1,5 +1,4 @@
 using System;
-using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using DbUp;
@@ -40,7 +39,9 @@ namespace FourthDown.Database
             _logger.LogInformation($"Starting {nameof(DeploymentService)}..");
 
             if (_task != null)
+            {
                 throw new InvalidOperationException();
+            }
 
             if (!_cancellationTokenSource.IsCancellationRequested)
             {
@@ -57,46 +58,56 @@ namespace FourthDown.Database
             _logger.LogInformation($"Stopping {nameof(DeploymentService)}..");
 
             _cancellationTokenSource.Cancel();
+
             var runningTask = Interlocked.Exchange(ref _task, null);
             if (runningTask != null)
+            {
                 await runningTask;
+            }
 
             _logger.LogInformation($"Stopped {nameof(DeploymentService)}..");
         }
 
         private void RunDeployment()
         {
-            var upgradeBuilder = DeployChanges.To
-                .SqlDatabase(_databaseOptions.ConnectionString)
-                .WithScriptsEmbeddedInAssembly(Assembly.GetExecutingAssembly())
-                .LogToConsole()
-                .Build();
+            EnsureDatabase.For.SqlDatabase(_databaseOptions.ConnectionString);
 
-            var scriptsToExecute = upgradeBuilder.GetScriptsToExecute();
+            var upgradeEngine = DeployChanges.To
+                .SqlDatabase(_databaseOptions.ConnectionString)
+                .WithScriptsFromFileSystem(_databaseOptions.SchemaLocation)
+                .WithTransaction()
+                .LogScriptOutput()
+                .LogToConsole();
+
+            var upgradeBuilder = upgradeEngine.Build();
 
             _logger.LogInformation("Scripts to execute: ");
-            foreach (var sqlScript in scriptsToExecute)
+            foreach (var sqlScript in upgradeBuilder.GetScriptsToExecute())
             {
                 _logger.LogInformation(sqlScript.Name);
-                
             }
 
-            // var result = upgradeBuilder.PerformUpgrade();
-            //
-            // if (!result.Successful)
-            // {
-            //     _logger.LogCritical(result.Error.Message);
-            //     _cancellationTokenSource.Cancel();
-            //     Environment.ExitCode = 1;
-            // }
+            if (!upgradeBuilder.IsUpgradeRequired())
+            {
+                _logger.LogError("Database upgrade is not required");
+                _cancellationTokenSource.Cancel();
+                Environment.ExitCode = 1;
+            }
 
-            Console.ForegroundColor = ConsoleColor.Green;
-            _logger.LogInformation("Database successfully upgraded!");
-            Console.ResetColor();
+            var upgradeResult = upgradeBuilder.PerformUpgrade();
 
+            if (!upgradeResult.Successful)
+            {
+                _logger.LogCritical(upgradeResult.Error.Message);
+                Environment.ExitCode = 1;
+            }
+            else
+            {
+                _logger.LogInformation("Database successfully upgraded!");
+                Environment.ExitCode = 0;
+            }
+            
             _cancellationTokenSource.Cancel();
-
-            Environment.ExitCode = 0;
         }
     }
 }
