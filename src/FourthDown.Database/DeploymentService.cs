@@ -1,28 +1,28 @@
 using System;
-using System.IO;
-using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using DbUp;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace FourthDown.Database
 {
     public class DeploymentService : IHostedService
     {
         private readonly ILogger<DeploymentService> _logger;
-        private readonly IDatabaseClient _databaseClient;
         private readonly CancellationTokenSource _cancellationTokenSource;
+        private readonly DatabaseOptions _databaseOptions;
 
         private Task _task;
 
         public DeploymentService(
             ILogger<DeploymentService> logger,
-            IDatabaseClient databaseClient,
+            IOptions<DatabaseOptions> databaseOptions,
             IHostApplicationLifetime appLifetime)
         {
             _logger = logger;
-            _databaseClient = databaseClient;
+            _databaseOptions = databaseOptions.Value;
             _cancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(appLifetime.ApplicationStopping);
 
             Environment.ExitCode = 0;
@@ -39,12 +39,16 @@ namespace FourthDown.Database
             _logger.LogInformation($"Starting {nameof(DeploymentService)}..");
 
             if (_task != null)
+            {
                 throw new InvalidOperationException();
+            }
 
             if (!_cancellationTokenSource.IsCancellationRequested)
+            {
                 _task = Task.Run(RunDeployment, cancellationToken);
+            }
 
-            _logger.LogInformation($"Starting {nameof(DeploymentService)}..");
+            _logger.LogInformation($"Started {nameof(DeploymentService)}..");
 
             return Task.CompletedTask;
         }
@@ -54,53 +58,56 @@ namespace FourthDown.Database
             _logger.LogInformation($"Stopping {nameof(DeploymentService)}..");
 
             _cancellationTokenSource.Cancel();
+
             var runningTask = Interlocked.Exchange(ref _task, null);
             if (runningTask != null)
+            {
                 await runningTask;
+            }
 
             _logger.LogInformation($"Stopped {nameof(DeploymentService)}..");
         }
 
-        private async Task RunDeployment()
+        private void RunDeployment()
         {
-            var assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            EnsureDatabase.For.SqlDatabase(_databaseOptions.ConnectionString);
 
-            if (assemblyPath == null)
-                throw new Exception($"{nameof(assemblyPath)} not set");
+            var upgradeEngine = DeployChanges.To
+                .SqlDatabase(_databaseOptions.ConnectionString)
+                .WithScriptsFromFileSystem(_databaseOptions.SchemaLocation)
+                .WithTransaction()
+                .LogScriptOutput()
+                .LogToConsole();
 
-            var path = Path.Combine(assemblyPath, @"../../../Scripts");
-            var deploymentScripts = Directory.GetFiles(path);
+            var upgradeBuilder = upgradeEngine.Build();
 
-            var preDeploymentCheck = await _databaseClient.PreDeploymentCheckSuccessful(_cancellationTokenSource.Token);
-
-            if (!preDeploymentCheck)
-                LogException("PreDeploymentCheck failed");
-
-            foreach (var script in deploymentScripts)
+            _logger.LogInformation("Scripts to execute: ");
+            foreach (var sqlScript in upgradeBuilder.GetScriptsToExecute())
             {
-                _logger.LogInformation($"Migration script found: {script}");
+                _logger.LogInformation(sqlScript.Name);
             }
 
-            try
+            if (!upgradeBuilder.IsUpgradeRequired())
             {
-                // do something
-            }
-            catch (Exception exception)
-            {
-                LogException(exception.ToString());
+                _logger.LogError("Database upgrade is not required");
+                _cancellationTokenSource.Cancel();
+                Environment.ExitCode = 1;
             }
 
+            var upgradeResult = upgradeBuilder.PerformUpgrade();
+
+            if (!upgradeResult.Successful)
+            {
+                _logger.LogCritical(upgradeResult.Error.Message);
+                Environment.ExitCode = 1;
+            }
+            else
+            {
+                _logger.LogInformation("Database successfully upgraded!");
+                Environment.ExitCode = 0;
+            }
+            
             _cancellationTokenSource.Cancel();
-
-            Environment.ExitCode = 0;
-        }
-
-        private void LogException(string exception)
-        {
-            _logger.LogCritical(exception);
-            _cancellationTokenSource.Cancel();
-
-            Environment.ExitCode = 1;
         }
     }
 }
