@@ -20,6 +20,7 @@ namespace FourthDown.Shared.Models
         public int Total { get; set; }
         public bool Overtime { get; set; }
         public string OldGameId { get; set; }
+        public int Espn { get; set; }
         public int AwayRest { get; set; }
         public int HomeRest { get; set; }
         public double AwayMoneyline { get; set; }
@@ -35,6 +36,10 @@ namespace FourthDown.Shared.Models
         public string Surface { get; set; }
         public int? Temp { get; set; }
         public int? Wind { get; set; }
+        public string AwayQbId { get; set; }
+        public string HomeQbId { get; set; }
+        public string AwaQbName { get; set; }
+        public string HomeQbName { get; set; }
         public string AwayCoach { get; set; }
         public string HomeCoach { get; set; }
         public string Referee { get; set; }

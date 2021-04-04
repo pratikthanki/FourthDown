@@ -4,6 +4,7 @@ import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
 import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
+import { useAppState } from '../hooks/useAppState';
 
 const useStyles = makeStyles((theme) => ({
     margin: {
@@ -11,13 +12,24 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-export default function SimpleSelect() {
+const seasons = [
+    2012,
+    2013,
+    2014,
+    2015,
+    2016,
+    2017,
+    2018,
+    2019,
+    2020
+];
+
+const SeasonPicker = () => {
     const classes = useStyles();
-    const [seasons, setSeasons] = React.useState('');
+    const { season, setSeason } = useAppState();
 
     const handleChange = (event) => {
-        console.log(event.target.value);
-        setSeasons(event.target.value);
+        setSeason(event.target.value);
     };
 
     return (
@@ -27,21 +39,19 @@ export default function SimpleSelect() {
                 <Select
                     labelId="demo-simple-select-outlined-label"
                     id="demo-simple-select-outlined"
-                    value={seasons}
+                    value={season}
                     onChange={handleChange}
                     label="Season"
                 >
-                    <MenuItem value={2012}>2012</MenuItem>
-                    <MenuItem value={2013}>2013</MenuItem>
-                    <MenuItem value={2014}>2014</MenuItem>
-                    <MenuItem value={2015}>2015</MenuItem>
-                    <MenuItem value={2016}>2016</MenuItem>
-                    <MenuItem value={2017}>2017</MenuItem>
-                    <MenuItem value={2018}>2018</MenuItem>
-                    <MenuItem value={2019}>2019</MenuItem>
-                    <MenuItem value={2020}>2020</MenuItem>
+                    {
+                        seasons.map(s => (
+                            <MenuItem key={s} value={s}>{s}</MenuItem>
+                        ))    
+                    }
                 </Select>
             </FormControl>
         </div>
     );
-}
+};
+
+export default SeasonPicker;
