@@ -13,6 +13,7 @@ namespace FourthDown.Shared.Repositories.Csv
     {
         private static ITracer _tracer;
         private static ILogger<CsvGameRepository> _logger;
+        private static readonly string Url = RepositoryEndpoints.GamesEndpoint;
 
         public CsvGameRepository(
             ITracer tracer,
@@ -22,7 +23,7 @@ namespace FourthDown.Shared.Repositories.Csv
             _logger = logger;
         }
 
-        public async Task<Dictionary<int, IEnumerable<Game>>> GetGamesAsync(CancellationToken cancellationToken)
+        public async Task<IEnumerable<Game>> GetGamesAsync(CancellationToken cancellationToken)
         {
             var url = RepositoryEndpoints.GamesEndpoint;
             var response = await RequestHelper.GetRequestResponse(url, cancellationToken);
@@ -31,14 +32,7 @@ namespace FourthDown.Shared.Repositories.Csv
 
             var responseBody = await response.Content.ReadAsStringAsync();
 
-            if (!response.IsSuccessStatusCode)
-                return new Dictionary<int, IEnumerable<Game>>();
-
-            var games = ProcessGamesResponse(responseBody);
-
-            return games
-                .GroupBy(x => x.Season)
-                .ToDictionary(x => x.Key, x => x.AsEnumerable());
+            return response.IsSuccessStatusCode ? ProcessGamesResponse(responseBody) : Enumerable.Empty<Game>();
         }
 
         private static IEnumerable<Game> ProcessGamesResponse(string responseBody)

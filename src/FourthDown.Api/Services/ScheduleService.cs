@@ -81,7 +81,9 @@ namespace FourthDown.Api.Services
 
         private async Task<Dictionary<int, IEnumerable<Game>>> GetAllGames(CancellationToken cancellationToken)
         {
-            return await _gameRepository.GetGamesAsync(cancellationToken);
+            var games = await _gameRepository.GetGamesAsync(cancellationToken);
+
+            return games.GroupBy(x => x.Season).ToDictionary(x => x.Key, x => x.AsEnumerable());
         }
     }
 }

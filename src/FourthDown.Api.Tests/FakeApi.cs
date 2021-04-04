@@ -64,7 +64,7 @@ namespace FourthDown.Api.Tests
             _mockGameRepository
                 .Setup(g => g.GetGamesAsync(
                     It.IsAny<CancellationToken>()))
-                .ReturnsAsync(new Dictionary<int, IEnumerable<Game>> {{0, new List<Game>()}});
+                .ReturnsAsync(new List<Game>() {new Game()});
 
             _mockTeamRepository
                 .Setup(t => t.GetTeamsAsync(
