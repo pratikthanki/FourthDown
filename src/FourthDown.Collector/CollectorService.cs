@@ -79,17 +79,12 @@ namespace FourthDown.Collector
              * 4. Insert to database 
              */
 
+            // TODO: get gameIds from the database
             var gameIdsWritten = new List<string>() {""};
             var gamesPerSeason = await _gameRepository.GetGamesAsync(_cancellationToken);
+            var gamesToWrite = gamesPerSeason.Where(x => !gameIdsWritten.Contains(x.GameId));
 
-            var allGames = gamesPerSeason
-                .GroupBy(x => x.Season).ToDictionary(x => x.Key, x => x.AsEnumerable());
-
-            var gamesToWrite = allGames
-                .SelectMany(x => x.Value).Where(x => !gameIdsWritten.Contains(x.GameId));
-
-            var gameDetailsTask = GetGamePlays(gamesToWrite, _cancellationToken);
-            var gameDetails = await gameDetailsTask;
+            var gameDetails = await GetGamePlays(gamesToWrite, _cancellationToken);
 
             // _databaseClient.Write();
 

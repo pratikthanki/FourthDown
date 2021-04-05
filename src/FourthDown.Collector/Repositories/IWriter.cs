@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace FourthDown.Collector.Storage
+namespace FourthDown.Collector.Repositories
 {
     public interface IWriter<in T>
     {
