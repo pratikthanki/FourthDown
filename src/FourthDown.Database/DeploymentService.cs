@@ -1,4 +1,5 @@
 using System;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using DbUp;
@@ -8,106 +9,74 @@ using Microsoft.Extensions.Options;
 
 namespace FourthDown.Database
 {
-    public class DeploymentService : IHostedService
+    public class DeploymentService : BackgroundService
     {
         private readonly ILogger<DeploymentService> _logger;
-        private readonly CancellationTokenSource _cancellationTokenSource;
         private readonly DatabaseOptions _databaseOptions;
-
-        private Task _task;
 
         public DeploymentService(
             ILogger<DeploymentService> logger,
-            IOptions<DatabaseOptions> databaseOptions,
-            IHostApplicationLifetime appLifetime)
+            IOptions<DatabaseOptions> databaseOptions)
         {
             _logger = logger;
             _databaseOptions = databaseOptions.Value;
-            _cancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(appLifetime.ApplicationStopping);
-
-            Environment.ExitCode = 0;
-
-            _cancellationTokenSource.Token.Register(() =>
-            {
-                _logger.LogInformation($"Shutting down {nameof(DeploymentService)}..");
-                appLifetime.StopApplication();
-            });
         }
 
-        public Task StartAsync(CancellationToken cancellationToken)
+        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            _logger.LogInformation($"Starting {nameof(DeploymentService)}..");
+            stoppingToken.Register(() => _logger.LogDebug($" Deployment background task is stopping."));
 
-            if (_task != null)
+            while (!stoppingToken.IsCancellationRequested)
             {
-                throw new InvalidOperationException();
+                EnsureDatabase.For.SqlDatabase(_databaseOptions.ConnectionString);
+
+                var upgradeBuilder = DeployChanges.To
+                    .SqlDatabase(_databaseOptions.ConnectionString)
+                    .WithScriptsEmbeddedInAssembly(Assembly.GetExecutingAssembly())
+                    .WithTransaction()
+                    .LogScriptOutput()
+                    .LogToConsole()
+                    .Build();
+
+                if (!upgradeBuilder.IsUpgradeRequired())
+                {
+                    _logger.LogError("Database upgrade is not required");
+                    return;
+                }
+
+
+                var upgradeResult = upgradeBuilder.PerformUpgrade();
+
+                if (!upgradeResult.Successful)
+                {
+                    _logger.LogCritical(upgradeResult.Error.Message);
+                }
+                else
+                {
+                    _logger.LogInformation("Database successfully upgraded!");
+                }
             }
-
-            if (!_cancellationTokenSource.IsCancellationRequested)
-            {
-                _task = Task.Run(RunDeployment, cancellationToken);
-            }
-
-            _logger.LogInformation($"Started {nameof(DeploymentService)}..");
-
-            return Task.CompletedTask;
         }
 
-        public async Task StopAsync(CancellationToken cancellationToken)
+        public override Task StartAsync(CancellationToken cancellationToken)
         {
-            _logger.LogInformation($"Stopping {nameof(DeploymentService)}..");
+            _logger.LogInformation($"{DateTime.Now}: Deployment started.");
 
-            _cancellationTokenSource.Cancel();
-
-            var runningTask = Interlocked.Exchange(ref _task, null);
-            if (runningTask != null)
-            {
-                await runningTask;
-            }
-
-            _logger.LogInformation($"Stopped {nameof(DeploymentService)}..");
+            return base.StartAsync(cancellationToken);
         }
 
-        private void RunDeployment()
+        public override Task StopAsync(CancellationToken cancellationToken)
         {
-            EnsureDatabase.For.SqlDatabase(_databaseOptions.ConnectionString);
+            _logger.LogInformation($"{DateTime.Now}:Deployment stopped.");
 
-            var upgradeEngine = DeployChanges.To
-                .SqlDatabase(_databaseOptions.ConnectionString)
-                .WithScriptsFromFileSystem(_databaseOptions.SchemaLocation)
-                .WithTransaction()
-                .LogScriptOutput()
-                .LogToConsole();
+            return base.StopAsync(cancellationToken);
+        }
 
-            var upgradeBuilder = upgradeEngine.Build();
+        public override void Dispose()
+        {
+            _logger.LogInformation($"{DateTime.Now}:Worker disposed.");
 
-            _logger.LogInformation("Scripts to execute: ");
-            foreach (var sqlScript in upgradeBuilder.GetScriptsToExecute())
-            {
-                _logger.LogInformation(sqlScript.Name);
-            }
-
-            if (!upgradeBuilder.IsUpgradeRequired())
-            {
-                _logger.LogError("Database upgrade is not required");
-                _cancellationTokenSource.Cancel();
-                Environment.ExitCode = 1;
-            }
-
-            var upgradeResult = upgradeBuilder.PerformUpgrade();
-
-            if (!upgradeResult.Successful)
-            {
-                _logger.LogCritical(upgradeResult.Error.Message);
-                Environment.ExitCode = 1;
-            }
-            else
-            {
-                _logger.LogInformation("Database successfully upgraded!");
-                Environment.ExitCode = 0;
-            }
-            
-            _cancellationTokenSource.Cancel();
+            base.Dispose();
         }
     }
 }
