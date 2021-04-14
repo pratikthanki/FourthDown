@@ -14,6 +14,7 @@ namespace FourthDown.Api.Controllers
     [Route("api/teams")]
     [ApiVersion("1.0")]
     [Produces("application/json")]
+    [ResponseCache(Duration = 86400, VaryByQueryKeys = new[] {"*"})]
     [ProducesResponseType(typeof(TeamResponse[]), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ValidationProblemDetailsResponse),StatusCodes.Status400BadRequest)]
     [ApiController]
