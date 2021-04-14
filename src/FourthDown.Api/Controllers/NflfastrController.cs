@@ -19,7 +19,7 @@ namespace FourthDown.Api.Controllers
     [Produces("application/json")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ValidationProblemDetailsResponse), StatusCodes.Status400BadRequest)]
-    [ResponseCache(Duration = 600, Location = ResponseCacheLocation.Any, VaryByQueryKeys = new[] {"impactlevel", "pii"})]
+    [ResponseCache(Duration = 86400, VaryByQueryKeys = new[] {"*"})]
     [ApiController]
     public class NflfastrController : ControllerBase
     {
