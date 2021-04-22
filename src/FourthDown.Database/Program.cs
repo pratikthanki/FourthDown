@@ -27,9 +27,8 @@ namespace FourthDown.Database
                 })
                 .ConfigureServices((hostContext, services) =>
                 {
-                    services
-                        .AddHostedService<DeploymentService>()
-                        .Configure<DatabaseOptions>(hostContext.Configuration);
+                    services.Configure<DatabaseOptions>(hostContext.Configuration);
+                    services.AddHostedService<DeploymentService>();
                 })
                 .UseConsoleLifetime();
         }
