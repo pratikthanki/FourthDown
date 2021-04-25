@@ -1,4 +1,5 @@
 ﻿using FourthDown.Collector.Options;
+using FourthDown.Collector.Repositories;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.DependencyInjection;
@@ -24,6 +25,7 @@ namespace FourthDown.Collector
                 {
                     services
                         .AddHostedService<CollectorService>()
+                        .AddSingleton<ISqlGameRepository, SqlGameRepository>()
                         .Configure<DatabaseOptions>(hostContext.Configuration);
                 })
                 .UseConsoleLifetime();

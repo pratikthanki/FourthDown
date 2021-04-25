@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace FourthDown.Collector.Repositories
 {
-    public interface IGameRepository
+    public interface ISqlGameRepository
     {
         Task<IEnumerable<string>> GetGameIdsAsync(CancellationToken cancellationToken);
     }

@@ -22,8 +22,4 @@
       <ProjectReference Include="..\FourthDown.Shared\FourthDown.Shared.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Repositories\Sql" />
-    </ItemGroup>
-
 </Project>

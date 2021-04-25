@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using FourthDown.Collector.Repositories;
 using FourthDown.Shared.Models;
 using FourthDown.Shared.Repositories;
 using Microsoft.Extensions.Hosting;
@@ -10,24 +11,25 @@ using Microsoft.Extensions.Logging;
 
 namespace FourthDown.Collector
 {
-    public class CollectorService : IHostedService
+    public class CollectorService : BackgroundService
     {
         private readonly ILogger<CollectorService> _logger;
-        private readonly IGameRepository _gameRepository;
-        private readonly IGamePlayRepository _gamePlayRepository;
-
         private readonly CancellationTokenSource _cancellationTokenSource;
         private readonly CancellationToken _cancellationToken;
 
-        private Task _task;
+        private readonly ISqlGameRepository _sqlGameRepository;
+        private readonly IGameRepository _gameRepository;
+        private readonly IGamePlayRepository _gamePlayRepository;
 
         public CollectorService(
             ILogger<CollectorService> logger,
             IHostApplicationLifetime appLifetime,
+            ISqlGameRepository sqlGameRepository,
             IGameRepository gameRepository,
             IGamePlayRepository gamePlayRepository)
         {
             _logger = logger;
+            _sqlGameRepository = sqlGameRepository;
             _gameRepository = gameRepository;
             _gamePlayRepository = gamePlayRepository;
 
@@ -43,34 +45,7 @@ namespace FourthDown.Collector
             });
         }
 
-        public Task StartAsync(CancellationToken cancellationToken)
-        {
-            _logger.LogInformation($"Starting {nameof(CollectorService)}..");
-
-            if (_task != null)
-                throw new InvalidOperationException();
-
-            if (!_cancellationTokenSource.IsCancellationRequested)
-                _task = Task.Run(RunAsync, cancellationToken);
-
-            _logger.LogInformation($"Starting {nameof(CollectorService)}..");
-
-            return Task.CompletedTask;
-        }
-
-        public async Task StopAsync(CancellationToken cancellationToken)
-        {
-            _logger.LogInformation($"Stopping {nameof(CollectorService)}..");
-
-            _cancellationTokenSource.Cancel();
-            var runningTask = Interlocked.Exchange(ref _task, null);
-            if (runningTask != null)
-                await runningTask;
-
-            _logger.LogInformation($"Stopped {nameof(CollectorService)}..");
-        }
-
-        private async Task RunAsync()
+        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             /*
              * 1. Read games from github csv
@@ -79,10 +54,12 @@ namespace FourthDown.Collector
              * 4. Insert to database 
              */
 
-            // TODO: get gameIds from the database
-            var gameIdsWritten = new List<string>() {""};
-            var gamesPerSeason = await _gameRepository.GetGamesAsync(_cancellationToken);
-            var gamesToWrite = gamesPerSeason.Where(x => !gameIdsWritten.Contains(x.GameId));
+            // List of gameIds from the database
+            var gameIdsWritten = await _sqlGameRepository.GetGameIdsAsync(_cancellationToken);
+
+            // Games file with legacy games
+            var games = await _gameRepository.GetGamesAsync(_cancellationToken);
+            var gamesToWrite = games.Where(x => !gameIdsWritten.Contains(x.GameId));
 
             var gameDetails = await GetGamePlays(gamesToWrite, _cancellationToken);
 
@@ -94,7 +71,10 @@ namespace FourthDown.Collector
             }
             catch (Exception exception)
             {
-                LogException(exception.ToString());
+                _logger.LogCritical(exception.Message);
+                _cancellationTokenSource.Cancel();
+
+                Environment.ExitCode = 1;
             }
 
             _cancellationTokenSource.Cancel();
@@ -126,14 +106,6 @@ namespace FourthDown.Collector
             }
 
             return gameDetails;
-        }
-
-        private void LogException(string exception)
-        {
-            _logger.LogCritical(exception);
-            _cancellationTokenSource.Cancel();
-
-            Environment.ExitCode = 1;
         }
     }
 }
