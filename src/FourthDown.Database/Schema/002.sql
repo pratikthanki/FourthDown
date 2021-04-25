@@ -40,10 +40,10 @@ IF(OBJECT_ID('dbo.Teams') IS NULL)
 GO
 
 
-IF(OBJECT_ID('dbo.Schedule') IS NULL)
+IF(OBJECT_ID('dbo.Games') IS NULL)
     BEGIN
-        PRINT N'Creating table dbo.Schedule';
-        CREATE TABLE [dbo].[Schedule]
+        PRINT N'Creating table dbo.Games';
+        CREATE TABLE [dbo].[Games]
         (
             [GameId]             VARCHAR(255)        NULL,
             [Season]             INT                 NULL,
