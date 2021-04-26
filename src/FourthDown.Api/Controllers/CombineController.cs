@@ -16,6 +16,7 @@ namespace FourthDown.Api.Controllers
     [ApiVersion("1.0")]
     [Produces("application/json")]
     [ProducesResponseType(typeof(CombineWorkoutResponse[]), StatusCodes.Status200OK)]
+    [ResponseCache(Duration = 86400, VaryByQueryKeys = new[] {"*"})]
     [ProducesResponseType(typeof(ValidationProblemDetailsResponse), StatusCodes.Status400BadRequest)]
     [ApiController]
     public class CombineController : ControllerBase

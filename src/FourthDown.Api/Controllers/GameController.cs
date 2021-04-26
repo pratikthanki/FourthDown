@@ -18,6 +18,7 @@ namespace FourthDown.Api.Controllers
     [ApiVersion("1.0")]
     [ApiController]
     [Produces("application/json")]
+    [ResponseCache(Duration = 86400, VaryByQueryKeys = new[] {"*"})]
     [ProducesResponseType(typeof(ValidationProblemDetailsResponse), StatusCodes.Status400BadRequest)]
     public class GameController : ControllerBase
     {
