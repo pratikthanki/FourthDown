@@ -25,6 +25,7 @@ namespace FourthDown.Collector
                 {
                     services
                         .AddHostedService<CollectorService>()
+                        .AddSingleton<IWriter, SqlWriter>()
                         .AddSingleton<ISqlGameRepository, SqlGameRepository>()
                         .Configure<DatabaseOptions>(hostContext.Configuration);
                 })

@@ -4,8 +4,8 @@ using System.Threading.Tasks;
 
 namespace FourthDown.Collector.Repositories
 {
-    public interface IWriter<in T> where T : class
+    public interface IWriter
     {
-        Task BulkInsertAsync(IEnumerable<T> items, CancellationToken cancellationToken);
+        Task BulkInsertAsync<T>(IEnumerable<T> items, CancellationToken cancellationToken);
     }
 }

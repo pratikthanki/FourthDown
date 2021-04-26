@@ -15,7 +15,6 @@ namespace FourthDown.Collector.Repositories
         public SqlGameRepository(IOptions<DatabaseOptions> options)
         {
             _options = options.Value;
-
         }
 
         public async Task<IEnumerable<string>> GetGameIdsAsync(CancellationToken cancellationToken)
@@ -23,7 +22,7 @@ namespace FourthDown.Collector.Repositories
             await using var conn = new SqlConnection(_options.ConnectionString);
             await conn.OpenAsync(cancellationToken);
 
-            var query = $"SELECT GameId From dbo.Games WITH (NOLOCK)";
+            var query = $"SELECT GameId FROM dbo.Games WITH (NOLOCK)";
 
             var command = new CommandDefinition(
                 commandText: query,
