@@ -37,7 +37,7 @@ namespace FourthDown.Collector.Repositories
 
             var tableName = GetTableName(enumerable);
 
-            // TODO
+            // TODO add columns
             dataTable.Columns.Add("Column");
 
             foreach (var i in enumerable)
