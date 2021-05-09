@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Dapper;
@@ -17,12 +17,17 @@ namespace FourthDown.Collector.Repositories
             _options = options.Value;
         }
 
-        public async Task<IEnumerable<string>> GetGameIdsAsync(CancellationToken cancellationToken)
+        /// <summary>
+        /// Get the dateTime of the last game inserted. The DateTime time zone is in EST.
+        /// </summary>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        public async Task<DateTime> GetLastGameDateTimeAsync(CancellationToken cancellationToken)
         {
             await using var conn = new SqlConnection(_options.ConnectionString);
             await conn.OpenAsync(cancellationToken);
 
-            var query = $"SELECT GameId FROM dbo.Games WITH (NOLOCK)";
+            var query = $"SELECT MAX(CAST(CONCAT(Gameday, ' ', Gametime) AS datetime)) FROM dbo.Games WITH (NOLOCK)";
 
             var command = new CommandDefinition(
                 commandText: query,
@@ -30,9 +35,7 @@ namespace FourthDown.Collector.Repositories
                 flags: CommandFlags.None,
                 cancellationToken: cancellationToken);
 
-            var gameIds = await conn.QueryAsync<string>(command);
-
-            return gameIds;
+            return await conn.QuerySingleAsync<DateTime>(command);
         }
     }
 }
