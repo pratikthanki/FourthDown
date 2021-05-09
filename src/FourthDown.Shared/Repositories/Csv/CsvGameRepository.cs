@@ -13,7 +13,6 @@ namespace FourthDown.Shared.Repositories.Csv
     {
         private static ITracer _tracer;
         private static ILogger<CsvGameRepository> _logger;
-        private static readonly string Url = RepositoryEndpoints.GamesEndpoint;
 
         public CsvGameRepository(
             ITracer tracer,
@@ -25,23 +24,23 @@ namespace FourthDown.Shared.Repositories.Csv
 
         public async Task<IEnumerable<Game>> GetGamesAsync(CancellationToken cancellationToken)
         {
-            var url = RepositoryEndpoints.GamesEndpoint;
+            const string url = RepositoryEndpoints.GamesEndpoint;
             var response = await RequestHelper.GetRequestResponse(url, cancellationToken);
 
             _logger.LogInformation($"Fetching data. Url: {url}; Status: {response.StatusCode}");
 
             var responseBody = await response.Content.ReadAsStringAsync();
-
-            return response.IsSuccessStatusCode ? ProcessGamesResponse(responseBody) : Enumerable.Empty<Game>();
-        }
-
-        private static IEnumerable<Game> ProcessGamesResponse(string responseBody)
-        {
+            
             var csvResponse = responseBody
                 .Split("\n")
                 .Skip(1)
                 .Select(x => x.Split(","));
 
+            return response.IsSuccessStatusCode ? ProcessGamesResponse(csvResponse) : Enumerable.Empty<Game>();
+        }
+
+        private static IEnumerable<Game> ProcessGamesResponse(IEnumerable<string[]> csvResponse)
+        {
             var games = new List<Game>();
             foreach (var fields in csvResponse)
             {
@@ -56,7 +55,7 @@ namespace FourthDown.Shared.Repositories.Csv
                     Week = StringParser.ToInt(fields[3]),
                     Gameday = StringParser.ToDateTime(fields[4], "yyyy-MM-dd"),
                     Weekday = fields[5],
-                    Gametime = fields[6],
+                    Gametime = string.IsNullOrWhiteSpace(fields[6]) ? "00:00" : fields[6],
                     AwayTeam = fields[7],
                     AwayScore = StringParser.ToIntDefaultZero(fields[8]),
                     HomeTeam = fields[9],

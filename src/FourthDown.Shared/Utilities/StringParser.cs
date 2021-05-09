@@ -3,6 +3,8 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Text.Json;
+using NodaTime;
+using NodaTime.Text;
 
 namespace FourthDown.Shared.Utilities
 {
@@ -67,6 +69,17 @@ namespace FourthDown.Shared.Utilities
             return DateTime.ParseExact(dateTime, format, CultureInfo.InvariantCulture);
         }
 
+        public static DateTime EstDateTimeToUtc(string dateTime)
+        {
+            var tz = DateTimeZoneProviders.Tzdb["America/New_York"];
+            const string format = "MM/dd/yyyy HH:mm";
+
+            var pattern = LocalDateTimePattern.CreateWithInvariantCulture(format);
+            var dt = pattern.Parse(dateTime).Value;
+
+            return tz.AtLeniently(dt).ToDateTimeOffset().DateTime;
+        }
+
         public static bool ToBool(string number)
         {
             return number == "1";
@@ -89,10 +102,10 @@ namespace FourthDown.Shared.Utilities
 
         private static string GetAbsolutePath(string relativePath)
         {
-            var _dataRoot = new FileInfo(typeof(Program).Assembly.Location);
+            var dataRoot = new FileInfo(typeof(Program).Assembly.Location);
 
-            Debug.Assert(_dataRoot.Directory != null);
-            var assemblyFolderPath = _dataRoot.Directory.FullName;
+            Debug.Assert(dataRoot.Directory != null);
+            var assemblyFolderPath = dataRoot.Directory.FullName;
 
             var fullPath = Path.Combine(assemblyFolderPath, relativePath);
 
