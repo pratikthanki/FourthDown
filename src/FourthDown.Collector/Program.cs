@@ -1,7 +1,16 @@
 ﻿using FourthDown.Collector.Options;
+using FourthDown.Collector.Repositories;
+using FourthDown.Collector.Services;
+using FourthDown.Shared.Repositories;
+using FourthDown.Shared.Repositories.Csv;
+using FourthDown.Shared.Repositories.Json;
+using Jaeger;
+using Jaeger.Samplers;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.DependencyInjection;
+using OpenTracing;
+using OpenTracing.Util;
 
 namespace FourthDown.Collector
 {
@@ -23,9 +32,25 @@ namespace FourthDown.Collector
                 .ConfigureServices((hostContext, services) =>
                 {
                     services
-                        .AddHostedService<CollectorService>()
-                        .Configure<CollectorOptions>(hostContext.Configuration)
-                        .Configure<DatabaseOptions>(hostContext.Configuration.GetSection("Database"));
+                        .Configure<DatabaseOptions>(hostContext.Configuration)
+                        .AddSingleton<ITracer>(serviceProvider =>
+                        {
+                            // This will log to a default localhost installation of Jaeger.
+                            var tracer = new Tracer.Builder("Collector Service")
+                                .WithSampler(new ConstSampler(true))
+                                .Build();
+
+                            // Allows code that can't use DI to also access the tracer.
+                            GlobalTracer.Register(tracer);
+
+                            return tracer;
+                        })
+                        .AddSingleton<IWriter, SqlWriter>()
+                        .AddSingleton<IGameRepository, CsvGameRepository>()
+                        .AddSingleton<ISqlGameRepository, SqlGameRepository>()
+                        .AddSingleton<IGamePlayRepository, JsonGamePlayRepository>()
+                        .AddSingleton<ICollectorManager, CollectorManager>()
+                        .AddHostedService<CollectorService>();
                 })
                 .UseConsoleLifetime();
         }

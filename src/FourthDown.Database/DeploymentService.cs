@@ -64,6 +64,7 @@ namespace FourthDown.Database
                 .SqlDatabase(_databaseOptions.ConnectionString)
                 .WithScriptsEmbeddedInAssembly(Assembly.GetExecutingAssembly())
                 .WithTransaction()
+                .JournalToSqlTable("dbo", "SchemaVersions")
                 .LogScriptOutput()
                 .Build();
 
