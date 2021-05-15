@@ -16,12 +16,6 @@ namespace FourthDown.Collector.Repositories
         private readonly ILogger _logger;
         private readonly DatabaseOptions _options;
 
-        private const string GamesTable = "Games";
-        private const string GameTeamsTable = "GameTeams";
-        private const string GameDrivesTable = "GameDrives";
-        private const string GameScoringSummariesTable = "GameScoringSummaries";
-        private const string GamePlaysTable = "GamePlays";
-
         public SqlWriter(
             ILogger<SqlWriter> logger,
             IOptions<DatabaseOptions> options)
@@ -30,12 +24,13 @@ namespace FourthDown.Collector.Repositories
             _options = options.Value;
         }
 
-        public async Task BulkInsertAsync<T>(IEnumerable<T> items, CancellationToken cancellationToken)
+        public async Task BulkInsertGamesAsync(IEnumerable<Game> games, CancellationToken cancellationToken)
         {
-            var enumerable = items.ToList();
-            var dataTable = new DataTable();
+            var enumerable = games.ToList();
+            var item = enumerable.First();
+            var tableName = GetTableName(item);
 
-            var tableName = GetTableName(enumerable);
+            var dataTable = new DataTable();
 
             // TODO add columns
             dataTable.Columns.Add("Column");
@@ -53,14 +48,29 @@ namespace FourthDown.Collector.Repositories
             await sqlBulkCopy.WriteToServerAsync(dataTable, cancellationToken);
         }
 
-        private static string GetTableName<T>(IEnumerable<T> items)
+        public Task BulkInsertGamePlaysAsync(IEnumerable<GamePlays> game, CancellationToken cancellationToken)
         {
-            var item = items.First();
+            throw new System.NotImplementedException();
+        }
 
+        public Task BulkInsertGameDrivesAsync(IEnumerable<GameDrives> game, CancellationToken cancellationToken)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public Task BulkInsertGameScoringSummariesAsync(IEnumerable<GameScoringSummaries> game, CancellationToken cancellationToken)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        private static string GetTableName<T>(T item)
+        {
             return item switch
             {
-                Game _ => GamesTable,
-                GameDetail _ => GameDrivesTable,
+                Game _ => "Games",
+                GamePlays _ => "GamePlays",
+                GameDrives _ => "GameDrives",
+                GameScoringSummaries _ => "GameScoringSummaries",
                 _ => null
             };
         }
