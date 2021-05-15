@@ -72,7 +72,7 @@ namespace FourthDown.Collector.Services
             
             _logger.LogInformation($"Writing game details to database");
 
-            await _writer.InsertGamesAsync(gamesToWrite, cancellationToken);
+            await _writer.BulkInsertGamesAsync(gamesToWrite, cancellationToken);
 
             return true;
         }
@@ -85,9 +85,9 @@ namespace FourthDown.Collector.Services
                 {
                     _logger.LogInformation($"Writing game play to database");
 
-                    await _writer.InsertGameDriveAsync(games.Select(x => x.ToGameDrives()), cancellationToken);
-                    await _writer.InsertGamePlayAsync(games.Select(x => x.ToGamePlays()), cancellationToken);
-                    await _writer.InsertGameScoringSummaryAsync(games.Select(x => x.ToGameScoringSummaries()), cancellationToken);
+                    await _writer.BulkInsertGameDrivesAsync(games.Select(x => x.ToGameDrives()), cancellationToken);
+                    await _writer.BulkInsertGamePlaysAsync(games.Select(x => x.ToGamePlays()), cancellationToken);
+                    await _writer.BulkInsertGameScoringSummariesAsync(games.Select(x => x.ToGameScoringSummaries()), cancellationToken);
                 }
             }
         }

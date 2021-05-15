@@ -24,7 +24,7 @@ namespace FourthDown.Collector.Repositories
             _options = options.Value;
         }
 
-        public async Task InsertGamesAsync(IEnumerable<Game> games, CancellationToken cancellationToken)
+        public async Task BulkInsertGamesAsync(IEnumerable<Game> games, CancellationToken cancellationToken)
         {
             var enumerable = games.ToList();
             var item = enumerable.First();
@@ -48,17 +48,17 @@ namespace FourthDown.Collector.Repositories
             await sqlBulkCopy.WriteToServerAsync(dataTable, cancellationToken);
         }
 
-        public Task InsertGamePlayAsync(IEnumerable<GamePlays> game, CancellationToken cancellationToken)
+        public Task BulkInsertGamePlaysAsync(IEnumerable<GamePlays> game, CancellationToken cancellationToken)
         {
             throw new System.NotImplementedException();
         }
 
-        public Task InsertGameDriveAsync(IEnumerable<GameDrives> game, CancellationToken cancellationToken)
+        public Task BulkInsertGameDrivesAsync(IEnumerable<GameDrives> game, CancellationToken cancellationToken)
         {
             throw new System.NotImplementedException();
         }
 
-        public Task InsertGameScoringSummaryAsync(IEnumerable<GameScoringSummaries> game, CancellationToken cancellationToken)
+        public Task BulkInsertGameScoringSummariesAsync(IEnumerable<GameScoringSummaries> game, CancellationToken cancellationToken)
         {
             throw new System.NotImplementedException();
         }

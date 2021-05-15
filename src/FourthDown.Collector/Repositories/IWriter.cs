@@ -7,9 +7,9 @@ namespace FourthDown.Collector.Repositories
 {
     public interface IWriter
     {
-        Task InsertGamesAsync(IEnumerable<Game> games, CancellationToken cancellationToken);
-        Task InsertGamePlayAsync(IEnumerable<GamePlays> game, CancellationToken cancellationToken);
-        Task InsertGameDriveAsync(IEnumerable<GameDrives> game, CancellationToken cancellationToken);
-        Task InsertGameScoringSummaryAsync(IEnumerable<GameScoringSummaries> game, CancellationToken cancellationToken);
+        Task BulkInsertGamesAsync(IEnumerable<Game> games, CancellationToken cancellationToken);
+        Task BulkInsertGamePlaysAsync(IEnumerable<GamePlays> game, CancellationToken cancellationToken);
+        Task BulkInsertGameDrivesAsync(IEnumerable<GameDrives> game, CancellationToken cancellationToken);
+        Task BulkInsertGameScoringSummariesAsync(IEnumerable<GameScoringSummaries> game, CancellationToken cancellationToken);
     }
 }
