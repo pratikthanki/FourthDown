@@ -1,4 +1,7 @@
-﻿using FourthDown.Collector.Options;
+﻿using System.IO;
+using System.Reflection;
+using FourthDown.Collector.Database;
+using FourthDown.Collector.Options;
 using FourthDown.Collector.Repositories;
 using FourthDown.Collector.Services;
 using FourthDown.Shared.Repositories;
@@ -16,6 +19,8 @@ namespace FourthDown.Collector
 {
     class Program
     {
+        private const string EnvironmentPrefix = "FD_";
+
         static void Main(string[] args)
         {
             CreateHostBuilder(args).Build().Run();
@@ -26,6 +31,8 @@ namespace FourthDown.Collector
             return Host.CreateDefaultBuilder(args)
                 .ConfigureAppConfiguration((_, config) =>
                 {
+                    config.AddEnvironmentVariables(EnvironmentPrefix);
+                    config.SetBasePath(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location));
                     config.AddCommandLine(args);
                     config.AddJsonFile("appsettings.json");
                 })
@@ -50,6 +57,7 @@ namespace FourthDown.Collector
                         .AddSingleton<ISqlGameRepository, SqlGameRepository>()
                         .AddSingleton<IGamePlayRepository, JsonGamePlayRepository>()
                         .AddSingleton<ICollectorManager, CollectorManager>()
+                        .AddSingleton<IMigrator, Migrator>()
                         .AddHostedService<CollectorService>();
                 })
                 .UseConsoleLifetime();

@@ -14,7 +14,8 @@ namespace FourthDown.Collector.Services
 {
     public interface ICollectorManager
     {
-        Task<bool> RunAsync(CancellationToken cancellationToken);
+        Task<bool> TryGetGamesAsync(CancellationToken cancellationToken);
+        Task ProcessGamesAsync(CancellationToken cancellationToken);
     }
 
     public class CollectorManager : ICollectorManager
@@ -25,14 +26,13 @@ namespace FourthDown.Collector.Services
         private readonly IGameRepository _gameRepository;
         private readonly IWriter _writer;
 
-        private static readonly Channel<GameDetail> _channel = Channel.CreateUnbounded<GameDetail>();
-        private ChannelReader<GameDetail> _channelReader = _channel.Reader;
+        private readonly Channel<List<ApiGamePlay>> _channel;
 
         public CollectorManager(
             ILogger<CollectorManager> logger,
             IGamePlayRepository gamePlayRepository,
             ISqlGameRepository sqlGameRepository,
-            IGameRepository gameRepository, 
+            IGameRepository gameRepository,
             IWriter writer)
         {
             _logger = logger;
@@ -40,64 +40,86 @@ namespace FourthDown.Collector.Services
             _sqlGameRepository = sqlGameRepository;
             _gameRepository = gameRepository;
             _writer = writer;
+
+            _channel = Channel.CreateUnbounded<List<ApiGamePlay>>();
         }
 
-        public async Task<bool> RunAsync(CancellationToken cancellationToken)
+        public async Task<bool> TryGetGamesAsync(CancellationToken cancellationToken)
         {
-            /*
-             * 1. Read games from github csv
-             * 2. Check last games written in database
-             * 3. Make request to get just those games
-             * 4. Insert to database 
-             */
-
             // List of gameIds from the database
             var lastGameDateTime = await _sqlGameRepository.GetLastGameDateTimeAsync(cancellationToken);
 
             // Games file with legacy games
-            var games = await _gameRepository.GetGamesAsync(cancellationToken);
+            var legacyGames = (await _gameRepository.GetGamesAsync(cancellationToken)).ToList();
 
             var estTimeNow = DateTime.UtcNow;
 
-            var gamesToWrite = games.Where(x =>
+            var gamesToWrite = legacyGames.Where(x =>
             {
                 var gameTime = StringParser.EstDateTimeToUtc($"{x.Gameday.ToShortDateString()} {x.Gametime}");
                 return gameTime > lastGameDateTime && gameTime < estTimeNow;
             }).ToList();
 
-            if (!gamesToWrite.Any() || gamesToWrite.Count == 0)
+            if (!gamesToWrite.Any())
             {
+                _logger.LogInformation($"No games to write");
                 return false;
             }
 
-            await GetGamePlaysAsync(gamesToWrite, cancellationToken);
+            _logger.LogInformation($"Games to write: {gamesToWrite.Select(x => x.GameId)}");
 
-            await _writer.BulkInsertAsync(gamesToWrite, cancellationToken);
+            await GetGamesToWrite(gamesToWrite, cancellationToken);
+            
+            _logger.LogInformation($"Writing game details to database");
+
+            await _writer.InsertGamesAsync(gamesToWrite, cancellationToken);
 
             return true;
         }
 
-        private async Task GetGamePlaysAsync(IEnumerable<Game> games, CancellationToken cancellationToken)
+        public async Task ProcessGamesAsync(CancellationToken cancellationToken)
         {
-            var requestTasks = games
-                .Select(game => _gamePlayRepository.GetGamePlaysAsync(game, cancellationToken))
-                .ToList();
-
-            //Wait for all the requests to finish
-            await Task.WhenAll(requestTasks);
-
-            //Get the responses
-            foreach (var request in requestTasks)
+            while (await _channel.Reader.WaitToReadAsync(cancellationToken))
             {
-                var gameDetail = await request;
+                while (_channel.Reader.TryRead(out var games))
+                {
+                    _logger.LogInformation($"Writing game play to database");
+
+                    await _writer.InsertGameDriveAsync(games.Select(x => x.ToGameDrives()), cancellationToken);
+                    await _writer.InsertGamePlayAsync(games.Select(x => x.ToGamePlays()), cancellationToken);
+                    await _writer.InsertGameScoringSummaryAsync(games.Select(x => x.ToGameScoringSummaries()), cancellationToken);
+                }
+            }
+        }
+
+        private async Task GetGamesToWrite(List<Game> gamesToWrite, CancellationToken cancellationToken)
+        {
+            var apiGames = new List<ApiGamePlay>();
+            
+            //Get the responses
+            foreach (var game in gamesToWrite)
+            {
+                GameDetail gameDetail;
+
+                try
+                {
+                    gameDetail = await _gamePlayRepository.GetGamePlaysAsync(game, cancellationToken);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine($"Failed to get game: {game.GameId}");
+                    throw;
+                }
 
                 if (gameDetail.Game == null)
                 {
                     continue;
                 }
 
-                _channel.Writer.TryWrite(gameDetail);
+                apiGames.Add(new ApiGamePlay(gameDetail));
             }
+            
+            _channel.Writer.TryWrite(apiGames);
         }
     }
 }
