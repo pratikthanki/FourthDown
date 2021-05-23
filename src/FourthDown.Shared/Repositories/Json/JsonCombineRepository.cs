@@ -31,12 +31,12 @@ namespace FourthDown.Shared.Repositories.Json
             var file = $"combine-{season}.json";
             var filePath = Path.Join(webRootPath, "data", file);
 
-            await using var SourceStream = File.Open(filePath, FileMode.Open);
+            await using var sourceStream = File.Open(filePath, FileMode.Open);
 
             scope.LogEnd(nameof(GetCombineSummaryAsync));
 
             var workouts = await JsonSerializer.DeserializeAsync<IEnumerable<CombineWorkout>>(
-                SourceStream,
+                sourceStream,
                 StringParser.JsonSerializerOptions,
                 cancellationToken);
 

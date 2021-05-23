@@ -29,12 +29,12 @@ namespace FourthDown.Shared.Repositories.Json
             const string file = "teams.json";
             var filePath = Path.Join(webRootPath, "data", file);
 
-            await using var SourceStream = File.Open(filePath, FileMode.Open);
+            await using var sourceStream = File.Open(filePath, FileMode.Open);
 
             scope.LogEnd(nameof(GetTeamsAsync));
 
             var teams = await JsonSerializer.DeserializeAsync<IEnumerable<Team>>(
-                SourceStream,
+                sourceStream,
                 StringParser.JsonSerializerOptions,
                 cancellationToken);
 

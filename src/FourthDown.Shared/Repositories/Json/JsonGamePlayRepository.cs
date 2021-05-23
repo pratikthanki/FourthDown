@@ -69,9 +69,9 @@ namespace FourthDown.Shared.Repositories.Json
             {
                 gameRaw = JsonSerializer.Deserialize<GameRaw>(data, StringParser.JsonSerializerOptions);
             }
-            catch (JsonException JsonException)
+            catch (JsonException jsonException)
             {
-                _logger.LogError($"Error in deserializing json string: {JsonException}\n url: {url}");
+                _logger.LogError($"Error in deserializing json string: {jsonException}\n url: {url}");
             }
 
             return gameRaw == null ? new GameDetail() : gameRaw.Data.Viewer.GameDetail;
