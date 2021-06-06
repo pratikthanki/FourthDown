@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -15,7 +16,11 @@ namespace FourthDown.Api.Services
     {
         private readonly ITracer _tracer;
         private readonly IGameRepository _gameRepository;
-        private readonly DateTime Today = DateTime.UtcNow;
+        private readonly DateTime _today = DateTime.UtcNow;
+
+        private DateTime _lastCacheUpdateDateTime = DateTime.MaxValue;
+        private readonly TimeSpan _cacheUpdateFrequency = TimeSpan.FromDays(-1);
+        private Dictionary<int, IEnumerable<Game>> _gamesPerSeasonCache = new Dictionary<int, IEnumerable<Game>>();
 
         public ScheduleService(
             ITracer tracer,
@@ -30,29 +35,33 @@ namespace FourthDown.Api.Services
             CancellationToken cancellationToken)
         {
             using var scope = _tracer.InitializeTrace(nameof(GetGames));
-            
+
             scope.LogStart(nameof(GetGames));
 
-            var gamesPerSeason = await GetAllGames(cancellationToken);
+            await UpdateGamesCache(cancellationToken);
 
-            var currentSeason = Today.Month > 8 ? Today.Year : Today.Year - 1;
+            var currentSeason = _today.Month > 8 ? _today.Year : _today.Year - 1;
             var season = queryParameter.Season ?? currentSeason;
 
-            var games = gamesPerSeason[season];
+            var games = _gamesPerSeasonCache[season];
 
             if (!string.IsNullOrWhiteSpace(queryParameter.Team))
+            {
                 games = games.Where(x => x.HomeTeam == queryParameter.Team || x.AwayTeam == queryParameter.Team);
+            }
 
             if (queryParameter.Week != null)
+            {
                 games = games.Where(x => x.Week == queryParameter.Week);
-            
+            }
+
             scope.LogEnd(nameof(GetGames));
 
             return games;
         }
 
         public async Task<IEnumerable<Game>> GetGamesBetween(
-            GameResultQueryParameter queryParameter, 
+            GameResultQueryParameter queryParameter,
             CancellationToken cancellationToken)
         {
             var team = queryParameter.Team;
@@ -60,9 +69,10 @@ namespace FourthDown.Api.Services
             var offset = queryParameter.GameOffset;
             var gameType = queryParameter.ToGameTypeFilter();
             
-            var gamesPerSeason = await GetAllGames(cancellationToken);
+            await UpdateGamesCache(cancellationToken);
 
-            var games = gamesPerSeason.SelectMany(x => x.Value.Where(g => g.HomeTeam == team || g.AwayTeam == team));
+            var games = _gamesPerSeasonCache
+                .SelectMany(x => x.Value.Where(g => g.HomeTeam == team || g.AwayTeam == team));
 
             if (gameType != GameTypeFilter.All)
             {
@@ -72,18 +82,30 @@ namespace FourthDown.Api.Services
             }
 
             if (!string.IsNullOrWhiteSpace(opposition))
+            {
                 games = games.Where(x => x.HomeTeam == opposition || x.AwayTeam == opposition);
+            }
 
             games = games.OrderByDescending(x => x.Gameday);
 
             return games.Take(offset);
         }
 
-        private async Task<Dictionary<int, IEnumerable<Game>>> GetAllGames(CancellationToken cancellationToken)
+        private async Task UpdateGamesCache(CancellationToken cancellationToken)
         {
-            var games = await _gameRepository.GetGamesAsync(cancellationToken);
+            if (!_gamesPerSeasonCache.Any() || _lastCacheUpdateDateTime < DateTime.UtcNow.Add(_cacheUpdateFrequency))
+            {
+                var task = Task.Run(async () =>
+                {
+                    var games = await _gameRepository.GetGamesAsync(cancellationToken);
 
-            return games.GroupBy(x => x.Season).ToDictionary(x => x.Key, x => x.AsEnumerable());
+                    return games.GroupBy(x => x.Season).ToDictionary(x => x.Key, x => x.AsEnumerable());
+
+                }, cancellationToken);
+
+                _gamesPerSeasonCache = await task;
+                _lastCacheUpdateDateTime = DateTime.UtcNow;
+            }
         }
     }
 }

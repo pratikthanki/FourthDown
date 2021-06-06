@@ -9,6 +9,7 @@ using FourthDown.Shared.Repositories;
 using FourthDown.Shared.Repositories.Csv;
 using FourthDown.Shared.Repositories.Json;
 using FourthDown.Api.Services;
+using FourthDown.Shared.Utilities;
 using Jaeger;
 using Jaeger.Reporters;
 using Jaeger.Samplers;
@@ -53,6 +54,7 @@ namespace FourthDown.Api
                 .AddSingleton<IGamePlayRepository, JsonGamePlayRepository>()
                 .AddSingleton<IPlayByPlayRepository, CsvPlayByPlayRepository>()
                 .AddSingleton<ICombineRepository, JsonCombineRepository>()
+                .AddSingleton<IRequestHelper, RequestHelper>()
                 .AddSingleton<ITracer>(serviceProvider =>
                 {
                     var serviceName = serviceProvider.GetRequiredService<IWebHostEnvironment>().ApplicationName;

@@ -7,13 +7,20 @@ namespace FourthDown.Api.HealthChecks
 {
     public class DataAccessHealthCheck : IHealthCheck
     {
+        private readonly IRequestHelper _requestHelper;
+
+        public DataAccessHealthCheck(IRequestHelper requestHelper)
+        {
+            _requestHelper = requestHelper;
+        }
+
         public async Task<HealthCheckResult> CheckHealthAsync(
             HealthCheckContext context,
             CancellationToken cancellationToken = default)
         {
             async Task<bool> GetStatusCode(string s)
             {
-                var response = await RequestHelper.GetRequestResponse(s, cancellationToken);
+                var response = await _requestHelper.GetRequestResponse(s, cancellationToken);
                 return response.IsSuccessStatusCode;
             }
 

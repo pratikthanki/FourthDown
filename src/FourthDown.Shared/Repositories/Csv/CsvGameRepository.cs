@@ -13,19 +13,22 @@ namespace FourthDown.Shared.Repositories.Csv
     {
         private static ITracer _tracer;
         private static ILogger<CsvGameRepository> _logger;
+        private readonly IRequestHelper _requestHelper;
 
         public CsvGameRepository(
             ITracer tracer,
-            ILogger<CsvGameRepository> logger)
+            ILogger<CsvGameRepository> logger,
+            IRequestHelper requestHelper)
         {
             _tracer = tracer;
             _logger = logger;
+            _requestHelper = requestHelper;
         }
 
         public async Task<IEnumerable<Game>> GetGamesAsync(CancellationToken cancellationToken)
         {
             const string url = RepositoryEndpoints.GamesEndpoint;
-            var response = await RequestHelper.GetRequestResponse(url, cancellationToken);
+            var response = await _requestHelper.GetRequestResponse(url, cancellationToken);
 
             _logger.LogInformation($"Fetching data. Url: {url}; Status: {response.StatusCode}");
 

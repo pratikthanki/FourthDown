@@ -17,13 +17,16 @@ namespace FourthDown.Shared.Repositories.Csv
     {
         private readonly ITracer _tracer;
         private static ILogger<CsvPlayByPlayRepository> _logger;
+        private readonly IRequestHelper _requestHelper;
 
         public CsvPlayByPlayRepository(
             ITracer tracer,
-            ILogger<CsvPlayByPlayRepository> logger)
+            ILogger<CsvPlayByPlayRepository> logger,
+            IRequestHelper requestHelper)
         {
             _tracer = tracer;
             _logger = logger;
+            _requestHelper = requestHelper;
         }
 
         public async IAsyncEnumerable<NflfastrPlayByPlay> GetPlayByPlaysAsync(
@@ -37,7 +40,7 @@ namespace FourthDown.Shared.Repositories.Csv
 
             var path = $"{RepositoryEndpoints.PlayByPlayEndpoint}/play_by_play_{season}.csv.gz?raw=true";
 
-            var response = await RequestHelper.GetRequestResponse(path, cancellationToken);
+            var response = await _requestHelper.GetRequestResponse(path, cancellationToken);
             _logger.LogInformation($"Fetching data. Url: {path}; Status: {response.StatusCode}");
 
             if (!response.IsSuccessStatusCode)

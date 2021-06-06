@@ -52,12 +52,10 @@ namespace FourthDown.Collector.Services
             // Games file with legacy games
             var legacyGames = (await _gameRepository.GetGamesAsync(cancellationToken)).ToList();
 
-            var estTimeNow = DateTime.UtcNow;
-
             var gamesToWrite = legacyGames.Where(x =>
             {
                 var gameTime = StringParser.EstDateTimeToUtc($"{x.Gameday.ToShortDateString()} {x.Gametime}");
-                return gameTime > lastGameDateTime && gameTime < estTimeNow;
+                return gameTime > lastGameDateTime && gameTime < DateTime.UtcNow;
             }).ToList();
 
             if (!gamesToWrite.Any())
@@ -107,7 +105,7 @@ namespace FourthDown.Collector.Services
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine($"Failed to get game: {game.GameId}");
+                    _logger.LogCritical(e, $"Failed to get game: {game.GameId}");
                     throw;
                 }
 

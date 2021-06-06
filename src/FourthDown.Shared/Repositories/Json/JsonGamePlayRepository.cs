@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
@@ -13,13 +14,17 @@ namespace FourthDown.Shared.Repositories.Json
     {
         private static ITracer _tracer;
         private static ILogger<JsonGamePlayRepository> _logger;
+        private readonly IRequestHelper _requestHelper;
+        private readonly ConcurrentDictionary<Game, GameDetail> _gamesCache = new ConcurrentDictionary<Game, GameDetail>();
 
         public JsonGamePlayRepository(
             ITracer tracer,
-            ILogger<JsonGamePlayRepository> logger)
+            ILogger<JsonGamePlayRepository> logger,
+            IRequestHelper requestHelper)
         {
             _tracer = tracer;
             _logger = logger;
+            _requestHelper = requestHelper;
         }
 
         public async Task<GameDetail> GetGamePlaysAsync(Game game, CancellationToken cancellationToken)
@@ -32,8 +37,16 @@ namespace FourthDown.Shared.Repositories.Json
 
             scope.LogEnd(nameof(GetGamePlaysAsync));
 
-            var gameDetail = await GetGameJson(url, cancellationToken, scope);
+            if (_gamesCache.TryGetValue(game, out var gameDetail))
+            {
+                _logger.LogInformation($"Game found in cache: {game.GameId}");
+                return gameDetail;
+            }
+
+            gameDetail = await GetGameJson(url, cancellationToken, scope);
             gameDetail.Game = game;
+
+            _gamesCache[game] = gameDetail;
 
             return gameDetail;
         }
@@ -47,7 +60,7 @@ namespace FourthDown.Shared.Repositories.Json
         {
             scope.LogStart(nameof(GetGameJson));
 
-            var response = await RequestHelper.GetRequestResponse(url, cancellationToken);
+            var response = await _requestHelper.GetRequestResponse(url, cancellationToken);
 
             _logger.LogInformation($"Fetching data. Url: {url}; Status: {response.StatusCode}");
 

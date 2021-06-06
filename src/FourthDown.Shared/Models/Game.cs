@@ -2,7 +2,7 @@ using System;
 
 namespace FourthDown.Shared.Models
 {
-    public class Game
+    public class Game : IEquatable<Game>
     {
         public string GameId { get; set; }
         public int Season { get; set; }
@@ -45,5 +45,30 @@ namespace FourthDown.Shared.Models
         public string Referee { get; set; }
         public string StadiumId { get; set; }
         public string Stadium { get; set; }
+
+        public bool Equals(Game other)
+        {
+            if (ReferenceEquals(null, other)) return false;
+            if (ReferenceEquals(this, other)) return true;
+            return GameId == other.GameId && Season == other.Season && GameType == other.GameType && Week == other.Week;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != this.GetType()) return false;
+            return Equals((Game) obj);
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = new HashCode();
+            hashCode.Add(GameId);
+            hashCode.Add(Season);
+            hashCode.Add(GameType);
+            hashCode.Add(Week);
+            return hashCode.ToHashCode();
+        }
     }
 }

@@ -6,23 +6,28 @@ using System.Threading.Tasks;
 
 namespace FourthDown.Shared.Utilities
 {
-    public static class RequestHelper
+    public interface IRequestHelper
     {
-        public static async Task<HttpResponseMessage> GetRequestResponse(
-            string url,
-            CancellationToken cancellationToken)
+        Task<HttpResponseMessage> GetRequestResponse(string url, CancellationToken cancellationToken);
+    }
+
+    public class RequestHelper : IRequestHelper
+    {
+        private readonly HttpClient _httpClient;
+        private readonly TimeSpan _timeout = TimeSpan.FromSeconds(10);
+        private readonly HttpClientHandler _httpClientHandler = new HttpClientHandler
         {
-            var timeout = TimeSpan.FromSeconds(10);
-            var httpClientHandler = new HttpClientHandler
-            {
-                AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate
-            };
+            AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate
+        };
 
-            var httpClient = new HttpClient(httpClientHandler) {Timeout = timeout};
+        public RequestHelper()
+        {
+            _httpClient = new HttpClient(_httpClientHandler) {Timeout = _timeout};
+        }
 
-            var response = await httpClient.GetAsync(url, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
-
-            return response;
+        public async Task<HttpResponseMessage> GetRequestResponse(string url, CancellationToken cancellationToken)
+        {
+            return await _httpClient.GetAsync(url, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
         }
     }
 }
