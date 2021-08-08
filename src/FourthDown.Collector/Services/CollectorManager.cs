@@ -23,7 +23,7 @@ namespace FourthDown.Collector.Services
         private readonly ILogger _logger;
         private readonly IGamePlayRepository _gamePlayRepository;
         private readonly ISqlGameRepository _sqlGameRepository;
-        private readonly IGameRepository _gameRepository;
+        private readonly ICollectorGameRepository _gameRepository;
         private readonly IWriter _writer;
 
         private readonly Channel<List<ApiGamePlay>> _channel;
@@ -32,7 +32,7 @@ namespace FourthDown.Collector.Services
             ILogger<CollectorManager> logger,
             IGamePlayRepository gamePlayRepository,
             ISqlGameRepository sqlGameRepository,
-            IGameRepository gameRepository,
+            ICollectorGameRepository gameRepository,
             IWriter writer)
         {
             _logger = logger;
@@ -50,7 +50,7 @@ namespace FourthDown.Collector.Services
             var lastGameDateTime = await _sqlGameRepository.GetLastGameDateTimeAsync(cancellationToken);
 
             // Games file with legacy games
-            var legacyGames = (await _gameRepository.GetGamesAsync(cancellationToken)).ToList();
+            var legacyGames = await _gameRepository.GetAllGames(cancellationToken);
 
             var gamesToWrite = legacyGames.Where(x =>
             {
