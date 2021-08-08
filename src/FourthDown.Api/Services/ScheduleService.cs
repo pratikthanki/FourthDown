@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -16,11 +15,6 @@ namespace FourthDown.Api.Services
     {
         private readonly ITracer _tracer;
         private readonly IGameRepository _gameRepository;
-        private readonly DateTime _today = DateTime.UtcNow;
-
-        private DateTime _lastCacheUpdateDateTime = DateTime.MaxValue;
-        private readonly TimeSpan _cacheUpdateFrequency = TimeSpan.FromDays(-1);
-        private Dictionary<int, IEnumerable<Game>> _gamesPerSeasonCache = new Dictionary<int, IEnumerable<Game>>();
 
         public ScheduleService(
             ITracer tracer,
@@ -38,12 +32,10 @@ namespace FourthDown.Api.Services
 
             scope.LogStart(nameof(GetGames));
 
-            await UpdateGamesCache(cancellationToken);
-
-            var currentSeason = _today.Month > 8 ? _today.Year : _today.Year - 1;
+            var currentSeason = DateTime.UtcNow.Month > 8 ? DateTime.UtcNow.Year : DateTime.UtcNow.Year - 1;
             var season = queryParameter.Season ?? currentSeason;
 
-            var games = _gamesPerSeasonCache[season];
+            var games = _gameRepository.GetGamesForSeason(season);
 
             if (!string.IsNullOrWhiteSpace(queryParameter.Team))
             {
@@ -69,10 +61,7 @@ namespace FourthDown.Api.Services
             var offset = queryParameter.GameOffset;
             var gameType = queryParameter.ToGameTypeFilter();
             
-            await UpdateGamesCache(cancellationToken);
-
-            var games = _gamesPerSeasonCache
-                .SelectMany(x => x.Value.Where(g => g.HomeTeam == team || g.AwayTeam == team));
+            var games = _gameRepository.GetGamesForTeam(team);
 
             if (gameType != GameTypeFilter.All)
             {
@@ -89,23 +78,6 @@ namespace FourthDown.Api.Services
             games = games.OrderByDescending(x => x.Gameday);
 
             return games.Take(offset);
-        }
-
-        private async Task UpdateGamesCache(CancellationToken cancellationToken)
-        {
-            if (!_gamesPerSeasonCache.Any() || _lastCacheUpdateDateTime < DateTime.UtcNow.Add(_cacheUpdateFrequency))
-            {
-                var task = Task.Run(async () =>
-                {
-                    var games = await _gameRepository.GetGamesAsync(cancellationToken);
-
-                    return games.GroupBy(x => x.Season).ToDictionary(x => x.Key, x => x.AsEnumerable());
-
-                }, cancellationToken);
-
-                _gamesPerSeasonCache = await task;
-                _lastCacheUpdateDateTime = DateTime.UtcNow;
-            }
         }
     }
 }
