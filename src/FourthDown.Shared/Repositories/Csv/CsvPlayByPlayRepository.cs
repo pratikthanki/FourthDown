@@ -44,7 +44,10 @@ namespace FourthDown.Shared.Repositories.Csv
             _logger.LogInformation($"Fetching data. Url: {path}; Status: {response.StatusCode}");
 
             if (!response.IsSuccessStatusCode)
+            {
                 yield return new NflfastrPlayByPlay();
+                yield break;
+            }
 
             _logger.LogInformation($"{nameof(GetPlayByPlaysAsync)}: before ReadCompressedStreamToString");
 
