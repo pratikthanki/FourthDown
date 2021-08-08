@@ -9,6 +9,7 @@ using FourthDown.Shared.Repositories;
 using FourthDown.Shared.Repositories.Csv;
 using FourthDown.Shared.Repositories.Json;
 using FourthDown.Api.Services;
+using FourthDown.Api.StartupFilters;
 using FourthDown.Shared.Utilities;
 using Jaeger;
 using Jaeger.Reporters;
@@ -78,6 +79,8 @@ namespace FourthDown.Api
 
                     return tracer;
                 });
+
+            services.AddTransient<IStartupFilter, CacheStartupFilter>();
             
             services
                 .AddControllers()
