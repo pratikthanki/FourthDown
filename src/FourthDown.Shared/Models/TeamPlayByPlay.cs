@@ -13,33 +13,28 @@ namespace FourthDown.Shared.Models
             PosTeam = playKey.PosTeam;
             TotalPlays = plays.Count;
 
+            RushEpaAverage = 0;
+            RushEpaTotal = 0;
+            RushEpaSuccess = 0;
+
+            PassEpaAverage = 0;
+            PassEpaTotal = 0;
+            PassEpaSuccess = 0;
+
             var rushPlays = plays.Where(x => x.IsRush).ToList();
-            var passPlays = plays.Where(x => x.IsPass).ToList();
-            
-            if (rushPlays.Count == 0)
-            {
-                RushEpaAverage = 0;
-                RushEpaTotal = 0;
-                RushEpaSuccess = 0;
-            }
-            else
+            if (rushPlays.Count > 0)
             {
                 RushEpaAverage = rushPlays.Average(x => x.Epa);
                 RushEpaTotal = rushPlays.Sum(x => x.Epa);
-                RushEpaSuccess = rushPlays.Where(x => x.Epa > 0).Count() / (double) rushPlays.Count;
+                RushEpaSuccess = rushPlays.Count(x => x.Epa > 0) / (double) rushPlays.Count;
             }
 
-            if (passPlays.Count == 0)
-            {
-                PassEpaAverage = 0;
-                PassEpaTotal = 0;
-                PassEpaSuccess = 0;
-            }
-            else
+            var passPlays = plays.Where(x => x.IsPass).ToList();
+            if (passPlays.Count > 0)
             {
                 PassEpaAverage = passPlays.Average(x => x.Epa);
                 PassEpaTotal = passPlays.Sum(x => x.Epa);
-                PassEpaSuccess = passPlays.Where(x => x.Epa > 0).Count() / (double) passPlays.Count;
+                PassEpaSuccess = passPlays.Count(x => x.Epa > 0) / (double) passPlays.Count;
             }
         }
 
