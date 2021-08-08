@@ -7,6 +7,8 @@ namespace FourthDown.Shared.Repositories
 {
     public interface IGameRepository
     {
-        Task<IEnumerable<Game>> GetGamesAsync(CancellationToken cancellationToken);
+        IEnumerable<Game> GetGamesForSeason(int season);
+        IEnumerable<Game> GetGamesForTeam(string team);
+        Task TryPopulateCacheAsync(CancellationToken cancellationToken);
     }
 }

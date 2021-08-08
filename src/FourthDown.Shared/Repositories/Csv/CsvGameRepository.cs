@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -9,11 +11,16 @@ using OpenTracing;
 
 namespace FourthDown.Shared.Repositories.Csv
 {
-    public class CsvGameRepository : IGameRepository
+    public class CsvGameRepository : IGameRepository, ICollectorGameRepository
     {
         private static ITracer _tracer;
         private static ILogger<CsvGameRepository> _logger;
         private readonly IRequestHelper _requestHelper;
+        
+        private DateTime _lastCacheUpdateDateTime = DateTime.MinValue;
+        private readonly TimeSpan _cacheUpdateFrequency = TimeSpan.FromHours(1);
+        private const int OneHourMilliseconds = 1_000 * 60;
+        private readonly ConcurrentDictionary<int, ConcurrentBag<Game>> _gamesPerSeasonCache;
 
         public CsvGameRepository(
             ITracer tracer,
@@ -23,9 +30,46 @@ namespace FourthDown.Shared.Repositories.Csv
             _tracer = tracer;
             _logger = logger;
             _requestHelper = requestHelper;
+            _gamesPerSeasonCache = new ConcurrentDictionary<int, ConcurrentBag<Game>>();
         }
 
-        public async Task<IEnumerable<Game>> GetGamesAsync(CancellationToken cancellationToken)
+        public IEnumerable<Game> GetGamesForSeason(int season)
+        {
+            return _gamesPerSeasonCache[season];
+        }
+        
+        public IEnumerable<Game> GetGamesForTeam(string team)
+        {
+            return _gamesPerSeasonCache.SelectMany(x => x.Value.Where(g => g.HomeTeam == team || g.AwayTeam == team));
+        }
+
+        public async Task<IEnumerable<Game>> GetAllGames(CancellationToken cancellationToken)
+        {
+            return await GetGamesAsync(cancellationToken);
+        }
+
+        public async Task TryPopulateCacheAsync(CancellationToken cancellationToken)
+        {
+            while (true)
+            {
+                if (!IsCacheExpired())
+                {
+                    continue;
+                }
+
+                var games = await GetGamesAsync(cancellationToken);
+                foreach (var seasonGrouping in games.GroupBy(x => x.Season))
+                {
+                    _gamesPerSeasonCache[seasonGrouping.Key] = new ConcurrentBag<Game>(seasonGrouping);
+                }
+
+                _lastCacheUpdateDateTime = DateTime.UtcNow;
+                await Task.Delay(OneHourMilliseconds, cancellationToken);
+            }
+            // ReSharper disable once FunctionNeverReturns
+        }
+
+        private async Task<IEnumerable<Game>> GetGamesAsync(CancellationToken cancellationToken)
         {
             const string url = RepositoryEndpoints.GamesEndpoint;
             var response = await _requestHelper.GetRequestResponse(url, cancellationToken);
@@ -33,7 +77,7 @@ namespace FourthDown.Shared.Repositories.Csv
             _logger.LogInformation($"Fetching data. Url: {url}; Status: {response.StatusCode}");
 
             var responseBody = await response.Content.ReadAsStringAsync();
-            
+
             var csvResponse = responseBody
                 .Split("\n")
                 .Skip(1)
@@ -103,6 +147,12 @@ namespace FourthDown.Shared.Repositories.Csv
             });
 
             return games;
+        }
+
+        private bool IsCacheExpired()
+        {
+            var nextUpdateTime = _lastCacheUpdateDateTime.Add(_cacheUpdateFrequency);
+            return _lastCacheUpdateDateTime < nextUpdateTime;
         }
     }
 }
