@@ -68,8 +68,13 @@ namespace FourthDown.Shared.Repositories.Csv
                 {
                     continue;
                 }
+                
+                _logger.LogInformation($"Starting cache refresh: {nameof(Game)}");
 
                 await InitializeCache(cancellationToken);
+                
+                _logger.LogInformation($"Finished cache refresh: {nameof(Game)}");
+
                 await Task.Delay(OneHourMilliseconds, cancellationToken);
             }
             // ReSharper disable once FunctionNeverReturns
