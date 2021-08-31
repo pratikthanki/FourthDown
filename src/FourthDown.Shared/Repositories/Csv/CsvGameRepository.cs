@@ -19,7 +19,7 @@ namespace FourthDown.Shared.Repositories.Csv
         
         private DateTime _lastCacheUpdateDateTime = DateTime.MinValue;
         private readonly TimeSpan _cacheUpdateFrequency = TimeSpan.FromHours(1);
-        private const int OneHourMilliseconds = 1_000 * 60;
+        private const int CacheDelayMilliseconds = 12 * 60 * 60 * 1_000; // 12 hours in milliseconds
         private readonly ConcurrentDictionary<int, ConcurrentBag<Game>> _gamesPerSeasonCache;
         private bool _cacheInitialized;
 
@@ -75,7 +75,7 @@ namespace FourthDown.Shared.Repositories.Csv
                 
                 _logger.LogInformation($"Finished cache refresh: {nameof(Game)}");
 
-                await Task.Delay(OneHourMilliseconds, cancellationToken);
+                await Task.Delay(CacheDelayMilliseconds, cancellationToken);
             }
             // ReSharper disable once FunctionNeverReturns
         }
