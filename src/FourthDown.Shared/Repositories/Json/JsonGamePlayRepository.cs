@@ -1,4 +1,7 @@
+using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
@@ -56,9 +59,31 @@ namespace FourthDown.Shared.Repositories.Json
             return $"{RepositoryEndpoints.GamePlayEndpoint}/{season}/{gameId}.json.gz?raw=true";
         }
 
-        private async Task<GameDetail> GetGameJson(string url, CancellationToken cancellationToken, IScope scope)
+        public async Task TryPopulateCacheAsync(IEnumerable<Game> games, CancellationToken cancellationToken)
         {
-            scope.LogStart(nameof(GetGameJson));
+            var gameTasks = games.Select(async game =>
+            {
+                var gameDetail = await GetGameJson(
+                    GetGameUrl(game.GameId, game.Season),
+                    cancellationToken);
+
+                gameDetail.Game = game;
+                _gamesCache[game] = gameDetail;
+            });
+
+            try
+            {
+                await Task.WhenAll(gameTasks);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, $"Failed to refresh game plays cache: {e.Message}");
+            }
+        }
+
+        private async Task<GameDetail> GetGameJson(string url, CancellationToken cancellationToken, IScope scope = null)
+        {
+            scope?.LogStart(nameof(GetGameJson));
 
             var response = await _requestHelper.GetRequestResponse(url, cancellationToken);
 
@@ -69,7 +94,7 @@ namespace FourthDown.Shared.Repositories.Json
 
             var data = ResponseHelper.ReadCompressedStreamToString(response);
 
-            scope.LogEnd(nameof(GetGameJson));
+            scope?.LogEnd(nameof(GetGameJson));
 
             return await ParseResponseString(url, data);
         }

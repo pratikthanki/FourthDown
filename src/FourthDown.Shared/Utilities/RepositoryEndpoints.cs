@@ -10,11 +10,11 @@ namespace FourthDown.Shared.Utilities
         /// <summary>
         /// Raw json which containing Scoring Summaries, Game Plays and Drives
         /// </summary>
-        public const string GamePlayEndpoint = "https://github.com/pratikthanki/nflfastR-raw/blob/upstream/raw";
+        public const string GamePlayEndpoint = "https://github.com/nflverse/nflfastR-raw/blob/master/raw";
 
         /// <summary>
         /// NflfastR play-by-play data endpoint
         /// </summary>
-        public const string PlayByPlayEndpoint = "https://github.com/pratikthanki/nflfastR-data/blob/upstream/data";
+        public const string PlayByPlayEndpoint = "https://github.com/nflverse/nflfastR-data/blob/master/data";
     }
 }

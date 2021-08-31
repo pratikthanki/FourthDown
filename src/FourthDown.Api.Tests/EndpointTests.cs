@@ -18,7 +18,7 @@ namespace FourthDown.Api.Tests
         public void PlayByPlayRepositoryEndpoint()
         {
             const string expected =
-                "https://github.com/pratikthanki/nflfastR-data/blob/upstream/data/play_by_play_2020.csv.gz?raw=true";
+                "https://github.com/nflverse/nflfastR-data/blob/master/data/play_by_play_2020.csv.gz?raw=true";
 
             var path = $"{RepositoryEndpoints.PlayByPlayEndpoint}/play_by_play_{2020}.csv.gz?raw=true";
 
@@ -31,7 +31,7 @@ namespace FourthDown.Api.Tests
             const int season = 2020;
             const string gameId = "2020_01_ABC_XYZ";
             var expected =
-                $"https://github.com/pratikthanki/nflfastR-raw/blob/upstream/raw/{season}/{gameId}.json.gz?raw=true";
+                $"https://github.com/nflverse/nflfastR-raw/blob/master/raw/{season}/{gameId}.json.gz?raw=true";
 
             var actual = JsonGamePlayRepository.GetGameUrl(gameId, season);
             
@@ -44,7 +44,7 @@ namespace FourthDown.Api.Tests
             const int season = 2002;
             const string gameId = "2002_01_ABC_XYZ";
             var expected =
-                $"https://github.com/pratikthanki/nflfastR-raw/blob/upstream/raw_old/{season}/{gameId}.json.gz?raw=true";
+                $"https://github.com/nflverse/nflfastR-raw/blob/master/raw/{season}/{gameId}.json.gz?raw=true";
 
             var actual = JsonGamePlayRepository.GetGameUrl(gameId, season);
             

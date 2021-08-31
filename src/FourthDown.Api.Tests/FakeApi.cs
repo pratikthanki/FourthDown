@@ -62,11 +62,11 @@ namespace FourthDown.Api.Tests
             services.AddSingleton(_mockPlayByPlayRepository.Object);
 
             _mockGameRepository
-                .Setup(g => g.GetGamesForSeason(It.IsAny<int>()))
-                .Returns(new List<Game>() {new()});
+                .Setup(g => g.GetGamesForSeason(It.IsAny<int>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new List<Game>() {new()});
             _mockGameRepository
-                .Setup(g => g.GetGamesForTeam(It.IsAny<string>()))
-                .Returns(new List<Game>() {new()});
+                .Setup(g => g.GetGamesForTeam(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new List<Game>() {new()});
 
             _mockTeamRepository
                 .Setup(t => t.GetTeamsAsync(
