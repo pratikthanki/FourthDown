@@ -69,15 +69,11 @@ namespace FourthDown.Api
                         .WithSender(new UdpSender(host, 6831, 0))
                         .Build();
 
-                    var tracer = new Tracer.Builder(serviceName)
+                    return new Tracer.Builder(serviceName)
                         .WithReporter(remoteReporter)
                         .WithLoggerFactory(loggerFactory)
                         .WithSampler(sampler)
                         .Build();
-
-                    GlobalTracer.Register(tracer);
-
-                    return tracer;
                 });
 
             services.AddTransient<IStartupFilter, CacheStartupFilter>();

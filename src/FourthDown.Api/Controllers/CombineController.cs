@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using FourthDown.Shared.Models;
 using FourthDown.Shared.Repositories;
 using FourthDown.Api.Schemas;
+using FourthDown.Shared.Utilities;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -67,8 +68,7 @@ namespace FourthDown.Api.Controllers
 
         private static Dictionary<string, string[]> Validate(int season)
         {
-            var Today = DateTime.UtcNow;
-            var currentSeason = Today.Month > 8 ? Today.Year : Today.Year - 1;
+            var currentSeason = StringParser.GetCurrentSeason();
 
             var errors = new Dictionary<string, string[]>();
 

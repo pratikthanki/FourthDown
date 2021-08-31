@@ -116,5 +116,11 @@ namespace FourthDown.Shared.Utilities
         {
             return GetAbsolutePath($@"../../../Data/{file}");
         }
+
+        public static int GetCurrentSeason()
+        {
+            var today = DateTime.UtcNow;
+            return today.Month > 8 ? today.Year : today.Year - 1;
+        }
     }
 }

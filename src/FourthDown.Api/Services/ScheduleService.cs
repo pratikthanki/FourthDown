@@ -7,6 +7,7 @@ using FourthDown.Shared.Extensions;
 using FourthDown.Shared.Models;
 using FourthDown.Api.Parameters;
 using FourthDown.Shared.Repositories;
+using FourthDown.Shared.Utilities;
 using OpenTracing;
 
 namespace FourthDown.Api.Services
@@ -32,10 +33,10 @@ namespace FourthDown.Api.Services
 
             scope.LogStart(nameof(GetGames));
 
-            var currentSeason = DateTime.UtcNow.Month > 8 ? DateTime.UtcNow.Year : DateTime.UtcNow.Year - 1;
+            var currentSeason = StringParser.GetCurrentSeason();
             var season = queryParameter.Season ?? currentSeason;
 
-            var games = _gameRepository.GetGamesForSeason(season);
+            var games = await _gameRepository.GetGamesForSeason(season, cancellationToken);
 
             if (!string.IsNullOrWhiteSpace(queryParameter.Team))
             {
@@ -61,7 +62,7 @@ namespace FourthDown.Api.Services
             var offset = queryParameter.GameOffset;
             var gameType = queryParameter.ToGameTypeFilter();
             
-            var games = _gameRepository.GetGamesForTeam(team);
+            var games = await _gameRepository.GetGamesForTeam(team, cancellationToken);
 
             if (gameType != GameTypeFilter.All)
             {

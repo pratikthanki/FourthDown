@@ -19,8 +19,9 @@ namespace FourthDown.Shared.Repositories.Csv
         
         private DateTime _lastCacheUpdateDateTime = DateTime.MinValue;
         private readonly TimeSpan _cacheUpdateFrequency = TimeSpan.FromHours(1);
-        private const int OneHourMilliseconds = 1_000 * 60;
+        private const int CacheDelayMilliseconds = 12 * 60 * 60 * 1_000; // 12 hours in milliseconds
         private readonly ConcurrentDictionary<int, ConcurrentBag<Game>> _gamesPerSeasonCache;
+        private bool _cacheInitialized;
 
         public CsvGameRepository(
             ITracer tracer,
@@ -33,13 +34,23 @@ namespace FourthDown.Shared.Repositories.Csv
             _gamesPerSeasonCache = new ConcurrentDictionary<int, ConcurrentBag<Game>>();
         }
 
-        public IEnumerable<Game> GetGamesForSeason(int season)
+        public async Task<IEnumerable<Game>> GetGamesForSeason(int season, CancellationToken cancellationToken)
         {
+            if (!_cacheInitialized)
+            {
+                await InitializeCache(cancellationToken);
+            }
+
             return _gamesPerSeasonCache[season];
         }
         
-        public IEnumerable<Game> GetGamesForTeam(string team)
+        public async Task<IEnumerable<Game>> GetGamesForTeam(string team, CancellationToken cancellationToken)
         {
+            if (!_cacheInitialized)
+            {
+                await InitializeCache(cancellationToken);
+            }
+
             return _gamesPerSeasonCache.SelectMany(x => x.Value.Where(g => g.HomeTeam == team || g.AwayTeam == team));
         }
 
@@ -52,21 +63,35 @@ namespace FourthDown.Shared.Repositories.Csv
         {
             while (true)
             {
-                if (!IsCacheExpired())
+                var nextUpdateTime = _lastCacheUpdateDateTime.Add(_cacheUpdateFrequency);
+                if (nextUpdateTime < DateTime.UtcNow)
                 {
                     continue;
                 }
+                
+                _logger.LogInformation($"Starting cache refresh: {nameof(Game)}");
 
-                var games = await GetGamesAsync(cancellationToken);
-                foreach (var seasonGrouping in games.GroupBy(x => x.Season))
-                {
-                    _gamesPerSeasonCache[seasonGrouping.Key] = new ConcurrentBag<Game>(seasonGrouping);
-                }
+                await InitializeCache(cancellationToken);
+                
+                _logger.LogInformation($"Finished cache refresh: {nameof(Game)}");
 
-                _lastCacheUpdateDateTime = DateTime.UtcNow;
-                await Task.Delay(OneHourMilliseconds, cancellationToken);
+                await Task.Delay(CacheDelayMilliseconds, cancellationToken);
             }
             // ReSharper disable once FunctionNeverReturns
+        }
+
+        private async Task InitializeCache(CancellationToken cancellationToken)
+        {
+            _cacheInitialized = false;
+
+            var games = await GetGamesAsync(cancellationToken);
+            foreach (var seasonGrouping in games.GroupBy(x => x.Season))
+            {
+                _gamesPerSeasonCache[seasonGrouping.Key] = new ConcurrentBag<Game>(seasonGrouping);
+            }
+
+            _cacheInitialized = true;
+            _lastCacheUpdateDateTime = DateTime.UtcNow;
         }
 
         private async Task<IEnumerable<Game>> GetGamesAsync(CancellationToken cancellationToken)
@@ -147,12 +172,6 @@ namespace FourthDown.Shared.Repositories.Csv
             });
 
             return games;
-        }
-
-        private bool IsCacheExpired()
-        {
-            var nextUpdateTime = _lastCacheUpdateDateTime.Add(_cacheUpdateFrequency);
-            return _lastCacheUpdateDateTime < nextUpdateTime;
         }
     }
 }

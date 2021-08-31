@@ -62,11 +62,12 @@ namespace FourthDown.Api.Tests
             services.AddSingleton(_mockPlayByPlayRepository.Object);
 
             _mockGameRepository
-                .Setup(g => g.GetGamesForSeason(It.IsAny<int>()))
-                .Returns(new List<Game>() {new()});
+                .Setup(g => g.GetGamesForSeason(It.IsAny<int>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new List<Game>());
             _mockGameRepository
-                .Setup(g => g.GetGamesForTeam(It.IsAny<string>()))
-                .Returns(new List<Game>() {new()});
+                .Setup(g => g.GetGamesForTeam(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new List<Game>());
+            _mockGameRepository.Setup(g => g.TryPopulateCacheAsync(It.IsAny<CancellationToken>()));
 
             _mockTeamRepository
                 .Setup(t => t.GetTeamsAsync(
@@ -85,14 +86,17 @@ namespace FourthDown.Api.Tests
                     It.IsAny<int?>(),
                     It.IsAny<string>(),
                     It.IsAny<CancellationToken>()));
+
+            _mockGamePlayRepository
+                .Setup(gp => gp.TryPopulateCacheAsync(It.IsAny<IEnumerable<Game>>(), It.IsAny<CancellationToken>()));
         }
 
         protected async Task<(HttpStatusCode, string)> SendRequest(
             string endpoint,
-            Dictionary<string, string> parameters)
+            Dictionary<string, string> parameters = null)
         {
             var parameterString = parameters == null
-                ? ""
+                ? string.Empty
                 : string.Join("&", parameters.Select(p => $"{p.Key}={Uri.EscapeDataString(p.Value)}"));
 
             var request = new HttpRequestMessage

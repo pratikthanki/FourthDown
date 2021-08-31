@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using FourthDown.Shared.Utilities;
 
 namespace FourthDown.Api.Parameters
 {
@@ -27,8 +28,7 @@ namespace FourthDown.Api.Parameters
         {
             var errors = new Dictionary<string, string[]>();
 
-            var Today = DateTime.UtcNow;
-            var currentSeason = Today.Month > 8 ? Today.Year : Today.Year - 1;
+            var currentSeason = StringParser.GetCurrentSeason();
 
             if (Week == null && string.IsNullOrWhiteSpace(Team))
                 errors["requiredField"] = new[] {$"Week or team must be provided."};
