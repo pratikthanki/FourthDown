@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using FourthDown.Shared.Repositories;
@@ -13,23 +14,31 @@ namespace FourthDown.Api.StartupFilters
     {
         public Action<IApplicationBuilder> Configure(Action<IApplicationBuilder> next)
         {
-            return async builder =>
+            return builder =>
             {
                 using (var scope = builder.ApplicationServices.CreateScope())
                 {
                     var token = new CancellationToken();
                     
-                    // https://github.com/nflverse/nflfastR-raw/blob/master/raw/2020/2020_06_BAL_PHI.json.gz?raw=true
-                    // https://github.com/nflverse/nflfastR-raw/blob/upstream/raw/2020/2020_10_WAS_DET.json.gz?raw=true;
-
                     var gamesRepository = scope.ServiceProvider.GetRequiredService<IGameRepository>();
                     _ = Task.Run(() => gamesRepository.TryPopulateCacheAsync(token), token);
 
                     var currentSeason = StringParser.GetCurrentSeason();
-                    var games = await gamesRepository.GetGamesForSeason(currentSeason, token);
+                    var firstGame = gamesRepository
+                        .GetGamesForSeason(currentSeason, token)
+                        .Result.ToList()
+                        .Where(game => game.Season == currentSeason && game.Week == 1)
+                        .Select(x => x.Gameday)
+                        .Min();
+
+                    var seasonGamesToFetch = firstGame < DateTime.UtcNow ? currentSeason : currentSeason - 1;
+                    var gamesToCache = gamesRepository
+                        .GetGamesForSeason(seasonGamesToFetch, token)
+                        .Result
+                        .ToList();
 
                     var gamePlaysRepository = scope.ServiceProvider.GetRequiredService<IGamePlayRepository>();
-                    _ = Task.Run(() => gamePlaysRepository.TryPopulateCacheAsync(games, token), token);
+                    _ = Task.Run(() => gamePlaysRepository.TryPopulateCacheAsync(gamesToCache, token), token);
                 }
 
                 next(builder);

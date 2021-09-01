@@ -66,7 +66,7 @@ namespace FourthDown.Shared.Repositories.Json
             stopwatch.Start();
             _logger.LogInformation($"Starting cache refresh: {nameof(GameDetail)}");
 
-            var sem = new SemaphoreSlim(20, 20);
+            var sem = new SemaphoreSlim(30, 30);
             var gameTasks = games.Select(async game =>
             {
                 sem.Wait();
