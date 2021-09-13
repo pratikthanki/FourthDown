@@ -140,11 +140,11 @@ namespace FourthDown.Api.Services
 
         private int GetCurrentWeek(IEnumerable<Game> games)
         {
-            var Today = DateTime.UtcNow;
-            var season = Today.Month > 8 ? Today.Year : Today.Year - 1;
+            var today = DateTime.UtcNow;
+            var season = today.Month > 8 ? today.Year : today.Year - 1;
 
             return games
-                .Where(x => x.Season == season && x.Gameday < Today.Date)
+                .Where(x => x.Season == season && x.Gameday < today.Date)
                 .Max(x => x.Week);
         }
     }

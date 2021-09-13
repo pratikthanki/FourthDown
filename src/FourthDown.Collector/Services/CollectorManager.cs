@@ -52,11 +52,9 @@ namespace FourthDown.Collector.Services
             // Games file with legacy games
             var legacyGames = await _gameRepository.GetAllGames(cancellationToken);
 
-            var gamesToWrite = legacyGames.Where(x =>
-            {
-                var gameTime = StringParser.EstDateTimeToUtc($"{x.Gameday.ToShortDateString()} {x.Gametime}");
-                return gameTime > lastGameDateTime && gameTime < DateTime.UtcNow;
-            }).ToList();
+            var gamesToWrite = legacyGames
+                .Where(x => x.GameTimeUtc > lastGameDateTime && x.GameTimeUtc < DateTime.UtcNow)
+                .ToList();
 
             if (!gamesToWrite.Any())
             {

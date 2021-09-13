@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -61,7 +60,7 @@ namespace FourthDown.Api.Services
             var opposition = queryParameter.Opposition;
             var offset = queryParameter.GameOffset;
             var gameType = queryParameter.ToGameTypeFilter();
-            
+
             var games = await _gameRepository.GetGamesForTeam(team, cancellationToken);
 
             if (gameType != GameTypeFilter.All)
