@@ -86,9 +86,6 @@ namespace FourthDown.Api.Tests
                     It.IsAny<int?>(),
                     It.IsAny<string>(),
                     It.IsAny<CancellationToken>()));
-
-            _mockGamePlayRepository
-                .Setup(gp => gp.TryPopulateCacheAsync(It.IsAny<IEnumerable<Game>>(), It.IsAny<CancellationToken>()));
         }
 
         protected async Task<(HttpStatusCode, string)> SendRequest(

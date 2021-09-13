@@ -28,7 +28,6 @@ using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Interfaces;
 using Microsoft.OpenApi.Models;
 using OpenTracing;
-using OpenTracing.Util;
 using Prometheus;
 using Prometheus.Client.HealthChecks;
 using Prometheus.Client.HttpRequestDurations;
@@ -42,6 +41,7 @@ namespace FourthDown.Api
             Configuration = configuration;
         }
 
+        // ReSharper disable once UnusedAutoPropertyAccessor.Local
         private IConfiguration Configuration { get; }
 
         public void ConfigureServices(IServiceCollection services)
@@ -102,7 +102,7 @@ namespace FourthDown.Api
                         Title = "FourthDown API",
                         Description =
                             "The FourthDown API is organised around the HTTP [REST](https://en.wikipedia.org/wiki/Representational_state_transfer) protocol. " +
-                            "Our API has predictable resource-oriented URLs and will returns [JSON-encoded](http://www.json.org/) responses, " +
+                            "Our API has predictable resource-oriented URLs and will returns [JSON-encoded](https://www.json.org/) responses, " +
                             "and uses standard HTTP response codes, authentication, and verbs.\n" +
                             "The API can be used to get NFL schedule and team details, as well as the more sophisticated and " +
                             "different types of play-by-play game data. The API is designed with the primary goal of " +
@@ -127,7 +127,7 @@ namespace FourthDown.Api
                         {
                             Name = "Pratik Thanki",
                             Email = "pratikthanki1@gmail.com",
-                            Url = new Uri("http://pratikthanki.github.io/")
+                            Url = new Uri("https://pratikthanki.github.io/")
                         },
                         License = new OpenApiLicense
                         {

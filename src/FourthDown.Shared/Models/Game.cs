@@ -1,4 +1,5 @@
 using System;
+using FourthDown.Shared.Utilities;
 
 namespace FourthDown.Shared.Models
 {
@@ -45,6 +46,10 @@ namespace FourthDown.Shared.Models
         public string Referee { get; set; }
         public string StadiumId { get; set; }
         public string Stadium { get; set; }
+
+        public DateTime GameTimeUtc =>
+            StringParser.EstDateTimeToUtc(
+                string.Concat(Gameday.ToShortDateString(), string.Empty, Gametime));
 
         public bool Equals(Game other)
         {

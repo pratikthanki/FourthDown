@@ -60,44 +60,6 @@ namespace FourthDown.Shared.Repositories.Json
             return $"{RepositoryEndpoints.GamePlayEndpoint}/{season}/{gameId}.json.gz?raw=true";
         }
 
-        public async Task TryPopulateCacheAsync(IEnumerable<Game> games, CancellationToken cancellationToken)
-        {
-            var stopwatch = new Stopwatch();
-            stopwatch.Start();
-            _logger.LogInformation($"Starting cache refresh: {nameof(GameDetail)}");
-
-            var sem = new SemaphoreSlim(30, 30);
-            var gameTasks = games.Select(async game =>
-            {
-                sem.Wait();
-                try
-                {
-                    var gameDetail = await GetGameJson(
-                        GetGameUrl(game.GameId, game.Season),
-                        cancellationToken);
-
-                    gameDetail.Game = game;
-                    _gamesCache[game] = gameDetail;
-                }
-                finally
-                {
-                    sem.Release();
-                }
-            });
-
-            try
-            {
-                await Task.WhenAll(gameTasks);
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, $"Failed to refresh game plays cache: {e.Message}");
-            }
-            
-            stopwatch.Stop();
-            _logger.LogInformation($"Finished cache refresh: {nameof(GameDetail)} ({stopwatch.ElapsedMilliseconds}ms)");
-        }
-
         private async Task<GameDetail> GetGameJson(string url, CancellationToken cancellationToken, IScope scope = null)
         {
             scope?.LogStart(nameof(GetGameJson));

@@ -11,15 +11,15 @@ using OpenTracing;
 
 namespace FourthDown.Shared.Repositories.Csv
 {
-    public class CsvGameRepository : IGameRepository, ICollectorGameRepository
+    public class CsvGameRepository : IGameRepository
     {
         private static ITracer _tracer;
         private static ILogger<CsvGameRepository> _logger;
         private readonly IRequestHelper _requestHelper;
-        
+
         private DateTime _lastCacheUpdateDateTime = DateTime.MinValue;
         private readonly TimeSpan _cacheUpdateFrequency = TimeSpan.FromHours(1);
-        private const int CacheDelayMilliseconds = 12 * 60 * 60 * 1_000; // 12 hours in milliseconds
+        private const int CacheDelayMilliseconds = 60 * 60 * 1_000; // 1 hour in milliseconds
         private readonly ConcurrentDictionary<int, ConcurrentBag<Game>> _gamesPerSeasonCache;
         private bool _cacheInitialized;
 
@@ -36,26 +36,21 @@ namespace FourthDown.Shared.Repositories.Csv
 
         public async Task<IEnumerable<Game>> GetGamesForSeason(int season, CancellationToken cancellationToken)
         {
-            if (!_cacheInitialized)
-            {
-                await InitializeCache(cancellationToken);
-            }
+            if (!_cacheInitialized) await InitializeCache(cancellationToken);
 
-            return _gamesPerSeasonCache[season];
+            return _gamesPerSeasonCache.TryGetValue(season, out var games) ? games : Enumerable.Empty<Game>();
         }
-        
+
         public async Task<IEnumerable<Game>> GetGamesForTeam(string team, CancellationToken cancellationToken)
         {
-            if (!_cacheInitialized)
-            {
-                await InitializeCache(cancellationToken);
-            }
+            if (!_cacheInitialized) await InitializeCache(cancellationToken);
 
             return _gamesPerSeasonCache.SelectMany(x => x.Value.Where(g => g.HomeTeam == team || g.AwayTeam == team));
         }
 
         public async Task<IEnumerable<Game>> GetAllGames(CancellationToken cancellationToken)
         {
+            _logger.LogInformation("Querying for all games.");
             return await GetGamesAsync(cancellationToken);
         }
 
@@ -63,16 +58,12 @@ namespace FourthDown.Shared.Repositories.Csv
         {
             while (true)
             {
-                var nextUpdateTime = _lastCacheUpdateDateTime.Add(_cacheUpdateFrequency);
-                if (nextUpdateTime < DateTime.UtcNow)
-                {
-                    continue;
-                }
-                
+                if (_lastCacheUpdateDateTime.Add(_cacheUpdateFrequency) >= DateTime.UtcNow) continue;
+
                 _logger.LogInformation($"Starting cache refresh: {nameof(Game)}");
 
                 await InitializeCache(cancellationToken);
-                
+
                 _logger.LogInformation($"Finished cache refresh: {nameof(Game)}");
 
                 await Task.Delay(CacheDelayMilliseconds, cancellationToken);
@@ -96,10 +87,11 @@ namespace FourthDown.Shared.Repositories.Csv
 
         private async Task<IEnumerable<Game>> GetGamesAsync(CancellationToken cancellationToken)
         {
-            const string url = RepositoryEndpoints.GamesEndpoint;
-            var response = await _requestHelper.GetRequestResponse(url, cancellationToken);
+            var response =
+                await _requestHelper.GetRequestResponse(RepositoryEndpoints.GamesEndpoint, cancellationToken);
 
-            _logger.LogInformation($"Fetching data. Url: {url}; Status: {response.StatusCode}");
+            _logger.LogInformation(
+                $"Fetching data. Url: {RepositoryEndpoints.GamesEndpoint}; Status: {response.StatusCode}");
 
             var responseBody = await response.Content.ReadAsStringAsync();
 

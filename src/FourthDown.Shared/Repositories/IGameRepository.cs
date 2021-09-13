@@ -5,7 +5,7 @@ using FourthDown.Shared.Models;
 
 namespace FourthDown.Shared.Repositories
 {
-    public interface IGameRepository
+    public interface IGameRepository : ICollectorGameRepository
     {
         Task<IEnumerable<Game>> GetGamesForSeason(int season, CancellationToken cancellationToken);
         Task<IEnumerable<Game>> GetGamesForTeam(string team, CancellationToken cancellationToken);
