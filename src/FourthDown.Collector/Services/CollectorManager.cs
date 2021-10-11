@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using FourthDown.Collector.Repositories;
 using FourthDown.Shared.Models;
 using FourthDown.Shared.Repositories;
-using FourthDown.Shared.Utilities;
 using Microsoft.Extensions.Logging;
 
 namespace FourthDown.Collector.Services
@@ -53,7 +52,7 @@ namespace FourthDown.Collector.Services
             var legacyGames = await _gameRepository.GetAllGames(cancellationToken);
 
             var gamesToWrite = legacyGames
-                .Where(x => x.GameTimeUtc > lastGameDateTime && x.GameTimeUtc < DateTime.UtcNow)
+                .Where(x => x.GameTimeUtc() > lastGameDateTime && x.GameTimeUtc() < DateTime.UtcNow)
                 .ToList();
 
             if (!gamesToWrite.Any())

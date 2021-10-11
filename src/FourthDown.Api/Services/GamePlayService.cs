@@ -94,9 +94,6 @@ namespace FourthDown.Api.Services
 
             var games = await GetGamesFromQueryOptions(queryParameter, cancellationToken);
 
-            if (games.Any(game => game.Gameday > DateTime.UtcNow.Date))
-                yield return null;
-
             games = games.Where(game => game.Gameday < DateTime.UtcNow.Date).ToList();
 
             if (!games.Any())
