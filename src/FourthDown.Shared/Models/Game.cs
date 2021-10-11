@@ -47,9 +47,11 @@ namespace FourthDown.Shared.Models
         public string StadiumId { get; set; }
         public string Stadium { get; set; }
 
-        public DateTime GameTimeUtc =>
-            StringParser.EstDateTimeToUtc(
+        public DateTime GameTimeUtc()
+        {
+            return StringParser.EstDateTimeToUtc(
                 string.Concat(Gameday.ToShortDateString(), string.Empty, Gametime));
+        }
 
         public bool Equals(Game other)
         {
