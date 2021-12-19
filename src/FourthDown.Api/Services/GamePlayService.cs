@@ -100,6 +100,7 @@ namespace FourthDown.Api.Services
                 yield return null;
 
             var requests = games
+                .OrderByDescending(game => game.Gameday)
                 .Select(game => _gamePlayRepository.GetGamePlaysAsync(game, cancellationToken))
                 .ToList();
 
@@ -111,7 +112,10 @@ namespace FourthDown.Api.Services
             {
                 var pbp = await request;
 
-                if (pbp.Game == null) continue;
+                if (pbp.Game == null)
+                {
+                    continue;
+                }
 
                 yield return new ApiGamePlay(pbp);
             }
@@ -125,14 +129,17 @@ namespace FourthDown.Api.Services
         {
             var scheduleParams = queryParameter.ToScheduleQueryParameters();
 
-            if (string.IsNullOrWhiteSpace(queryParameter.GameId))
-                return (await _scheduleService.GetGames(scheduleParams, cancellationToken)).ToList();
-
             var allGames = await _scheduleService.GetGames(scheduleParams, cancellationToken);
 
-            allGames.ToDictionary(x => x.GameId, x => x).TryGetValue(queryParameter.GameId, out var game);
+            // Filter by the gameId provided by the client
+            // ReSharper disable once InvertIf
+            if (!string.IsNullOrWhiteSpace(queryParameter.GameId))
+            {
+                allGames.ToDictionary(x => x.GameId, x => x).TryGetValue(queryParameter.GameId, out var game);
+                return new List<Game>() { game };
+            }
 
-            return new List<Game>() {game};
+            return allGames.ToList();
         }
 
         private int GetCurrentWeek(IEnumerable<Game> games)

@@ -110,8 +110,8 @@ namespace FourthDown.Api.Tests
             return (response.StatusCode, responseString);
         }
 
-        [OneTimeTearDown]
-        public void OneTimeTearDown()
+        [TearDown]
+        public void TearDown()
         {
             _factory?.Dispose();
         }

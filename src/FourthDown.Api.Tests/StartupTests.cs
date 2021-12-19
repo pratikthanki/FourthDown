@@ -5,19 +5,24 @@ namespace FourthDown.Api.Tests
 {
     public class StartupTests
     {
-        private static void Build()
+        private static WebApplicationFactory<Startup> _factory;
+
+        [SetUp]
+        public void SetUp()
         {
-            var factory = new WebApplicationFactory<Startup>();
-            factory.WithWebHostBuilder(builder =>
-            {
-            }).CreateClient();
+            _factory = new WebApplicationFactory<Startup>();
         }
 
-        [Test,
-         TestCase(null)]
-        public void AppDoesNotThrowWhenSampleAppOptionNotSet(string option)
+        [Test]
+        public void AppDoesNotThrowWhenSampleAppOptionNotSet()
         {
-            Assert.DoesNotThrow(Build);
+            Assert.DoesNotThrow(() => { _factory.WithWebHostBuilder(builder => { }).CreateClient(); });
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            _factory.Dispose();
         }
     }
 }
