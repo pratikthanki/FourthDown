@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -39,7 +40,9 @@ namespace FourthDown.Api.Services
 
             if (!string.IsNullOrWhiteSpace(queryParameter.Team))
             {
-                games = games.Where(x => x.HomeTeam == queryParameter.Team || x.AwayTeam == queryParameter.Team);
+                games = games.Where(x =>
+                    string.Equals(x.HomeTeam, queryParameter.Team, StringComparison.OrdinalIgnoreCase) ||
+                    string.Equals(x.AwayTeam, queryParameter.Team, StringComparison.OrdinalIgnoreCase));
             }
 
             if (queryParameter.Week != null)
