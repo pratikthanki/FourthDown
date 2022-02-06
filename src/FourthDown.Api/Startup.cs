@@ -111,17 +111,6 @@ namespace FourthDown.Api
                             "`Team` and `Week`.\n" +
                             "This API is documented in **OpenAPI format** and supported by a few " +
                             "[vendor extensions](https://github.com/Redocly/redoc/blob/master/docs/redoc-vendor-extensions.md).",
-                        Extensions = new Dictionary<string, IOpenApiExtension>
-                        {
-                            {
-                                "x-logo", new OpenApiObject
-                                {
-                                    {"url", new OpenApiString("https://bit.ly/37qIayZ")},
-                                    {"backgroundColor", new OpenApiString("#007CBD")},
-                                    {"altText", new OpenApiString("Fourth Down")}
-                                }
-                            }
-                        },
                         TermsOfService = new Uri("https://example.com/terms"),
                         Contact = new OpenApiContact
                         {

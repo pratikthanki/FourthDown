@@ -16,9 +16,9 @@ namespace FourthDown.Api.StartupFilters
             {
                 using (var scope = builder.ApplicationServices.CreateScope())
                 {
-                    var token = CancellationToken.None;
+                    var tokenSource = new CancellationTokenSource();
                     var gamesRepository = scope.ServiceProvider.GetRequiredService<IGameRepository>();
-                    _ = Task.Run(() => gamesRepository.TryPopulateCacheAsync(token), token);
+                    _ = Task.Run(() => gamesRepository.TryPopulateCacheAsync(tokenSource.Token), tokenSource.Token);
                 }
 
                 next(builder);
