@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using NodaTime;
 using NodaTime.Text;
 
@@ -14,7 +15,7 @@ namespace FourthDown.Shared.Utilities
         {
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
             PropertyNameCaseInsensitive = true,
-            IgnoreNullValues = true,
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
             AllowTrailingCommas = true,
             IgnoreReadOnlyProperties = true
         };
