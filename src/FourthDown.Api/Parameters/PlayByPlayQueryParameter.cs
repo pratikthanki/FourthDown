@@ -27,28 +27,19 @@ namespace FourthDown.Api.Parameters
         public Dictionary<string, string[]> Validate()
         {
             var errors = new Dictionary<string, string[]>();
-
             var currentSeason = StringParser.GetCurrentSeason();
 
-            if (Week == null && string.IsNullOrWhiteSpace(Team))
-                errors["requiredField"] = new[] {$"Week or team must be provided."};
-
             if (Season > currentSeason || Season < 1999)
-                errors["season"] = new[] {$"Season must be between 2001 and {currentSeason}"};
+                errors["season"] = new[] { $"Season must be between 2001 and {currentSeason}" };
 
             if (Week < 1 || Week > 21)
                 errors["week"] = new[]
-                    {"Week must be between 1-17 (REG), Divisional (19), Conference (20) and Super Bowl (21)"};
+                    { "Week must be between 1-17 (REG), Divisional (19), Conference (20) and Super Bowl (21)" };
 
-            if (GameId == null)
+            if (string.IsNullOrWhiteSpace(GameId) && string.IsNullOrWhiteSpace(Team) && Week is null && Season is null)
             {
-                if (!NonGameIdParameterSet())
-                    errors["query"] = new[] {"If gameId is not used then one of Week, Season or Team must be provided"};
-            }
-            else
-            {
-                if (NonGameIdParameterSet())
-                    errors["query"] = new[] {"If gameId is used then Week, Season and Team do not need to be provided"};
+                errors["query"] = new[]
+                    { "Either gameId or a combination of Week, Season or Team must be provided" };
             }
 
             return errors;
@@ -56,15 +47,20 @@ namespace FourthDown.Api.Parameters
 
         public ScheduleQueryParameter ToScheduleQueryParameters()
         {
+            if (string.IsNullOrWhiteSpace(GameId))
+            {
+                return new ScheduleQueryParameter()
+                {
+                    Season = Season, Week = Week, Team = Team
+                };
+            }
+
+            var split = GameId.Split("_");
+
             return new ScheduleQueryParameter()
             {
-                Season = Season, Week = Week, Team = Team
+                Season = StringParser.ToInt(split[0]), Week = StringParser.ToInt(split[1]), Team = string.Empty
             };
-        }
-
-        private bool NonGameIdParameterSet()
-        {
-            return Week != null || Season != null || string.IsNullOrWhiteSpace(Team);
         }
     }
 }
