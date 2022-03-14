@@ -52,7 +52,7 @@ namespace FourthDown.Api.Controllers
 
             _tracer.ActiveSpan.SetTags(
                 HttpContext.Request.GetDisplayUrl(),
-                HttpContext.Connection.RemoteIpAddress.MapToIPv6().ToString());
+                HttpContext.Connection.RemoteIpAddress?.MapToIPv6().ToString());
 
             return Ok(plays);
         }
@@ -79,7 +79,7 @@ namespace FourthDown.Api.Controllers
 
             _tracer.ActiveSpan.SetTags(
                 HttpContext.Request.GetDisplayUrl(),
-                HttpContext.Connection.RemoteIpAddress.MapToIPv6().ToString());
+                HttpContext.Connection.RemoteIpAddress?.MapToIPv6().ToString());
 
             return Ok(plays);
         }
@@ -106,7 +106,7 @@ namespace FourthDown.Api.Controllers
 
             _tracer.ActiveSpan.SetTags(
                 HttpContext.Request.GetDisplayUrl(),
-                HttpContext.Connection.RemoteIpAddress.MapToIPv6().ToString());
+                HttpContext.Connection.RemoteIpAddress?.MapToIPv6().ToString());
 
             return Ok(plays);
         }
