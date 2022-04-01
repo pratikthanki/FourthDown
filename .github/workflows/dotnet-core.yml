@@ -9,21 +9,24 @@ on:
     branches: [ main ]
 
 jobs:
-  version:
+  get_version:
     runs-on: ubuntu-latest
+    outputs:
+      BUILD_VERSION: ${{ steps.GetVersion.outputs.BUILD_VERSION }}
     steps:
     - name: Checkout
       uses: actions/checkout@v3
 
     - shell: pwsh
+      id: GetVersion
       name: Get Version
       run: |
         ci/Run-GetVersion.ps1 -ProjectDir './src/'
-      outputs:
-        BUILD_VERSION: ${{ steps.identify.outputs.BUILD_VERSION }}
 
   build:
+    name: Build and Test
     runs-on: ubuntu-latest
+    needs: [get_version]
     steps:
     - name: Checkout
       uses: actions/checkout@v3
@@ -54,7 +57,7 @@ jobs:
   push_to_registry:
     name: Push image to registry
     runs-on: ubuntu-latest
-    needs: build
+    needs: [get_version, build]
     if: github.ref == 'refs/heads/main'
     steps:
       - name: Checkout the repo
@@ -64,6 +67,6 @@ jobs:
         env:
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-          BUILD_VERSION: ${{ needs.version.outputs.BUILD_VERSION }}
+          BUILD_VERSION: ${{ needs.get_version.outputs.BUILD_VERSION }}
         run: |
           ci/Run-PushToRegistry.ps1 -DockerfileDir './src' -Version "$env:BUILD_VERSION"
