@@ -1,6 +1,11 @@
 # FourthDown
 
-![.NET Core](https://github.com/pratikthanki/FourthDown/workflows/.NET%20Core/badge.svg)
+[![FourthDown API Pipeline](https://github.com/pratikthanki/FourthDown/actions/workflows/dotnet-core.yml/badge.svg)](https://github.com/pratikthanki/FourthDown/actions/workflows/dotnet-core.yml) 
+![Github last-commit](https://img.shields.io/github/last-commit/pratikthanki/fourthdown)
+
+[![codecov](https://codecov.io/gh/pratikthanki/FourthDown/branch/main/graph/badge.svg?token=ZXXUQNM47R)](https://codecov.io/gh/pratikthanki/FourthDown)
+
+[![Docker Pulls](https://img.shields.io/docker/pulls/pratikthanki9/fourthdown-api.svg)](https://hub.docker.com/repository/docker/pratikthanki9/fourthdown-api)
 
 ## Background
 
