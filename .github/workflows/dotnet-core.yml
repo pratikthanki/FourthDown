@@ -14,6 +14,7 @@ env:
 
 jobs:
   get_version:
+    name: Get Version
     runs-on: ubuntu-latest
     outputs:
       BUILD_VERSION: ${{ steps.GetVersion.outputs.BUILD_VERSION }}
@@ -57,6 +58,7 @@ jobs:
         flags: unit-tests
         name: codecov-umbrella
         fail_ci_if_error: false
+        version: "v0.1.15"
         override_pr: ${{ github.ref }}
         override_branch: "refs/heads/master"
         verbose: true
