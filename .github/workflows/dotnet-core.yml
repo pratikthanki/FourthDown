@@ -1,30 +1,81 @@
-name: .NET Core
+name: FourthDown API Pipeline
 
 on:
   push:
-    branches: [ master ]
+    branches: [ main ]
+    paths:
+    - 'src/FourthDown.Api/**'
   pull_request:
-    branches: [ master ]
+    branches: [ main ]
+
+env:
+  API_PROJECT: 'src/FourthDown.Api'
+  TEST_PROJECT: 'src/FourthDown.Api.Tests'
 
 jobs:
-  build:
-
+  get_version:
+    name: Get Version
     runs-on: ubuntu-latest
-
+    outputs:
+      BUILD_VERSION: ${{ steps.GetVersion.outputs.BUILD_VERSION }}
     steps:
-    - name: Checkout GitHub Action
-      uses: actions/checkout@v2
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    - shell: pwsh
+      id: GetVersion
+      name: Get Version
+      run: |
+        ci/Run-GetVersion.ps1 -ProjectDir './src/'
+
+  build:
+    name: Build and Test
+    runs-on: ubuntu-latest
+    needs: [get_version]
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
 
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: '6.0.x'
 
-    - name: Install dependencies
+    - name: dotnet restore
       run: dotnet restore
 
-    - name: Build
-      run: dotnet build --configuration Release --no-restore
+    - name: dotnet build
+      run: dotnet build --configuration Release --verbosity minimal
 
-    - name: Test
-      run: dotnet test --no-restore --verbosity normal
+    - name: dotnet test
+      run: dotnet test '${{ env.TEST_PROJECT }}' --logger "trx;LogFileName=TestResults.xml" --verbosity minimal /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
+
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v2
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        files: ${{ env.TEST_PROJECT }}/coverage.opencover.xml
+        flags: unit-tests
+        name: codecov-umbrella
+        fail_ci_if_error: false
+        version: "v0.1.15"
+        override_pr: ${{ github.ref }}
+        override_branch: "refs/heads/master"
+        verbose: true
+
+  push_to_registry:
+    name: Push image to registry
+    runs-on: ubuntu-latest
+    needs: [get_version, build]
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout the repo
+        uses: actions/checkout@v3
+      
+      - shell: pwsh
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+          BUILD_VERSION: ${{ needs.get_version.outputs.BUILD_VERSION }}
+        run: |
+          ci/Run-PushToRegistry.ps1 -DockerfileDir ${{ env.API_PROJECT }} -Version "$env:BUILD_VERSION"

@@ -406,3 +406,4 @@ ASALocalRun/
 secrets/
 src/FourthDown.Client/nextjs-example/
 src/FourthDown.Client/web-app/.next/
+coverage.opencover.xml
