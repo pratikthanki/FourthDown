@@ -13,6 +13,7 @@ try {
     $UNIX_TIME_SECS = [DateTimeOffset]::UtcNow.ToUnixTimeSeconds()
     $BUILD_VERSION = $VERSION + "." + $UNIX_TIME_SECS
 
+    Write-Host "Preparing to build and test - ${BUILD_VERSION}"
     Write-Host "::set-output name=BUILD_VERSION::${BUILD_VERSION}"
 }
 catch {

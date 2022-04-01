@@ -40,10 +40,10 @@ jobs:
       run: dotnet restore
 
     - name: dotnet build
-      run: dotnet build --configuration Release --verbosity minimal --no-logo
+      run: dotnet build --configuration Release --verbosity minimal
 
     - name: dotnet test
-      run: dotnet test --logger "trx;LogFileName=TestResults.xml" --verbosity minimal --no-logo /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
+      run: dotnet test --logger "trx;LogFileName=TestResults.xml" --verbosity minimal /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
 
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v2
