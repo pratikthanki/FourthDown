@@ -7,6 +7,11 @@ on:
     - 'src/FourthDown.Api/**'
   pull_request:
     branches: [ main ]
+    paths:
+    - 'src/FourthDown.Api/**'
+    - 'src/FourthDown.Api.Tests/**'
+    - 'ci/**'
+    - '.github/workflows/**'
   workflow_dispatch:
     branches: [ main ]
 
