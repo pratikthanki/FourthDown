@@ -11,7 +11,7 @@ $VERSION_TAG = "pratikthanki9/fourthdown-api:${Version}"
 $LATEST_TAG = "pratikthanki9/fourthdown-api:latest"
 
 
-if ($env:DOCKER_USERNAME != "" -and $env:DOCKER_PASSWORD !="") {
+if ($env:DOCKER_USERNAME -ne "" -and $env:DOCKER_PASSWORD -ne "") {
     docker login -u="${DOCKER_USERNAME}" -p="${DOCKER_PASSWORD}"
     Write-Host "Docker login successful"
 }
