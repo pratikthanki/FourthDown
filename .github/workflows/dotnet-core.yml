@@ -1,5 +1,4 @@
 name: FourthDown API Pipeline
-description: 'Build and Test the FourthDown API and Push to DockerHub'
 
 on:
   push:
