@@ -52,10 +52,13 @@ jobs:
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v2
       with:
+        token: ${{ secrets.CODECOV_TOKEN }}
         files: ${{ env.TEST_PROJECT }}/coverage.opencover.xml
         flags: unit-tests
         name: codecov-umbrella
         fail_ci_if_error: false
+        override_pr: ${{ github.ref }}
+        override_branch: "refs/heads/master"
         verbose: true
 
   push_to_registry:
