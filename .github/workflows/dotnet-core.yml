@@ -8,6 +8,10 @@ on:
   pull_request:
     branches: [ main ]
 
+env:
+  API_PROJECT: 'src/FourthDown.Api'
+  TEST_PROJECT: 'src/FourthDown.Api.Tests'
+
 jobs:
   get_version:
     runs-on: ubuntu-latest
@@ -43,12 +47,12 @@ jobs:
       run: dotnet build --configuration Release --verbosity minimal
 
     - name: dotnet test
-      run: dotnet test --logger "trx;LogFileName=TestResults.xml" --verbosity minimal /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
+      run: dotnet test '${{ env.TEST_PROJECT }}' --logger "trx;LogFileName=TestResults.xml" --verbosity minimal /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
 
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v2
       with:
-        files: ./coverage.opencover.xml
+        files: ${{ env.TEST_PROJECT }}/coverage.opencover.xml
         flags: unit-tests
         name: codecov-umbrella
         fail_ci_if_error: false
@@ -69,4 +73,4 @@ jobs:
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
           BUILD_VERSION: ${{ needs.get_version.outputs.BUILD_VERSION }}
         run: |
-          ci/Run-PushToRegistry.ps1 -DockerfileDir './src' -Version "$env:BUILD_VERSION"
+          ci/Run-PushToRegistry.ps1 -DockerfileDir ${{ env.API_PROJECT }} -Version "$env:BUILD_VERSION"
