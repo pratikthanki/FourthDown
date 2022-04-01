@@ -4,21 +4,21 @@
 
 ## Background
 
-Most tools to analyse NFL data is limited to Python and R packages or miscellaneous data from 
-GitHub repos. This means all the C#/.NET devs (and most other languages) are missing out or 
-needing to create data pipelines to actually make doing any analysis work-able!
+Most tools to analyse NFL data is limited to Python and R packages or miscellaneous data 
+from GitHub repos. This means all the C#/.NET devs (and most other languages) are missing 
+out or needing to create data pipelines to actually make doing any analysis work-able!
 
-The aim of this API is to make it easier to work with NFL data, without having to do much more 
-(formatting/parsing) around it. The benefits here for a NuGet Package is that this can be language 
-agnostic and extensible. This Web API is written in ASP.NET Core 3.1.
+The aim of this API is to make it easier to work with NFL data, without having to do much 
+more (formatting/parsing) around it. The benefits here for a NuGet Package is that this can 
+be language agnostic and extensible. This Web API is written in ASP.NET Core 3.1.
 
 There are a set of API endpoints to query team, schedule and various aspects of game data. 
 You can find more details on the [Swagger](https://pratikthanki.github.io/FourthDown/) page.
 
 ## Try it out
 
-You don't need an API Key to get started, if you want to see how the API works and if it can 
-meet your needs you can pull the docker image from [dockerhub](https://hub.docker.com/repository/docker/pratikthanki9/fourthdown-api).
+If you want to see how the API works and if it can meet your needs you can pull the docker 
+image from [dockerhub](https://hub.docker.com/repository/docker/pratikthanki9/fourthdown-api).
 
 Loosely from your favourite command line tool you can pull the image and run the API locally.
 
@@ -31,11 +31,12 @@ $ docker images
 REPOSITORY                        TAG         IMAGE ID        CREATED      SIZE
 pratikthanki9/fourthdown-api      latest      f50f9524513f    1 days ago   85.1 MB
 
-$ docker run pratikthanki9/fourthdown-api:latest -e USESAMPLEAUTH="true"
+$ docker run pratikthanki9/fourthdown-api:latest
 
 ```
 
-Or you can add it to your docker-compose and spin it up with other service, an example could look like this:
+Or you can add it to your docker-compose and spin it up with other service, an example could 
+look like this:
 
 ```yml
 
@@ -50,15 +51,16 @@ services:
 
 ```
 
-And then `docker-compose up -d` from where your compose file is.
+And then `docker-compose up -d` from the directory of your compose file.
 
 You can then query the api at `http://localhost:5000`.
 
-The `./monitoring` directory contains a docker-compose file to deploy the api and monitoring resources locally.
+The `./monitoring` directory contains a docker-compose file to deploy the api and monitoring 
+resources locally. Run the shell script to create the docker network and services from root: 
+`./monitoring/build-monitoring.sh`
 
-Run the shell script to create the docker network and services from root: `./monitoring/build-monitoring.sh`
-
-On linux-based systems you'll need permissions to execute the script. To do so run the following: `chmod +x monitoring/build-monitoring.sh`
+On linux-based systems you'll need permissions to execute the script. To do so run the 
+following: `chmod +x monitoring/build-monitoring.sh`
 
 View stats at the following:
 
@@ -67,10 +69,10 @@ View stats at the following:
 - Grafana: <http://localhost:3000>
 
 ## Projects 
+
 - `FourthDown.Api`: client-facing project (deployed on Azure)
 - `FourthDown.Client`: nextJS web app
 - `FourthDown.Collector`: project for writing records to the database
-- `FourthDown.Database`: manage database migrations
 - `FourthDown.Shared`: library of shared models and helper methods
 
 ## Thanks
@@ -83,8 +85,8 @@ on the game data and modelling of EPA, WP and CPOE amongst other things availabl
 
 ## Feedback
 
-You can reach out to me on [Twitter](https://twitter.com/pratikthanki) with any feedback or questions. 
-I also write about all things CS on my [blog](http://pratikthanki.github.io/).
+You can reach out to me on [Twitter](https://twitter.com/pratikthanki) with any feedback or 
+questions. I also write about all things CS on my [blog](http://pratikthanki.github.io/).
 
 Should you have any thoughts, questions, bugs or suggestions on the Fourth Down API you can also 
 raise an [Issue](https://github.com/pratikthanki/FourthDown/issues) with details and I will aim 
