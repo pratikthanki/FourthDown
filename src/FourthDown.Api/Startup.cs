@@ -1,9 +1,7 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Text.Json.Serialization;
-using System.Text.RegularExpressions;
 using FourthDown.Api.HealthChecks;
 using FourthDown.Shared.Repositories;
 using FourthDown.Shared.Repositories.Csv;
@@ -24,13 +22,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Microsoft.OpenApi.Any;
-using Microsoft.OpenApi.Interfaces;
 using Microsoft.OpenApi.Models;
 using OpenTracing;
 using Prometheus;
-using Prometheus.Client.HealthChecks;
-using Prometheus.Client.HttpRequestDurations;
 
 namespace FourthDown.Api
 {
@@ -47,6 +41,11 @@ namespace FourthDown.Api
         public void ConfigureServices(IServiceCollection services)
         {
             services
+                .AddControllers()
+                .AddJsonOptions(opts => { opts.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()); });
+
+            services
+                .AddTransient<IStartupFilter, CacheStartupFilter>()
                 .AddSingleton<IGamePlayService, GamePlayService>()
                 .AddSingleton<INflfastrService, NflfastrService>()
                 .AddSingleton<IScheduleService, ScheduleService>()
@@ -54,8 +53,9 @@ namespace FourthDown.Api
                 .AddSingleton<IGameRepository, CsvGameRepository>()
                 .AddSingleton<IGamePlayRepository, JsonGamePlayRepository>()
                 .AddSingleton<IPlayByPlayRepository, CsvPlayByPlayRepository>()
-                .AddSingleton<ICombineRepository, JsonCombineRepository>()
-                .AddSingleton<IRequestHelper, RequestHelper>()
+                .AddSingleton<IRequestHelper, RequestHelper>();
+
+            services
                 .AddSingleton<ITracer>(serviceProvider =>
                 {
                     var serviceName = serviceProvider.GetRequiredService<IWebHostEnvironment>().ApplicationName;
@@ -76,15 +76,8 @@ namespace FourthDown.Api
                         .Build();
                 });
 
-            services.AddTransient<IStartupFilter, CacheStartupFilter>();
-            
-            services
-                .AddControllers()
-                .AddJsonOptions(opts => { opts.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()); });
-
             services.AddOpenTracing();
             services.AddResponseCaching();
-
             services.AddCors();
 
             services.AddLogging(config =>
@@ -132,11 +125,9 @@ namespace FourthDown.Api
 
             services
                 .AddHealthChecks()
-                .WriteToPrometheus()
                 .AddCheck<DataAccessHealthCheck>(
-                    "Health check for access to data repository",
-                    HealthStatus.Degraded,
-                    new[] {"data"});
+                    "Health check for access to data repository", HealthStatus.Degraded, new[] { "data" })
+                .ForwardToPrometheus();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -156,16 +147,10 @@ namespace FourthDown.Api
             app.UseSwagger();
             app.UseRouting();
             app.UseResponseCaching();
-            app.UseHttpMetrics();
-            app.UseMetricServer();
-
-            app.UsePrometheusRequestDurations(q =>
+            app.UseHttpMetrics(options =>
             {
-                q.IncludePath = true;
-                q.IncludeMethod = true;
-                q.IgnoreRoutesConcrete = new[] {"/favicon.ico", "/robots.txt", "/"};
-                q.IgnoreRoutesStartWith = new[] {"/swagger", "/health", "/metrics"};
-                q.CustomNormalizePath = new Dictionary<Regex, string> {{new Regex(@"\/[0-9]{1,}(?![a-z])"), "/id"}};
+                options.ReduceStatusCodeCardinality();
+                options.AddCustomLabel("host", context => context.Request.Host.Host);
             });
 
             app.UseAuthentication();
