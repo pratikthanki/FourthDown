@@ -17,6 +17,7 @@ if ("$env:DOCKER_USERNAME" -ne "" -and "$env:DOCKER_PASSWORD" -ne "") {
 }
 else {
     Write-Host "Username and Password not set"
+    exit 1
 }
 
 Write-Host "Building Api docker image"
