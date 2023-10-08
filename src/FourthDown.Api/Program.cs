@@ -28,8 +28,8 @@ namespace FourthDown.Api
                     configuration.AddEnvironmentVariables();
 
                     configuration
-                        .SetBasePath(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location))
-                        .AddJsonFile("appsettings.json");
+                        .SetBasePath(hostingContext.HostingEnvironment.ContentRootPath)
+                        .AddJsonFile("appsettings.json", reloadOnChange: true, optional: false);
                 })
                 .ConfigureWebHostDefaults(webBuilder => { webBuilder.UseStartup<Startup>(); })
                 .UseSerilog((context, _, config) =>

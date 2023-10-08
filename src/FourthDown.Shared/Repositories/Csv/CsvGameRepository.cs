@@ -93,11 +93,11 @@ namespace FourthDown.Shared.Repositories.Csv
             _logger.LogInformation(
                 $"Fetching data. Url: {RepositoryEndpoints.GamesEndpoint}; Status: {response.StatusCode}");
 
-            var responseBody = await response.Content.ReadAsStringAsync();
+            var responseBody = await response.Content.ReadAsStringAsync(cancellationToken);
 
             var csvResponse = responseBody
                 .Split("\n")
-                .Skip(1)
+                .Skip(1) // header row
                 .Select(x => x.Split(","));
 
             return response.IsSuccessStatusCode ? ProcessGamesResponse(csvResponse) : Enumerable.Empty<Game>();
@@ -108,11 +108,7 @@ namespace FourthDown.Shared.Repositories.Csv
             var games = new List<Game>();
             Parallel.ForEach(csvResponse, fields =>
             {
-                if (fields.All(x => x == ""))
-                {
-                    // do nothing
-                }
-                else
+                if (!fields.All(string.IsNullOrEmpty))
                 {
                     var game = new Game
                     {
@@ -131,32 +127,40 @@ namespace FourthDown.Shared.Repositories.Csv
                         Result = StringParser.ToIntDefaultZero(fields[12]),
                         Total = StringParser.ToIntDefaultZero(fields[13]),
                         Overtime = StringParser.ToBool(fields[14]),
+
+                        // ID fields to map against other data sources
                         OldGameId = fields[15],
-                        Espn = StringParser.ToIntDefaultZero(fields[16]),
-                        AwayRest = StringParser.ToInt(fields[17]),
-                        HomeRest = StringParser.ToInt(fields[18]),
-                        AwayMoneyline = StringParser.ToDoubleDefaultZero(fields[19]),
-                        HomeMoneyline = StringParser.ToDoubleDefaultZero(fields[20]),
-                        SpreadLine = StringParser.ToDoubleDefaultZero(fields[21]),
-                        AwaySpreadOdds = StringParser.ToDoubleDefaultZero(fields[22]),
-                        HomeSpreadOdds = StringParser.ToDoubleDefaultZero(fields[23]),
-                        TotalLine = StringParser.ToDoubleDefaultZero(fields[24]),
-                        UnderOdds = StringParser.ToDoubleDefaultZero(fields[25]),
-                        OverOdds = StringParser.ToDoubleDefaultZero(fields[26]),
-                        DivGame = StringParser.ToBool(fields[27]),
-                        Roof = fields[28],
-                        Surface = fields[29],
-                        Temp = StringParser.ToIntDefaultZero(fields[30]),
-                        Wind = StringParser.ToIntDefaultZero(fields[31]),
-                        AwayQbId = fields[32],
-                        HomeQbId = fields[33],
-                        AwaQbName = fields[34],
-                        HomeQbName = fields[35],
-                        AwayCoach = fields[36],
-                        HomeCoach = fields[37],
-                        Referee = fields[38],
-                        StadiumId = fields[39],
-                        Stadium = fields[40]
+                        Gsis = fields[16],
+                        NflDetailId = fields[17],
+                        Pfr = fields[18],
+                        Pff = fields[19],
+                        Espn = StringParser.ToIntDefaultZero(fields[20]),
+                        Ftn = fields[21],
+
+                        AwayRest = StringParser.ToInt(fields[22]),
+                        HomeRest = StringParser.ToInt(fields[23]),
+                        AwayMoneyline = StringParser.ToDoubleDefaultZero(fields[24]),
+                        HomeMoneyline = StringParser.ToDoubleDefaultZero(fields[25]),
+                        SpreadLine = StringParser.ToDoubleDefaultZero(fields[26]),
+                        AwaySpreadOdds = StringParser.ToDoubleDefaultZero(fields[27]),
+                        HomeSpreadOdds = StringParser.ToDoubleDefaultZero(fields[28]),
+                        TotalLine = StringParser.ToDoubleDefaultZero(fields[29]),
+                        UnderOdds = StringParser.ToDoubleDefaultZero(fields[30]),
+                        OverOdds = StringParser.ToDoubleDefaultZero(fields[31]),
+                        DivGame = StringParser.ToBool(fields[32]),
+                        Roof = fields[33],
+                        Surface = fields[34],
+                        Temp = StringParser.ToIntDefaultZero(fields[35]),
+                        Wind = StringParser.ToIntDefaultZero(fields[36]),
+                        AwayQbId = fields[37],
+                        HomeQbId = fields[38],
+                        AwaQbName = fields[39],
+                        HomeQbName = fields[40],
+                        AwayCoach = fields[41],
+                        HomeCoach = fields[42],
+                        Referee = fields[43],
+                        StadiumId = fields[44],
+                        Stadium = fields[45]
                     };
 
                     games.Add(game);

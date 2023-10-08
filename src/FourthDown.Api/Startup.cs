@@ -3,6 +3,7 @@ using System.IO;
 using System.Reflection;
 using System.Text.Json.Serialization;
 using FourthDown.Api.HealthChecks;
+using FourthDown.Api.Schemas;
 using FourthDown.Shared.Repositories;
 using FourthDown.Shared.Repositories.Csv;
 using FourthDown.Shared.Repositories.Json;
@@ -42,7 +43,11 @@ namespace FourthDown.Api
         {
             services
                 .AddControllers()
-                .AddJsonOptions(opts => { opts.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()); });
+                .AddJsonOptions(opts =>
+                {
+                    opts.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
+                    opts.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+                });
 
             services
                 .AddTransient<IStartupFilter, CacheStartupFilter>()

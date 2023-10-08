@@ -125,7 +125,7 @@ namespace FourthDown.Shared.Models
         public string NextPlayType { get; set; }
         public double OrderSequence { get; set; }
         public bool PenaltyOnPlay { get; set; }
-        public string PlayClock { get; set; }
+        public int PlayClock { get; set; }
         public bool PlayDeleted { get; set; }
         public string PlayDescription { get; set; }
         public string PlayDescriptionWithJerseyNumbers { get; set; }
