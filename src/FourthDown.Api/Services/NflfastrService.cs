@@ -6,6 +6,7 @@ using FourthDown.Api.Controllers;
 using FourthDown.Shared.Models;
 using FourthDown.Api.Parameters;
 using FourthDown.Shared.Repositories;
+using FourthDown.Shared.Utilities;
 using Microsoft.Extensions.Logging;
 using OpenTracing;
 
@@ -34,8 +35,8 @@ namespace FourthDown.Api.Services
             _logger.LogInformation($"Started method {nameof(GetSummarisedStats)}");
 
             var plays = await _playByPlayRepository.GetPlayByPlaysAsync(
-                queryParameter.Season, 
-                queryParameter.Team, 
+                queryParameter.Season ?? StringParser.GetCurrentSeason(),
+                queryParameter.Team ?? string.Empty,
                 cancellationToken).ToArrayAsync(cancellationToken);
 
             var playsByKey = plays

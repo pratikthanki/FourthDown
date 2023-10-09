@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using FourthDown.Shared.Utilities;
 
@@ -26,7 +25,7 @@ namespace FourthDown.Api.Parameters
         /// <example>
         /// `DAL`
         /// </example>
-        public string Team { get; set; }
+        public string? Team { get; set; }
 
         public Dictionary<string, string[]> Validate()
         {
@@ -36,6 +35,9 @@ namespace FourthDown.Api.Parameters
 
             if (Season > currentSeason || Season < 1999)
                 errors["season"] = new[] {$"Season must be between 2001 and {currentSeason}"};
+            
+            if (!string.IsNullOrWhiteSpace(Team) && Team.Length < 2)
+                errors["team"] = new[] {"Invalid team abbreviation given"};
 
             return errors;
         }

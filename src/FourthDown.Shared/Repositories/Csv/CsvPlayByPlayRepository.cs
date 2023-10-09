@@ -1,3 +1,4 @@
+#nullable enable
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -29,9 +30,9 @@ namespace FourthDown.Shared.Repositories.Csv
             _requestHelper = requestHelper;
         }
 
-        public async IAsyncEnumerable<NflfastrPlayByPlay> GetPlayByPlaysAsync(
-            int? season,
-            string team,
+        public async IAsyncEnumerable<NflfastrPlayByPlayRow> GetPlayByPlaysAsync(
+            int season,
+            string? team,
             [EnumeratorCancellation] CancellationToken cancellationToken)
         {
             using var scope = _tracer.BuildTrace(nameof(GetPlayByPlaysAsync));
@@ -45,7 +46,7 @@ namespace FourthDown.Shared.Repositories.Csv
 
             if (!response.IsSuccessStatusCode)
             {
-                yield return new NflfastrPlayByPlay();
+                yield return new NflfastrPlayByPlayRow();
                 yield break;
             }
 
@@ -62,7 +63,7 @@ namespace FourthDown.Shared.Repositories.Csv
             }
         }
 
-        private static async IAsyncEnumerable<NflfastrPlayByPlay> ProcessPlayByPlayResponse(
+        private static async IAsyncEnumerable<NflfastrPlayByPlayRow> ProcessPlayByPlayResponse(
             string data,
             string team,
             IScope scope)
@@ -83,26 +84,30 @@ namespace FourthDown.Shared.Repositories.Csv
 
             foreach (var line in csvResponse)
             {
-                var play = SplitCsvLine(line, team);
+                var row = SplitLineToArray(line, team);
+                var play = new NflfastrPlayByPlayRow(row.ToArray());
 
-                if (play == null) continue;
+                // We only care about valid plays and downs
+                if (play is { IsPass: false, IsRush: false } || play.Down == null) continue;
+                // Filter by team if provided
+                if (!string.IsNullOrWhiteSpace(team) && play.PosTeam != team) continue;
 
-                if ((play.IsPass || play.IsRush) && play.Down != null) yield return play;
+                yield return play;
             }
 
             scope.LogEnd(nameof(ProcessPlayByPlayResponse));
             _logger.LogInformation($"Finished method {nameof(ProcessPlayByPlayResponse)}");
         }
 
-        private static NflfastrPlayByPlay SplitCsvLine(string line, string team)
+        private static List<string> SplitLineToArray(string line, string? team)
         {
             var result = new List<string>();
             var currentStr = new StringBuilder("");
             var inQuotes = false;
 
-            foreach (var T in line)
+            foreach (var character in line)
             {
-                switch (T)
+                switch (character)
                 {
                     case '\"':
                         inQuotes = !inQuotes;
@@ -112,20 +117,17 @@ namespace FourthDown.Shared.Repositories.Csv
                         currentStr.Clear();
                         break;
                     case ',':
-                        currentStr.Append(T);
+                        currentStr.Append(character);
                         break;
                     default:
-                        currentStr.Append(T);
+                        currentStr.Append(character);
                         break;
                 }
             }
 
             result.Add(currentStr.ToString());
-            var final = new NflfastrPlayByPlay(result.ToArray());
 
-            if (string.IsNullOrWhiteSpace(team)) return final;
-
-            return final.PosTeam == team ? final : null;
+            return result;
         }
     }
 }

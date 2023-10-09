@@ -83,8 +83,8 @@ namespace FourthDown.Api.Tests
 
             _mockPlayByPlayRepository
                 .Setup(pbp => pbp.GetPlayByPlaysAsync(
-                    It.IsAny<int?>(),
-                    It.IsAny<string>(),
+                    It.IsAny<int>(),
+                    It.IsAny<string?>(),
                     It.IsAny<CancellationToken>()));
         }
 

@@ -40,7 +40,7 @@ namespace FourthDown.Api.Controllers
         /// <summary>
         /// Play-by-Play data for a set of games.
         /// Either GameId or a combination of Season, Week and Team should be provided.
-        /// Game data sourced from the R package nflfastrR.
+        /// Game data sourced from the R package nflfastr.
         /// </summary>
         /// <param name="queryParameter">Combination of Season, Week and Team</param>
         /// <param name="cancellationToken"></param>
@@ -64,7 +64,7 @@ namespace FourthDown.Api.Controllers
 
             _tracer.ActiveSpan.SetTags(
                 HttpContext.Request.GetDisplayUrl(),
-                HttpContext.Connection.RemoteIpAddress.MapToIPv6().ToString());
+                HttpContext.Connection.RemoteIpAddress?.MapToIPv6().ToString());
 
             return Ok(plays);
         }
