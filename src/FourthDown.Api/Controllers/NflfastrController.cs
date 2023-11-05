@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Threading;
-using System.Threading.Tasks;
 using FourthDown.Shared.Extensions;
 using FourthDown.Shared.Models;
 using FourthDown.Api.Parameters;
@@ -19,7 +18,7 @@ namespace FourthDown.Api.Controllers
     [Produces("application/json")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ValidationProblemDetailsResponse), StatusCodes.Status400BadRequest)]
-    [ResponseCache(Duration = 86400, VaryByQueryKeys = new[] {"*"})]
+    [ResponseCache(Duration = 86400, VaryByQueryKeys = new[] { "*" })]
     [ApiController]
     public class NflfastrController : ControllerBase
     {
@@ -46,9 +45,9 @@ namespace FourthDown.Api.Controllers
         /// <param name="cancellationToken"></param>
         /// <returns>List of game play by plays</returns>
         [HttpGet("")]
-        [ResponseCache(Duration = (60 * 60 * 12), VaryByQueryKeys = new[] {"*"})]
+        [ResponseCache(Duration = (60 * 60 * 12), VaryByQueryKeys = new[] { "*" })]
         [ProducesResponseType(typeof(TeamPlayByPlay[]), StatusCodes.Status200OK)]
-        public async Task<ActionResult<IEnumerable<TeamPlayByPlay>>> GetPlayByPlays(
+        public ActionResult<IEnumerable<TeamPlayByPlay>> GetPlayByPlays(
             [FromQuery] NflfastrQueryParameter queryParameter,
             CancellationToken cancellationToken)
         {
@@ -60,7 +59,7 @@ namespace FourthDown.Api.Controllers
                     Status = StatusCodes.Status400BadRequest
                 });
 
-            var plays = await _nflfastrService.GetSummarisedStats(queryParameter, cancellationToken);
+            var plays = _nflfastrService.GetSummarisedStats(queryParameter, cancellationToken);
 
             _tracer.ActiveSpan.SetTags(
                 HttpContext.Request.GetDisplayUrl(),
