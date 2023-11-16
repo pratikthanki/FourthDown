@@ -33,11 +33,13 @@ namespace FourthDown.Api.Services
         {
             _logger.LogInformation($"Started method {nameof(GetSummarisedStats)}");
 
+            var season = queryParameter.Season ?? StringParser.GetCurrentSeason();
+
             var plays = _playByPlayRepository
-                .GetPlayByPlaysAsync(
-                    queryParameter.Season ?? StringParser.GetCurrentSeason(), queryParameter.Team, cancellationToken)
+                .GetPlayByPlaysAsync(season, queryParameter.Team, cancellationToken)
                 .GroupBy(x => x.ToPlayKey())
-                .Select(x => new TeamPlayByPlay(x.Key, x.ToList()));
+                .Select(x => new TeamPlayByPlay(x.Key, x.ToList()))
+                .OrderBy(p => p.GameId).ThenBy(p => p.Down);
 
             _logger.LogInformation($"Finished method {nameof(GetSummarisedStats)}");
 

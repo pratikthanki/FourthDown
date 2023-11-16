@@ -8,7 +8,7 @@ namespace FourthDown.Shared.Repositories
 {
     public interface IPlayByPlayRepository
     {
-        Task TryPopulateCacheAsync(CancellationToken cancellationToken);
+        Task TryPopulateCacheAsync(bool forceRefresh, CancellationToken cancellationToken);
         
         IEnumerable<NflfastrPlayByPlayRow> GetPlayByPlaysAsync(
             int season,

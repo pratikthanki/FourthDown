@@ -21,10 +21,11 @@ namespace FourthDown.Shared.Repositories.Csv
         private readonly ILogger<CsvPlayByPlayRepository> _logger;
         private readonly IRequestHelper _requestHelper;
 
-        private readonly ConcurrentBag<NflfastrPlayByPlayRow> _playByPlayRows = new();
-        private DateTime _lastCacheUpdateDateTime = DateTime.MinValue;
-        private readonly TimeSpan _cacheUpdateFrequency = TimeSpan.FromHours(1);
-        private const int CacheDelayMilliseconds = 60 * 60 * 1_000; // 1 hour in milliseconds
+        private readonly ConcurrentDictionary<string, ConcurrentBag<NflfastrPlayByPlayRow>> _pbpRowsByTeam = new();
+        private readonly PeriodicTimer _periodicTimer;
+
+        private readonly int _validRefreshHour = 9;
+        private readonly int[] _validRefreshMonths = new[] { 1, 2, 9, 10, 11, 12 };
 
         public CsvPlayByPlayRepository(
             ITracer tracer,
@@ -34,6 +35,7 @@ namespace FourthDown.Shared.Repositories.Csv
             _tracer = tracer;
             _logger = logger;
             _requestHelper = requestHelper;
+            _periodicTimer = new PeriodicTimer(TimeSpan.FromMinutes(5));
         }
 
         public IEnumerable<NflfastrPlayByPlayRow> GetPlayByPlaysAsync(int season, string? team,
@@ -44,63 +46,96 @@ namespace FourthDown.Shared.Repositories.Csv
             _logger.LogInformation($"Started method {nameof(GetPlayByPlaysAsync)}");
             scope.LogStart(nameof(GetPlayByPlaysAsync));
 
-            foreach (var play in _playByPlayRows)
+            bool IsValidPlay(NflfastrPlayByPlayRow play)
             {
-                // We only care about valid plays and downs
-                if (play is { IsPass: false, IsRush: false } || play.Down == null) continue;
+                return play is not { IsPass: false, IsRush: false } && play.Down != null;
+            }
 
-                // Filter by team if provided
-                if (string.IsNullOrWhiteSpace(team) || play.PosTeam == team) yield return play;
+            // Filter by team if provided
+            if (!string.IsNullOrWhiteSpace(team))
+            {
+                if (_pbpRowsByTeam.TryGetValue(team, out var playByPlayRows))
+                {
+                    foreach (var play in playByPlayRows)
+                    {
+                        if (IsValidPlay(play)) yield return play;
+                    }
+
+                    yield break;
+                }
+            }
+
+            foreach (var teamPlays in _pbpRowsByTeam.Values)
+            {
+                foreach (var play in teamPlays)
+                {
+                    // We only care about valid plays and downs
+                    if (IsValidPlay(play)) yield return play;
+                }
             }
 
             scope.LogEnd(nameof(GetPlayByPlaysAsync));
             _logger.LogInformation($"Finished method {nameof(GetPlayByPlaysAsync)}");
         }
 
-        public async Task TryPopulateCacheAsync(CancellationToken cancellationToken)
+        public async Task TryPopulateCacheAsync(bool forceRefresh, CancellationToken cancellationToken = default)
         {
-            while (true)
+            if (forceRefresh) await RefreshAsync(cancellationToken);
+            
+            while (await _periodicTimer.WaitForNextTickAsync(cancellationToken))
             {
-                if (_lastCacheUpdateDateTime.Add(_cacheUpdateFrequency) >= DateTime.UtcNow) continue;
-
-                _logger.LogInformation($"Starting cache refresh: {nameof(Game)}");
-
-                var currentSeason = StringParser.GetCurrentSeason();
-                var path = $"{RepositoryEndpoints.PlayByPlayEndpoint}/play_by_play_{currentSeason}.csv.gz?raw=true";
-
-                var response = await _requestHelper.GetRequestResponse(path, cancellationToken);
-                _logger.LogInformation($"Fetching data. Url: {path}; Status: {response.StatusCode}");
-
-                if (!response.IsSuccessStatusCode)
+                // Attempt to refresh data everyday at 9am during the in-season months
+                var now = DateTime.UtcNow;
+                if (_validRefreshMonths.Contains(now.Month) && now.Hour >= _validRefreshHour)
                 {
-                    return;
+                    await RefreshAsync(cancellationToken);
                 }
-
-                var responseString = await ResponseHelper.ReadCompressedStreamToString(response);
-
-                // TODO make this nicer
-                var data = responseString
-                    .Split("\n")
-                    .Skip(1) // Skip header row
-                    // .Where(x => x.Any(cell => cell != "")) // Account for empty lines
-                    .ToList();
-
-                // Last element is an empty line
-                data.RemoveAt(data.Count - 1);
-
-                foreach (var line in data)
-                {
-                    var row = SplitLineToArray(line);
-                    _playByPlayRows.Add(new NflfastrPlayByPlayRow(row.ToArray()));
-                }
-
-                _lastCacheUpdateDateTime = DateTime.UtcNow;
-
-                _logger.LogInformation($"Finished cache refresh: {nameof(Game)}");
-
-                await Task.Delay(CacheDelayMilliseconds, cancellationToken);
             }
-            // ReSharper disable once FunctionNeverReturns
+        }
+
+        private async Task RefreshAsync(CancellationToken cancellationToken = default)
+        {
+            _logger.LogInformation($"Starting cache refresh: {nameof(Game)}");
+
+            var currentSeason = StringParser.GetCurrentSeason();
+            var path = $"{RepositoryEndpoints.PlayByPlayEndpoint}/play_by_play_{currentSeason}.csv.gz?raw=true";
+
+            var response = await _requestHelper.GetRequestResponse(path, cancellationToken);
+            _logger.LogInformation($"Fetching data. Url: {path}; Status: {response.StatusCode}");
+
+            if (!response.IsSuccessStatusCode) return;
+
+            var responseString = await ResponseHelper.ReadCompressedStreamToString(response);
+
+            // TODO make this nicer
+            var data = responseString
+                .Split("\n")
+                .Skip(1) // Skip header row
+                // .Where(x => x.Any(cell => cell != "")) // Account for empty lines
+                .ToList();
+
+            // Last element is an empty line
+            data.RemoveAt(data.Count - 1);
+
+            Parallel.ForEach(data, line =>
+            {
+                var row = SplitLineToArray(line);
+                if (row.Count != 372) return;
+
+                var pbpRow = new NflfastrPlayByPlayRow(row);
+
+                if (_pbpRowsByTeam.TryGetValue(pbpRow.PosTeam, out var rows))
+                {
+                    rows.Add(pbpRow);
+                }
+                else
+                {
+                    rows = new ConcurrentBag<NflfastrPlayByPlayRow>() { pbpRow };
+                    _pbpRowsByTeam.TryAdd(pbpRow.PosTeam, rows);
+                }
+            });
+
+            _logger.LogInformation($"Finished cache refresh: {nameof(Game)}");
         }
 
         private static List<string> SplitLineToArray(string line)
