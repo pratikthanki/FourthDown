@@ -15,6 +15,6 @@ namespace FourthDown.Shared.Utilities
         /// <summary>
         /// NflfastR play-by-play data endpoint
         /// </summary>
-        public const string PlayByPlayEndpoint = "https://github.com/nflverse/nflfastR-data/blob/master/data";
+        public const string PlayByPlayEndpoint = "https://github.com/nflverse/nflverse-data/releases/download/pbp";
     }
 }

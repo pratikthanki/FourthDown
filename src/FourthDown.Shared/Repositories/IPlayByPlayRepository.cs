@@ -1,14 +1,18 @@
+#nullable enable
 using System.Collections.Generic;
 using System.Threading;
+using System.Threading.Tasks;
 using FourthDown.Shared.Models;
 
 namespace FourthDown.Shared.Repositories
 {
     public interface IPlayByPlayRepository
     {
-        IAsyncEnumerable<NflfastrPlayByPlay> GetPlayByPlaysAsync(
-            int? season,
-            string team,
+        Task TryPopulateCacheAsync(bool forceRefresh, CancellationToken cancellationToken);
+        
+        IEnumerable<NflfastrPlayByPlayRow> GetPlayByPlaysAsync(
+            int season,
+            string? team,
             CancellationToken cancellationToken);
     }
 }

@@ -1,11 +1,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
 using FourthDown.Api.Controllers;
 using FourthDown.Shared.Models;
 using FourthDown.Api.Parameters;
 using FourthDown.Shared.Repositories;
+using FourthDown.Shared.Utilities;
 using Microsoft.Extensions.Logging;
 using OpenTracing;
 
@@ -27,24 +27,23 @@ namespace FourthDown.Api.Services
             _tracer = tracer;
         }
 
-        public async Task<IEnumerable<TeamPlayByPlay>> GetSummarisedStats(
+        public IEnumerable<TeamPlayByPlay> GetSummarisedStats(
             NflfastrQueryParameter queryParameter,
             CancellationToken cancellationToken)
         {
             _logger.LogInformation($"Started method {nameof(GetSummarisedStats)}");
 
-            var plays = await _playByPlayRepository.GetPlayByPlaysAsync(
-                queryParameter.Season, 
-                queryParameter.Team, 
-                cancellationToken).ToArrayAsync(cancellationToken);
+            var season = queryParameter.Season ?? StringParser.GetCurrentSeason();
 
-            var playsByKey = plays
+            var plays = _playByPlayRepository
+                .GetPlayByPlaysAsync(season, queryParameter.Team, cancellationToken)
                 .GroupBy(x => x.ToPlayKey())
-                .ToDictionary(k => k.Key, x => new TeamPlayByPlay(x.Key, x.ToList()));
-            
+                .Select(x => new TeamPlayByPlay(x.Key, x.ToList()))
+                .OrderBy(p => p.GameId).ThenBy(p => p.Down);
+
             _logger.LogInformation($"Finished method {nameof(GetSummarisedStats)}");
 
-            return playsByKey.Select(x => x.Value);
+            return plays;
         }
     }
 }

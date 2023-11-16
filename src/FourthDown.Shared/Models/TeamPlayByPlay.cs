@@ -6,7 +6,7 @@ namespace FourthDown.Shared.Models
 {
     public class TeamPlayByPlay
     {
-        public TeamPlayByPlay((string GameId, string PosTeam, int? Down) playKey, List<NflfastrPlayByPlay> plays)
+        public TeamPlayByPlay((string GameId, string PosTeam, int? Down) playKey, List<NflfastrPlayByPlayRow> plays)
         {
             GameId = playKey.GameId;
             Down = playKey.Down;

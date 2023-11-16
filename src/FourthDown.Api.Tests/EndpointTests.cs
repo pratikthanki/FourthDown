@@ -18,7 +18,7 @@ namespace FourthDown.Api.Tests
         public void PlayByPlayRepositoryEndpoint()
         {
             const string expected =
-                "https://github.com/nflverse/nflfastR-data/blob/master/data/play_by_play_2020.csv.gz?raw=true";
+                "https://github.com/nflverse/nflverse-data/releases/download/pbp/play_by_play_2020.csv.gz?raw=true";
 
             var path = $"{RepositoryEndpoints.PlayByPlayEndpoint}/play_by_play_{2020}.csv.gz?raw=true";
 

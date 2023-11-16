@@ -21,7 +21,12 @@ namespace FourthDown.Shared.Models
         public int Total { get; set; }
         public bool Overtime { get; set; }
         public string OldGameId { get; set; }
+        public string Gsis { get; set; }
+        public string NflDetailId { get; set; }
+        public string Pfr { get; set; }
+        public string Pff { get; set; }
         public int Espn { get; set; }
+        public string Ftn { get; set; }
         public int AwayRest { get; set; }
         public int HomeRest { get; set; }
         public double AwayMoneyline { get; set; }
