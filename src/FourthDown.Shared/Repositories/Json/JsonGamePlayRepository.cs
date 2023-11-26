@@ -31,22 +31,21 @@ namespace FourthDown.Shared.Repositories.Json
         {
             using var scope = _tracer.BuildTrace(nameof(GetGamePlaysAsync));
 
-            scope.LogStart(nameof(GetGamePlaysAsync));
-
-            var url = GetGameUrl(game.GameId, game.Season);
-
-            scope.LogEnd(nameof(GetGamePlaysAsync));
-
             if (_gamesCache.TryGetValue(game, out var gameDetail))
             {
                 _logger.LogInformation($"Game found in cache: {game.GameId}");
                 return gameDetail;
             }
 
+            scope.LogStart(nameof(GetGamePlaysAsync));
+
+            var url = GetGameUrl(game.GameId, game.Season);
             gameDetail = await GetGameJson(url, cancellationToken, scope);
             gameDetail.Game = game;
 
             _gamesCache[game] = gameDetail;
+
+            scope.LogEnd(nameof(GetGamePlaysAsync));
 
             return gameDetail;
         }
