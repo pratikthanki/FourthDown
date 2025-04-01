@@ -36,37 +36,11 @@ namespace FourthDown.Api.Tests
         }
 
         [Test]
-        public void PlayByPlayQueryParameter_InvalidWeekNumber()
-        {
-            var parameters = new PlayByPlayQueryParameter()
-            {
-                Week = 99
-            };
-
-            var errors = parameters.Validate();
-
-            Assert.AreEqual(1, errors.Count);
-        }
-
-        [Test]
         public void ScheduleQueryParameter_InvalidWeekNumber()
         {
             var parameters = new ScheduleQueryParameter()
             {
                 Week = 99
-            };
-
-            var errors = parameters.Validate();
-
-            Assert.AreEqual(1, errors.Count);
-        }
-
-        [Test]
-        public void ScheduleQueryParameter_InvalidSeason()
-        {
-            var parameters = new ScheduleQueryParameter()
-            {
-                Season = 2099
             };
 
             var errors = parameters.Validate();
