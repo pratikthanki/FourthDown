@@ -3,7 +3,6 @@ using System.IO;
 using System.Reflection;
 using System.Text.Json.Serialization;
 using FourthDown.Api.HealthChecks;
-using FourthDown.Api.Schemas;
 using FourthDown.Shared.Repositories;
 using FourthDown.Shared.Repositories.Csv;
 using FourthDown.Shared.Repositories.Json;
