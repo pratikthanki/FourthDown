@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using FourthDown.Shared.Utilities;
 
@@ -19,10 +18,6 @@ namespace FourthDown.Api.Parameters
 
             if (Season > currentSeason || Season < 1999)
                 errors["season"] = new[] {$"Season must be between 2001 and {currentSeason}"};
-
-            if (Week < 1 || Week > 21)
-                errors["week"] = new[]
-                    {"Week must be between 1-17 (REG), Divisional (19), Conference (20) and Super Bowl (21)"};
 
             if (!string.IsNullOrWhiteSpace(Team) && Team.Length < 2)
                 errors["team"] = new[] {"Invalid team abbreviation given"};
