@@ -36,11 +36,11 @@ namespace FourthDown.Api.Tests
         }
 
         [Test]
-        public void ScheduleQueryParameter_InvalidWeekNumber()
+        public void ScheduleQueryParameter_InvalidSeason()
         {
             var parameters = new ScheduleQueryParameter()
             {
-                Week = 99
+                Season = 2099
             };
 
             var errors = parameters.Validate();
